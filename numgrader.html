@@ -1,0 +1,2555 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NUMBGRADER — Апгрейд номеров</title>
+<style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Roboto',system-ui,sans-serif;}
+    html,body{height:100%;}
+    body{
+        background:radial-gradient(ellipse at top, #10151f 0%, #0a0d12 60%, #06080b 100%);
+        min-height:100vh;color:#dfe6f2;
+        display:flex;justify-content:center;align-items:flex-start;
+        padding:16px;-webkit-font-smoothing:antialiased;
+    }
+    .app{max-width:1340px;width:100%;
+        background:linear-gradient(180deg,#0e1218 0%,#0b0f14 100%);
+        border-radius:14px;border:1px solid #1a2230;
+        box-shadow:0 30px 80px -30px #000, inset 0 1px 0 rgba(255,255,255,0.03);
+        overflow:hidden;animation:fadeIn 0.5s ease;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+    .topbar{display:flex;justify-content:space-between;align-items:center;
+        padding:12px 20px;background:linear-gradient(180deg,#0b0f15,#090d12);
+        border-bottom:1px solid #171e29;flex-wrap:wrap;gap:10px;}
+    .brand{display:flex;align-items:center;gap:10px;
+        font-size:16px;font-weight:900;letter-spacing:1.5px;color:#fff;text-transform:uppercase;}
+    .brand .mark{width:30px;height:30px;border-radius:7px;
+        background:linear-gradient(135deg,#f0b90b,#c99300);
+        display:flex;align-items:center;justify-content:center;
+        color:#0a0d12;font-weight:900;font-size:14px;
+        box-shadow:0 4px 14px rgba(240,185,11,0.4);}
+
+    .tabs{display:flex;gap:3px;background:#090d12;padding:4px;border-radius:10px;
+        border:1px solid #171e29;flex-wrap:wrap;justify-content:center;}
+    .tab{background:transparent;border:none;color:#6d7c92;
+        font-size:11px;font-weight:800;padding:9px 14px;border-radius:7px;
+        cursor:pointer;letter-spacing:0.6px;text-transform:uppercase;transition:all 0.25s;}
+    .tab:hover{color:#cfd8e6;}
+    .tab.active{background:linear-gradient(180deg,#1e2a3a,#16202c);
+        color:#fff;box-shadow:inset 0 0 0 1px #2c3b50, 0 4px 12px rgba(0,0,0,0.4);}
+
+    .userbar{display:flex;align-items:center;gap:10px;}
+    .market-indicator{background:linear-gradient(180deg,#0d1219,#090d12);
+        border:1px solid #1a2230;padding:7px 14px;border-radius:22px;
+        font-weight:800;font-size:11px;color:#8a9bb5;
+        display:flex;align-items:center;gap:6px;letter-spacing:0.5px;}
+    .market-indicator .val{color:#f0b90b;font-weight:900;}
+    .market-indicator.up .val{color:#22c55e;}
+    .market-indicator.down .val{color:#ef4444;}
+    .balance{background:linear-gradient(180deg,#0d1219,#090d12);
+        border:1px solid #1a2230;padding:9px 18px;border-radius:26px;
+        font-weight:900;font-size:14px;color:#f0b90b;
+        display:flex;align-items:center;gap:8px;letter-spacing:0.4px;transition:all 0.3s;}
+    .balance.flash{box-shadow:0 0 24px rgba(240,185,11,0.55);transform:scale(1.04);}
+    .balance .lbl{color:#52627a;font-size:10px;letter-spacing:1.2px;font-weight:800;}
+    .avatar{width:36px;height:36px;border-radius:50%;
+        background:linear-gradient(135deg,#1a2533,#111820);
+        display:flex;align-items:center;justify-content:center;
+        color:#7d8ca3;font-weight:900;border:1px solid #263244;font-size:14px;
+        cursor:pointer;transition:all 0.3s;}
+    .avatar:hover{border-color:#f0b90b;color:#f0b90b;transform:scale(1.05);}
+
+    .profile-modal-content{display:flex;flex-direction:column;gap:2px;}
+    .profile-modal-content .prof-row{display:flex;justify-content:space-between;
+        align-items:center;padding:12px 4px;border-bottom:1px solid #1a2230;font-size:13px;}
+    .profile-modal-content .prof-row:last-child{border-bottom:none;}
+    .profile-modal-content .prof-row .lbl{color:#7d8ca3;font-weight:700;}
+    .profile-modal-content .prof-row .val{color:#f0b90b;font-weight:900;font-variant-numeric:tabular-nums;}
+
+    .content{padding:22px;}
+    .page{display:none;}
+    .page.active{display:block;animation:pageIn 0.35s ease;}
+    @keyframes pageIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+    .page-title{text-align:center;font-size:20px;font-weight:900;
+        letter-spacing:1.2px;color:#fff;margin-bottom:22px;text-transform:uppercase;}
+    .page-title small{display:block;color:#5c6c82;font-size:11px;
+        font-weight:700;letter-spacing:1.5px;margin-top:4px;}
+
+    .panel{background:linear-gradient(180deg,#0b0f15,#090d12);
+        border:1px solid #171e29;border-radius:12px;padding:16px;}
+    .panel-head{display:flex;justify-content:space-between;align-items:center;
+        font-size:11px;color:#6d7c92;font-weight:800;
+        letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px;}
+
+    .upgrid{display:grid;grid-template-columns:1fr 340px 1fr;gap:18px;align-items:start;}
+    @media(max-width:1050px){.upgrid{grid-template-columns:1fr;}}
+
+    .slots{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .slot{aspect-ratio:1/1;background:linear-gradient(180deg,#090d12,#070a0e);
+        border:1px dashed #1e2a3a;border-radius:8px;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        cursor:pointer;transition:all 0.25s;padding:6px;position:relative;overflow:hidden;}
+    .slot:hover{border-color:#f0b90b;transform:translateY(-2px);}
+    .slot.filled{border-style:solid;border-color:#233044;cursor:default;}
+    .slot.filled:hover{border-color:#ef4444;}
+    .slot.empty::before{content:"+";font-size:32px;color:#28374b;font-weight:200;}
+    .slot.empty:hover::before{color:#f0b90b;}
+    .slot .plate{font-size:12px;height:auto;padding:4px 6px;max-width:100%;}
+    .slot .plate .main{font-size:12px;letter-spacing:1.2px;}
+    .slot .plate .region{font-size:11px;}
+    .slot .plate .rus{font-size:5px;}
+    .slot .plate .flag{width:11px;height:7px;}
+
+    /* НОМЕРА — буквы и цифры одного размера, пробелы между группами */
+    .plate{
+        display:inline-flex;align-items:stretch;justify-content:stretch;
+        font-family:'Roboto Condensed','Arial Narrow','Arial',sans-serif;
+        background:#fff;color:#0a0a0a;
+        border:2.5px solid #0a0a0a;border-radius:4px;
+        padding:5px 10px;font-weight:600;letter-spacing:1px;
+        box-shadow:0 2px 6px rgba(0,0,0,0.5);
+        white-space:nowrap;line-height:1;user-select:none;
+        width:100%;max-width:240px;height:48px;
+        font-size:19px;
+    }
+    .plate .main{
+        display:flex;align-items:center;justify-content:center;
+        flex:1;font-size:19px;font-weight:600;letter-spacing:1.5px;
+        font-variant-numeric:tabular-nums;
+        padding:0 4px;
+        white-space:nowrap;
+    }
+    .plate .right{
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        border-left:2px solid currentColor;padding-left:7px;margin-left:8px;
+        line-height:1;min-width:36px;
+    }
+    .plate .region{font-size:15px;font-weight:600;letter-spacing:0.3px;}
+    .plate .rus{
+        font-size:6px;font-weight:700;letter-spacing:0.4px;
+        display:flex;align-items:center;gap:2px;margin-top:2px;
+    }
+    .plate .flag{
+        width:14px;height:9px;border:0.5px solid currentColor;
+        background:linear-gradient(to bottom,#fff 33.33%,#0039a6 33.33% 66.66%,#d52b1e 66.66%);
+        display:block;
+    }
+    .plate.rarity-0{background:#fff;color:#0a0a0a;border-color:#0a0a0a;}
+    .plate.rarity-0 .right{border-left-color:#0a0a0a;}
+    .plate.rarity-0 .flag{border-color:#0a0a0a;}
+    .plate.rarity-1{
+        background:#f5c518;color:#0a0a0a;border-color:#0a0a0a;
+        box-shadow:0 2px 6px rgba(0,0,0,0.5), 0 0 22px rgba(245,197,24,0.6);
+    }
+    .plate.rarity-1 .right{border-left-color:#0a0a0a;}
+    .plate.rarity-1 .flag{border-color:#0a0a0a;}
+    .plate.rarity-2{
+        background:#0a3a8c;color:#fff;border-color:#fff;
+        box-shadow:0 2px 6px rgba(0,0,0,0.5), 0 0 24px rgba(59,130,246,0.7);
+        animation:pulseBlue 2.5s ease-in-out infinite;
+    }
+    .plate.rarity-2 .right{border-left-color:#fff;}
+    .plate.rarity-2 .flag{border-color:#fff;}
+    @keyframes pulseBlue{
+        0%,100%{box-shadow:0 2px 6px rgba(0,0,0,0.5), 0 0 22px rgba(59,130,246,0.5);}
+        50%{box-shadow:0 2px 6px rgba(0,0,0,0.5), 0 0 38px rgba(59,130,246,1);}
+    }
+    .plate.rarity-3{
+        background:#0d0d0d;color:#fff;border-color:#fff;
+        box-shadow:0 2px 6px rgba(0,0,0,0.5), 0 0 30px rgba(255,255,255,0.5);
+        animation:glowWhite 2s ease-in-out infinite;
+    }
+    .plate.rarity-3 .right{border-left-color:#fff;}
+    .plate.rarity-3 .flag{border-color:#fff;}
+    @keyframes glowWhite{
+        0%,100%{box-shadow:0 2px 6px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.4);}
+        50%{box-shadow:0 2px 6px rgba(0,0,0,0.5), 0 0 42px rgba(255,255,255,0.8);}
+    }
+    .plate.rarity-4{
+        background:linear-gradient(180deg,#8b0000,#3d0000);color:#fff;border-color:#ff2222;
+        box-shadow:0 2px 6px rgba(0,0,0,0.5), 0 0 40px rgba(255,34,34,0.9);
+        animation:glowRed 1.8s ease-in-out infinite;
+    }
+    .plate.rarity-4 .right{border-left-color:#ff2222;}
+    .plate.rarity-4 .flag{border-color:#ff2222;}
+    @keyframes glowRed{
+        0%,100%{box-shadow:0 2px 6px rgba(0,0,0,0.5), 0 0 30px rgba(255,34,34,0.7);}
+        50%{box-shadow:0 2px 6px rgba(0,0,0,0.5), 0 0 60px rgba(255,34,34,1);}
+    }
+
+    .center-col{text-align:center;}
+    .circle-wrap{position:relative;width:260px;height:260px;margin:0 auto 14px;perspective:600px;}
+    .circle-svg{transform:rotate(-90deg);width:100%;height:100%;display:block;}
+    .circle-bg{fill:none;stroke:#151c26;stroke-width:12;}
+    .circle-fill{fill:none;stroke:url(#grad);stroke-width:12;stroke-linecap:round;
+        transition:stroke-dashoffset 0.4s;}
+    .circle-inner{position:absolute;inset:0;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;pointer-events:none;}
+    .chance-big{font-size:42px;font-weight:900;color:#fff;
+        letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.3s;}
+    .chance-sub{font-size:11px;color:#6d7c92;font-weight:800;
+        letter-spacing:1.4px;text-transform:uppercase;margin-top:8px;}
+    .circle-pointer{position:absolute;top:-2px;left:50%;width:0;height:0;margin-left:-8px;
+        border-left:8px solid transparent;border-right:8px solid transparent;
+        border-top:14px solid #f0b90b;filter:drop-shadow(0 0 6px rgba(240,185,11,0.9));z-index:5;}
+    .circle-wrap.spinning .circle-svg{animation:wheelSpin 0.7s linear infinite;transform-origin:50% 50%;}
+    .circle-wrap.spinning .circle-fill{stroke:#f0b90b;transition:none;}
+    .circle-wrap.spinning .chance-big{color:#f0b90b;}
+    .circle-wrap.spinning .chance-sub{color:#f0b90b;}
+    .circle-wrap.spinning .circle-pointer{animation:pointerBlink 0.3s linear infinite alternate;}
+    @keyframes wheelSpin{from{transform:rotate(-90deg) scale(1);}to{transform:rotate(270deg) scale(1.03);}}
+    @keyframes pointerBlink{from{opacity:1;}to{opacity:0.4;}}
+    .circle-wrap.result-win .circle-fill{stroke:#22c55e;}
+    .circle-wrap.result-win .chance-big{color:#22c55e;text-shadow:0 0 30px rgba(34,197,94,0.7);}
+    .circle-wrap.result-lose .circle-fill{stroke:#ef4444;}
+    .circle-wrap.result-lose .chance-big{color:#ef4444;}
+
+    .multipliers{display:flex;justify-content:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+    .mult-btn{background:linear-gradient(180deg,#0b0f15,#090d12);
+        border:1px solid #1a2230;color:#6d7c92;
+        font-size:12px;font-weight:900;padding:9px 18px;border-radius:7px;
+        cursor:pointer;transition:all 0.25s;}
+    .mult-btn:hover:not(:disabled){color:#cfd8e6;border-color:#2c3b50;transform:translateY(-1px);}
+    .mult-btn.active{background:linear-gradient(180deg,#1e2a3a,#16202c);
+        color:#f0b90b;border-color:#f0b90b;
+        box-shadow:0 0 16px rgba(240,185,11,0.25);}
+    .mult-btn:disabled{opacity:0.3;cursor:not-allowed;}
+
+    .add-money-box{margin-top:14px;padding:12px 14px;
+        background:linear-gradient(180deg,#0a0e15,#080b10);
+        border:1px solid #1a2230;border-radius:10px;
+        display:flex;flex-direction:column;gap:8px;}
+    .add-money-head{display:flex;justify-content:space-between;align-items:center;
+        font-size:11px;color:#6d7c92;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;}
+    .add-money-head .val{color:#f0b90b;font-weight:900;font-variant-numeric:tabular-nums;}
+    .add-money-input{-webkit-appearance:none;appearance:none;
+        width:100%;height:6px;border-radius:3px;outline:none;
+        background:linear-gradient(90deg,#1e2a3a,#f0b90b);cursor:pointer;}
+    .add-money-input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+        width:18px;height:18px;border-radius:50%;
+        background:linear-gradient(180deg,#fff,#c0c0c0);
+        border:2px solid #f0b90b;
+        box-shadow:0 2px 6px rgba(0,0,0,0.6), 0 0 10px rgba(240,185,11,0.5);cursor:pointer;}
+    .add-money-input::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
+        background:linear-gradient(180deg,#fff,#c0c0c0);border:2px solid #f0b90b;cursor:pointer;}
+
+    .btn{width:100%;padding:13px;border:none;border-radius:8px;
+        font-size:14px;font-weight:900;color:#0a0d12;
+        background:linear-gradient(180deg,#ffd966,#f0b90b);
+        letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+        transition:all 0.15s;box-shadow:0 3px 0 #a37a08;}
+    .btn:hover:not(:disabled){filter:brightness(1.07);transform:translateY(-1px);}
+    .btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 #a37a08;}
+    .btn:disabled{opacity:0.35;cursor:not-allowed;box-shadow:0 3px 0 #3d2f08;}
+    .btn.secondary{background:linear-gradient(180deg,#1a2533,#131c28);
+        color:#cfd8e6;box-shadow:0 3px 0 #0a1018;border:1px solid #2c3b50;}
+    .btn.secondary:hover:not(:disabled){border-color:#f0b90b;color:#f0b90b;}
+
+    .hint{text-align:center;color:#52627a;font-size:11px;margin-top:12px;font-weight:700;}
+    .sumrow{margin-top:12px;display:flex;justify-content:space-between;align-items:center;
+        font-size:12px;color:#7d8ca3;font-weight:800;}
+    .sumrow strong{color:#fff;font-size:14px;}
+    .target-empty{aspect-ratio:1/1;background:linear-gradient(180deg,#090d12,#070a0e);
+        border:1px dashed #1e2a3a;border-radius:8px;
+        display:flex;align-items:center;justify-content:center;
+        color:#28374b;font-size:11px;font-weight:800;letter-spacing:1.2px;
+        text-transform:uppercase;text-align:center;padding:10px;}
+
+    /* КЕЙСЫ */
+    .case-picker-screen{display:none;flex-direction:column;align-items:center;gap:18px;}
+    .case-picker-screen.active{display:flex;animation:pageIn 0.35s ease;}
+    .case-picker-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+        gap:18px;width:100%;max-width:1200px;}
+    .case-picker-card{background:linear-gradient(180deg,#111720,#0a0e14);
+        border:2px solid #1e2a3a;border-radius:18px;
+        padding:28px 20px;text-align:center;cursor:pointer;
+        transition:all 0.35s;display:flex;flex-direction:column;align-items:center;gap:14px;
+        position:relative;overflow:hidden;
+        box-shadow:0 12px 30px -10px rgba(0,0,0,0.8);}
+    .case-picker-card:hover{transform:translateY(-8px);}
+    .case-picker-card.free{border-color:#4a7a2e;}
+    .case-picker-card.free:hover{border-color:#8fd65a;box-shadow:0 24px 50px -18px rgba(143,214,90,0.5);}
+    .case-picker-card.standard{border-color:#8a8a8a;}
+    .case-picker-card.standard:hover{border-color:#d0d0d0;box-shadow:0 24px 50px -18px rgba(208,208,208,0.4);}
+    .case-picker-card.yellow{border-color:#8a6d00;}
+    .case-picker-card.yellow:hover{border-color:#f5d76e;box-shadow:0 24px 50px -18px rgba(245,215,110,0.5);}
+    .case-picker-card.blue{border-color:#12407a;}
+    .case-picker-card.blue:hover{border-color:#3b82f6;box-shadow:0 24px 50px -18px rgba(59,130,246,0.6);}
+    .case-picker-card.black{border-color:#4a4a4a;}
+    .case-picker-card.black:hover{border-color:#ffffff;box-shadow:0 24px 50px -18px rgba(255,255,255,0.4);}
+
+    .case-scene{width:100%;height:130px;position:relative;
+        display:flex;align-items:center;justify-content:center;
+        perspective:800px;margin-bottom:6px;}
+    .case-3d{position:relative;width:170px;height:110px;
+        transform-style:preserve-3d;
+        transform:rotateX(18deg) rotateY(-24deg);
+        transition:transform 0.5s;
+        filter:drop-shadow(0 14px 20px rgba(0,0,0,0.7));
+        animation:caseFloat 4s ease-in-out infinite;}
+    .case-picker-card:hover .case-3d{
+        transform:rotateX(14deg) rotateY(-18deg) scale(1.08);
+        animation-play-state:paused;}
+    @keyframes caseFloat{
+        0%,100%{transform:rotateX(18deg) rotateY(-24deg) translateY(0);}
+        50%{transform:rotateX(18deg) rotateY(-24deg) translateY(-4px);}}
+    .case-3d .case-back{position:absolute;top:6px;left:6px;width:100%;height:calc(100% - 12px);
+        background:linear-gradient(135deg,#000,#1a1a1a);
+        border-radius:8px;transform:translateZ(-30px);opacity:0.85;}
+    .case-3d .case-front{position:absolute;top:0;left:0;width:100%;height:100%;
+        border-radius:10px;background:linear-gradient(135deg,#3a3f47,#14171b 70%);
+        border:1px solid rgba(255,255,255,0.08);overflow:hidden;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -2px 6px rgba(0,0,0,0.6);}
+    .case-3d .case-front::before{content:"";position:absolute;inset:0;
+        background:repeating-linear-gradient(0deg,
+            transparent 0, transparent 16px,
+            rgba(0,0,0,0.25) 16px, rgba(0,0,0,0.25) 18px,
+            rgba(255,255,255,0.05) 18px, rgba(255,255,255,0.05) 20px);opacity:0.7;}
+    .case-3d .case-front::after{content:"";position:absolute;top:0;left:0;right:0;height:50%;
+        background:linear-gradient(180deg,rgba(255,255,255,0.25),transparent);}
+    .case-3d .case-handle{position:absolute;top:38%;right:-10px;width:14px;height:36px;
+        background:linear-gradient(90deg,#000,#2a2a2a);border-radius:3px;}
+    .case-3d .case-lock-tl,.case-3d .case-lock-tr{position:absolute;top:-3px;
+        width:12px;height:14px;background:linear-gradient(180deg,#e0e0e0,#909090);border-radius:2px;}
+    .case-3d .case-lock-tl{left:34%;}.case-3d .case-lock-tr{right:34%;}
+    .case-3d.free .case-front{background:linear-gradient(135deg,#b8e6a0,#4a7a2e 70%);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.3), 0 0 30px rgba(143,214,90,0.3);}
+    .case-3d.standard .case-front{background:linear-gradient(135deg,#d8dde5,#7a828e 70%);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.5), 0 0 25px rgba(200,208,220,0.25);}
+    .case-3d.yellow .case-front{background:linear-gradient(135deg,#fce27e,#8a6d00 70%);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.4), 0 0 32px rgba(245,215,110,0.35);}
+    .case-3d.blue .case-front{background:linear-gradient(135deg,#5aa0ff,#0c2a5a 70%);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.25), 0 0 32px rgba(59,130,246,0.4);}
+    .case-3d.black .case-front{background:linear-gradient(135deg,#3a3a3a,#000 70%);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.15), 0 0 35px rgba(255,255,255,0.15);}
+
+    .case-picker-card .case-picker-name{font-size:17px;font-weight:900;color:#fff;
+        letter-spacing:1.5px;text-transform:uppercase;}
+    .case-picker-card .case-picker-price{font-size:20px;font-weight:900;color:#f0b90b;
+        letter-spacing:0.5px;text-shadow:0 0 20px rgba(240,185,11,0.4);}
+    .case-picker-card.free .case-picker-price{color:#8fd65a;}
+    .case-picker-card .case-picker-desc{font-size:12px;color:#8a9bb5;font-weight:700;}
+    .case-picker-card .case-picker-chance{font-size:10px;color:#6d7c92;font-weight:800;
+        background:#080b10;padding:10px 14px;border-radius:8px;
+        width:100%;border:1px solid #1a2230;line-height:1.5;}
+
+    .roulette-screen{display:none;flex-direction:column;align-items:center;gap:16px;}
+    .roulette-screen.active{display:flex;animation:pageIn 0.35s ease;}
+    .roulette-back-big{background:linear-gradient(180deg,#1a2533,#131c28);
+        border:1px solid #2c3b50;color:#cfd8e6;
+        font-size:14px;font-weight:900;padding:14px 32px;border-radius:10px;
+        cursor:pointer;letter-spacing:1px;text-transform:uppercase;
+        transition:all 0.25s;align-self:flex-start;
+        box-shadow:0 4px 0 #0a1018, 0 8px 20px rgba(0,0,0,0.4);}
+    .roulette-back-big:hover{border-color:#f0b90b;color:#f0b90b;
+        transform:translateY(-2px);
+        box-shadow:0 6px 0 #0a1018, 0 10px 26px rgba(240,185,11,0.2);}
+    .roulette-back-big:active{transform:translateY(2px);box-shadow:0 2px 0 #0a1018;}
+    .roulette-screen-header{width:100%;display:flex;justify-content:space-between;
+        align-items:center;background:linear-gradient(180deg,#0b0f15,#090d12);
+        border:1px solid #171e29;border-radius:10px;
+        padding:12px 18px;font-size:11px;color:#6d7c92;font-weight:800;
+        letter-spacing:1px;text-transform:uppercase;flex-wrap:wrap;gap:8px;}
+
+    .roulette-multi{display:grid;grid-template-columns:1fr;gap:12px;width:100%;}
+    .roulette{position:relative;width:100%;height:170px;
+        background:linear-gradient(180deg,#080b10,#06090d);
+        border:1px solid #171e29;border-radius:12px;overflow:hidden;
+        box-shadow:inset 0 0 60px rgba(0,0,0,0.9);}
+    .roulette-track{display:flex;height:100%;align-items:center;
+        position:absolute;top:0;left:0;will-change:transform;}
+    .roulette-item{flex:0 0 170px;height:130px;margin:0 5px;
+        background:linear-gradient(180deg,#0d131b,#0a0f15);
+        border:1px solid #1e2a3a;border-radius:10px;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        gap:6px;padding:8px;}
+    .roulette-item .plate{font-size:12px;height:auto;padding:4px 6px;max-width:150px;}
+    .roulette-item .plate .main{font-size:12px;}
+    .roulette-item .plate .region{font-size:10px;}
+    .roulette-item .rou-price{color:#f0b90b;font-weight:900;font-size:11px;}
+    .roulette-item .rou-rarity{font-size:8px;letter-spacing:1.1px;font-weight:800;
+        text-transform:uppercase;color:#6d7c92;}
+    .roulette-item.rarity-1{border-color:#f5d76e;box-shadow:0 0 10px rgba(245,215,110,0.4);}
+    .roulette-item.rarity-2{border-color:#3b82f6;box-shadow:0 0 12px rgba(59,130,246,0.4);}
+    .roulette-item.rarity-3{border-color:#fff;box-shadow:0 0 18px rgba(255,255,255,0.5);}
+    .roulette-item.rarity-4{border-color:#ff2222;box-shadow:0 0 24px rgba(255,34,34,0.8);}
+    .roulette-pointer{position:absolute;top:0;bottom:0;left:50%;width:2px;
+        background:linear-gradient(180deg,#f0b90b,#e63e3e,#f0b90b);
+        transform:translateX(-50%);box-shadow:0 0 14px #f0b90b;z-index:3;}
+    .roulette-pointer::before,.roulette-pointer::after{content:"";position:absolute;left:50%;
+        transform:translateX(-50%);width:0;height:0;
+        border-left:7px solid transparent;border-right:7px solid transparent;}
+    .roulette-pointer::before{top:-1px;border-top:9px solid #f0b90b;}
+    .roulette-pointer::after{bottom:-1px;border-bottom:9px solid #f0b90b;}
+    .roulette::before,.roulette::after{content:"";position:absolute;top:0;bottom:0;
+        width:60px;z-index:2;pointer-events:none;}
+    .roulette::before{left:0;background:linear-gradient(to right,#080b10 30%,transparent);}
+    .roulette::after{right:0;background:linear-gradient(to left,#080b10 30%,transparent);}
+
+    .case-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;width:100%;}
+    .case-actions .btn{max-width:320px;}
+    .skip-btn{background:rgba(10,13,18,0.85);border:1px solid #2c3b50;
+        color:#cfd8e6;font-weight:900;font-size:11px;
+        padding:11px 20px;border-radius:8px;cursor:pointer;
+        text-transform:uppercase;max-width:200px;transition:all 0.25s;}
+    .skip-btn:hover{border-color:#f0b90b;color:#f0b90b;}
+
+    .win-box{width:100%;background:linear-gradient(180deg,#0b0f15,#090d12);
+        border:1px solid #171e29;border-radius:12px;
+        padding:22px;display:none;flex-direction:column;align-items:center;
+        gap:12px;text-align:center;}
+    .win-box.show{display:flex;border-color:#f0b90b;
+        box-shadow:0 0 40px rgba(240,185,11,0.2);animation:winIn 0.4s;}
+    @keyframes winIn{from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);}}
+    .win-title{font-size:11px;letter-spacing:2px;font-weight:900;
+        text-transform:uppercase;color:#6d7c92;}
+    .win-multi-wrap{display:flex;flex-direction:column;gap:14px;width:100%;align-items:center;}
+    .win-item-box{display:flex;flex-direction:column;align-items:center;gap:8px;}
+    .win-item-box .plate{max-width:240px;}
+    .win-item-box .win-price{color:#f0b90b;font-weight:900;font-size:18px;}
+    .win-item-box .win-rarity{font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:900;}
+    .win-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px;}
+    .win-actions .btn{max-width:220px;padding:11px 18px;font-size:12px;}
+
+    /* КРАФТ */
+    .craft-wrap{display:flex;flex-direction:column;gap:20px;align-items:center;}
+    .craft-info{text-align:center;color:#7d8ca3;font-size:12px;font-weight:700;
+        max-width:600px;line-height:1.6;}
+    .craft-info strong{color:#f0b90b;}
+    .craft-slots{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;
+        width:100%;max-width:900px;}
+    @media(max-width:700px){.craft-slots{grid-template-columns:repeat(3,1fr);}}
+    .craft-slot{aspect-ratio:1/1;background:linear-gradient(180deg,#090d12,#070a0e);
+        border:1px dashed #1e2a3a;border-radius:10px;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        cursor:pointer;transition:all 0.25s;padding:8px;position:relative;}
+    .craft-slot:hover{border-color:#f0b90b;transform:translateY(-2px);}
+    .craft-slot.filled{border-style:solid;border-color:#233044;cursor:pointer;}
+    .craft-slot.filled:hover{border-color:#ef4444;}
+    .craft-slot.empty::before{content:"+";font-size:26px;color:#28374b;font-weight:200;}
+    .craft-slot .plate{font-size:10px;height:auto;padding:3px 4px;max-width:100%;}
+    .craft-slot .plate .main{font-size:10px;}
+    .craft-slot .plate .region{font-size:8px;}
+    .craft-slot .craft-price{color:#f0b90b;font-weight:900;font-size:10px;margin-top:6px;}
+    .craft-result{background:linear-gradient(180deg,#0b0f15,#090d12);
+        border:2px solid #1e2a3a;border-radius:12px;
+        padding:20px;display:flex;flex-direction:column;align-items:center;
+        gap:12px;min-width:280px;min-height:200px;justify-content:center;}
+    .craft-result.ready{border-color:#f0b90b;box-shadow:0 0 30px rgba(240,185,11,0.2);}
+    .craft-result-label{font-size:11px;color:#6d7c92;font-weight:900;
+        letter-spacing:1.5px;text-transform:uppercase;}
+    .craft-arrow{font-size:24px;color:#3a4555;}
+
+    .inv-wrap{margin-top:22px;background:linear-gradient(180deg,#0b0f15,#090d12);
+        border:1px solid #171e29;border-radius:12px;padding:16px;}
+    .inv-head{display:flex;justify-content:space-between;align-items:center;
+        margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+    .inv-head h3{font-size:11px;letter-spacing:1.6px;color:#6d7c92;
+        font-weight:900;text-transform:uppercase;}
+    .inv-head .count{font-size:11px;color:#52627a;font-weight:800;}
+    .inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+    .inv-card{background:linear-gradient(180deg,#090d12,#070a0e);
+        border:1px solid #171e29;border-radius:8px;
+        padding:10px;cursor:pointer;transition:all 0.25s;
+        display:flex;flex-direction:column;gap:8px;position:relative;}
+    .inv-card:hover{border-color:#2c3b50;transform:translateY(-3px);}
+    .inv-card.selected{border-color:#f0b90b;box-shadow:0 0 20px rgba(240,185,11,0.3);}
+    .inv-card.rarity-0{border-left:3px solid #fff;}
+    .inv-card.rarity-1{border-left:3px solid #f5d76e;}
+    .inv-card.rarity-2{border-left:3px solid #3b82f6;}
+    .inv-card.rarity-3{border-left:3px solid #fff;background:linear-gradient(180deg,#0c0d0e,#0a0a0a);}
+    .inv-card.rarity-4{border-left:3px solid #ff2222;background:linear-gradient(180deg,#1a0000,#0a0000);}
+    .inv-card .inv-price{color:#f0b90b;font-weight:900;font-size:13px;text-align:center;}
+    .inv-card .inv-rarity{font-size:9px;letter-spacing:1.2px;font-weight:900;
+        text-transform:uppercase;text-align:center;color:#6d7c92;}
+    .inv-card .sell{background:linear-gradient(180deg,#1a2533,#131c28);
+        color:#cfd8e6;border:none;border-radius:6px;padding:7px;
+        font-size:10px;font-weight:900;cursor:pointer;text-transform:uppercase;}
+    .inv-card .sell:hover{background:linear-gradient(180deg,#7a2222,#5a1818);color:#fff;}
+    .inv-empty{text-align:center;padding:36px;color:#28374b;font-size:12px;
+        letter-spacing:1px;grid-column:1/-1;font-weight:800;text-transform:uppercase;}
+
+    .blackmarket-header{display:flex;justify-content:space-between;align-items:center;
+        background:linear-gradient(180deg,#1a0000,#0d0000);
+        border:1px solid #5a1010;border-radius:10px;
+        padding:14px 18px;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+    .blackmarket-header .bm-title{font-size:14px;color:#ff6b6b;font-weight:900;
+        letter-spacing:2px;text-transform:uppercase;}
+    .blackmarket-header .bm-timer{font-size:12px;color:#ff9c9c;font-weight:800;}
+    .blackmarket-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+    .bm-card{background:linear-gradient(180deg,#1a0000,#0a0000);
+        border:1px solid #5a1010;border-radius:10px;padding:14px;
+        display:flex;flex-direction:column;gap:10px;align-items:center;transition:all 0.3s;}
+    .bm-card:hover{border-color:#ff2222;transform:translateY(-3px);}
+    .bm-card.standard{border-color:#33415a;background:linear-gradient(180deg,#0b0f15,#090d12);}
+    .bm-card .bm-label{font-size:9px;color:#ff6b6b;font-weight:900;letter-spacing:1.5px;
+        text-transform:uppercase;background:rgba(255,34,34,0.15);
+        padding:3px 10px;border-radius:5px;}
+    .bm-card.standard .bm-label{color:#7d8ca3;background:rgba(255,255,255,0.05);}
+    .bm-card .bm-plate{width:100%;display:flex;justify-content:center;}
+    .bm-card .bm-price{font-size:15px;color:#ffd966;font-weight:900;}
+    .bm-card .bm-buy{background:linear-gradient(180deg,#7a1818,#4a0a0a);
+        border:1px solid #ff2222;color:#fff;
+        padding:9px;border-radius:6px;font-size:11px;font-weight:900;
+        text-transform:uppercase;cursor:pointer;width:100%;transition:all 0.2s;}
+    .bm-card .bm-buy:hover:not(:disabled){background:linear-gradient(180deg,#a02525,#6a1515);}
+    .bm-card .bm-buy:disabled{opacity:0.4;cursor:not-allowed;}
+    .bm-card.standard .bm-buy{background:linear-gradient(180deg,#1a2533,#131c28);border:1px solid #2c3b50;}
+
+    /* МАЙНИНГ */
+    .mining-header{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+    @media(max-width:900px){.mining-header{grid-template-columns:repeat(2,1fr);}}
+    .mining-stat{background:linear-gradient(180deg,#0b0f15,#090d12);
+        border:1px solid #171e29;border-radius:10px;padding:14px;text-align:center;}
+    .mining-stat .lbl{font-size:10px;color:#6d7c92;font-weight:800;
+        letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+    .mining-stat .val{font-size:18px;font-weight:900;color:#f0b90b;
+        text-shadow:0 0 20px rgba(240,185,11,0.3);font-variant-numeric:tabular-nums;}
+    .mining-stat .val.green{color:#22c55e;}
+
+    .mining-grid-wrap{display:grid;grid-template-columns:1fr 340px;gap:18px;margin-bottom:20px;}
+    @media(max-width:900px){.mining-grid-wrap{grid-template-columns:1fr;}}
+    .mining-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+    @media(max-width:900px){.mining-grid{grid-template-columns:repeat(5,1fr);gap:5px;}}
+    .mining-slot{aspect-ratio:1/1.05;background:linear-gradient(180deg,#0b0f15,#090d12);
+        border:2px dashed #1e2a3a;border-radius:10px;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        cursor:pointer;transition:all 0.3s;padding:5px;position:relative;
+        overflow:hidden;text-align:center;}
+    .mining-slot:hover{border-color:#f0b90b;transform:translateY(-2px);}
+    .mining-slot.filled{border-style:solid;border-color:#233044;
+        background:linear-gradient(180deg,#0f1620,#0c1219);}
+    .mining-slot.locked{opacity:0.55;cursor:not-allowed;}
+    .mining-slot.locked:hover{border-color:#1e2a3a;transform:none;}
+    .mining-slot.broken{border-color:#ef4444;
+        background:linear-gradient(180deg,#2a0a0a,#1a0505);
+        animation:brokenPulse 1.5s ease-in-out infinite;}
+    @keyframes brokenPulse{
+        0%,100%{box-shadow:0 0 0 rgba(239,68,68,0.4);}
+        50%{box-shadow:0 0 16px rgba(239,68,68,0.7);}}
+    .mining-slot .empty-icon{font-size:22px;color:#28374b;font-weight:200;}
+    .mining-slot:hover .empty-icon{color:#f0b90b;}
+    .mining-slot .empty-label{font-size:8px;color:#52627a;font-weight:800;
+        letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+    .mining-slot .mining-plate{width:100%;display:flex;justify-content:center;margin-bottom:4px;}
+    .mining-slot .mining-plate .plate{font-size:9px;height:auto;padding:2px 4px;max-width:100%;}
+    .mining-slot .mining-plate .plate .main{font-size:9px;letter-spacing:1px;}
+    .mining-slot .mining-plate .plate .region{font-size:7px;}
+    .mining-slot .mining-plate .plate .rus{font-size:4px;}
+    .mining-slot .mining-plate .plate .flag{width:8px;height:5px;}
+    .mining-slot .mining-rate{font-size:9px;color:#22c55e;font-weight:900;text-align:center;}
+    .mining-slot .remove-mining{position:absolute;top:2px;right:2px;width:16px;height:16px;
+        border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid #ef4444;
+        color:#ef4444;font-size:10px;font-weight:900;
+        display:flex;align-items:center;justify-content:center;
+        cursor:pointer;transition:all 0.2s;}
+    .mining-slot .remove-mining:hover{background:#ef4444;color:#fff;}
+    .mining-slot .locked-icon{font-size:18px;color:#3a4555;}
+    .mining-slot .locked-price{font-size:9px;color:#f0b90b;font-weight:900;margin-top:3px;}
+    .mining-slot .locked-label{font-size:8px;color:#52627a;font-weight:800;
+        letter-spacing:0.8px;text-transform:uppercase;margin-top:2px;}
+    .mining-slot .broken-icon{font-size:18px;color:#ef4444;}
+    .mining-slot .broken-label{font-size:8px;color:#ef4444;font-weight:900;
+        text-transform:uppercase;margin-top:2px;}
+    .mining-slot .broken-repair{font-size:8px;color:#f0b90b;font-weight:900;margin-top:2px;}
+
+    .sets-panel{background:linear-gradient(180deg,#0b0f15,#090d12);
+        border:1px solid #171e29;border-radius:12px;padding:16px;}
+    .sets-title{font-size:13px;color:#8a9bb5;font-weight:900;
+        letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;}
+    .set-row{display:flex;justify-content:space-between;align-items:center;
+        padding:12px 14px;border-radius:8px;margin-bottom:8px;
+        background:linear-gradient(180deg,#090d12,#070a0e);
+        border:1px solid #1a2230;transition:all 0.3s;}
+    .set-row.active{border-color:#22c55e;
+        background:linear-gradient(180deg,#0a1a10,#061210);}
+    .set-row.failed{border-color:#ef4444;
+        background:linear-gradient(180deg,#1a0a0a,#100606);}
+    .set-row .set-name{font-size:14px;font-weight:900;color:#cfd8e6;letter-spacing:0.3px;}
+    .set-row .set-progress{font-size:12px;color:#8a9bb5;font-weight:800;margin-top:3px;}
+    .set-row.active .set-name{color:#22c55e;}
+    .set-row.active .set-progress{color:#7cff8b;}
+    .set-row.failed .set-name{color:#ef4444;}
+    .set-row .set-bonus{font-size:15px;font-weight:900;color:#f0b90b;font-variant-numeric:tabular-nums;}
+    .set-row.active .set-bonus{color:#22c55e;}
+
+    .mining-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;}
+    .mining-actions .btn{max-width:280px;}
+
+    .autorepair-row{display:flex;align-items:center;justify-content:center;gap:10px;
+        margin-top:14px;font-size:12px;color:#8a9bb5;font-weight:800;}
+    .autorepair-row input[type=checkbox]{width:18px;height:18px;cursor:pointer;accent-color:#f0b90b;}
+
+    .notify{position:fixed;top:16px;right:16px;
+        background:linear-gradient(180deg,#0e1218,#0b0f14);
+        border:1px solid #1a2230;border-left:4px solid #f0b90b;
+        color:#dfe6f2;padding:13px 20px;border-radius:8px;
+        font-size:12px;font-weight:700;z-index:9999;
+        box-shadow:0 18px 36px rgba(0,0,0,0.7);
+        animation:slide .25s;max-width:340px;}
+    .notify.success{border-left-color:#7cff8b;}
+    .notify.error{border-left-color:#ff5c5c;}
+    @keyframes slide{from{transform:translateX(120%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.85);
+        display:none;align-items:center;justify-content:center;z-index:9000;padding:20px;}
+    .modal-bg.open{display:flex;animation:modalIn 0.25s ease;}
+    @keyframes modalIn{from{opacity:0;}to{opacity:1;}}
+    .modal{background:linear-gradient(180deg,#0e1218,#0b0f14);
+        border:1px solid #1a2230;border-radius:12px;
+        max-width:820px;width:100%;max-height:80vh;overflow:auto;padding:22px;
+        animation:modalBoxIn 0.3s;box-shadow:0 30px 80px -20px #000;}
+    @keyframes modalBoxIn{from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);}}
+    .modal h3{color:#fff;font-size:14px;letter-spacing:1.5px;
+        text-transform:uppercase;margin-bottom:14px;}
+    .modal .close{float:right;background:transparent;border:none;
+        color:#6d7c92;font-size:22px;cursor:pointer;transition:color 0.2s;}
+    .modal .close:hover{color:#fff;}
+
+    .result-modal .modal{max-width:440px;text-align:center;
+        border-color:#f0b90b;box-shadow:0 30px 80px -20px #000, 0 0 60px rgba(240,185,11,0.2);}
+    .result-modal .modal.win{border-color:#22c55e;}
+    .result-modal .modal.lose{border-color:#ef4444;}
+    .result-title{font-size:22px;font-weight:900;letter-spacing:2px;
+        text-transform:uppercase;margin-bottom:14px;}
+    .result-title.win{color:#22c55e;}
+    .result-title.lose{color:#ef4444;}
+    .result-plate{margin-bottom:14px;display:flex;justify-content:center;}
+    .result-price{font-size:18px;font-weight:900;color:#f0b90b;margin-bottom:8px;}
+    .result-loss{font-size:15px;font-weight:900;color:#ef4444;}
+    .result-actions{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;}
+    .result-actions .btn{max-width:180px;padding:12px 18px;font-size:12px;}
+
+    .plate-info-modal .modal{max-width:400px;text-align:center;}
+    .plate-info-modal .plate{margin:20px auto;max-width:280px;height:56px;}
+    .plate-info-modal .plate .main{font-size:22px;}
+    .plate-info-row{display:flex;justify-content:space-between;
+        padding:10px 4px;border-bottom:1px solid #1a2230;font-size:13px;}
+    .plate-info-row:last-child{border-bottom:none;}
+    .plate-info-row .lbl{color:#7d8ca3;font-weight:700;}
+    .plate-info-row .val{color:#f0b90b;font-weight:900;}
+    .plate-info-chars{
+        display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+        margin:14px 0;padding:10px;background:#080b10;border-radius:8px;
+        border:1px solid #1a2230;
+    }
+    .plate-info-chars .char{
+        display:flex;flex-direction:column;align-items:center;gap:2px;
+        padding:6px 10px;border-radius:6px;background:#0d131b;border:1px solid #1e2a3a;
+    }
+    .plate-info-chars .char .sym{font-size:18px;font-weight:900;color:#f0b90b;}
+    .plate-info-chars .char .type{font-size:8px;color:#6d7c92;font-weight:800;
+        letter-spacing:0.5px;text-transform:uppercase;}
+
+    ::-webkit-scrollbar{width:8px;height:8px;}
+    ::-webkit-scrollbar-track{background:#0a0d12;border-radius:4px;}
+    ::-webkit-scrollbar-thumb{background:#1e2a3a;border-radius:4px;}
+    ::-webkit-scrollbar-thumb:hover{background:#2c3b50;}
+
+    @media(max-width:768px){
+        body{padding:8px;}
+        .content{padding:14px;}
+        .topbar{padding:10px 14px;}
+        .tabs{width:100%;overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;}
+        .tab{padding:8px 12px;font-size:10px;flex-shrink:0;}
+        .mining-header{grid-template-columns:repeat(2,1fr);}
+        .inv-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
+    }
+</style>
+</head>
+<body>
+<div class="app">
+
+    <div class="topbar">
+        <div class="brand">
+            <div class="mark">N</div>
+            NUMBGRADER
+        </div>
+        <div class="tabs">
+            <button class="tab active" data-tab="upgrader">Апгрейдер</button>
+            <button class="tab" data-tab="case">Кейс</button>
+            <button class="tab" data-tab="craft">Крафт</button>
+            <button class="tab" data-tab="blackmarket">Чёрный рынок</button>
+            <button class="tab" data-tab="inventory">Инвентарь</button>
+            <button class="tab" data-tab="mining">Майнинг</button>
+        </div>
+        <div class="userbar">
+            <div class="market-indicator" id="marketBox">
+                <span>РЫНОК</span>
+                <span class="val" id="marketVal">×1.00</span>
+            </div>
+            <div class="balance" id="balanceBox">
+                <span class="lbl">БАЛАНС</span>
+                <span id="balanceDisplay">100 000 ₽</span>
+            </div>
+            <div class="avatar" id="avatarBtn" title="Профиль">N</div>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- UPGRADER -->
+        <div class="page active" id="page-upgrader">
+            <div class="page-title">
+                Апгрейдер номеров
+                <small>закиньте номер, выберите шанс и получите результат</small>
+            </div>
+            <div class="upgrid">
+                <div class="panel">
+                    <div class="panel-head"><span>Ваши номера</span><span id="inputCount">0/4</span></div>
+                    <div class="slots" id="inputSlots">
+                        <div class="slot empty"></div><div class="slot empty"></div>
+                        <div class="slot empty"></div><div class="slot empty"></div>
+                    </div>
+                    <div class="sumrow"><span>Общая сумма:</span><strong id="inputSum">0 ₽</strong></div>
+                    <div class="add-money-box">
+                        <div class="add-money-head">
+                            <span>Добавить к ставке</span>
+                            <span class="val" id="addMoneyVal">0.00 ₽</span>
+                        </div>
+                        <input type="range" class="add-money-input" id="addMoneySlider" min="0" max="100000" value="0" step="0.01">
+                    </div>
+                </div>
+                <div class="center-col">
+                    <div class="circle-wrap" id="circleWrap">
+                        <div class="circle-pointer"></div>
+                        <svg class="circle-svg" viewBox="0 0 120 120">
+                            <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#e63e3e"/>
+                                <stop offset="50%" stop-color="#f0b90b"/>
+                                <stop offset="100%" stop-color="#7cff8b"/>
+                            </linearGradient></defs>
+                            <circle class="circle-bg" cx="60" cy="60" r="52"/>
+                            <circle class="circle-fill" id="circleFill" cx="60" cy="60" r="52"
+                                    stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+                        </svg>
+                        <div class="circle-inner">
+                            <div class="chance-big" id="chanceBig">0.00%</div>
+                            <div class="chance-sub" id="chanceLabel">Шанс</div>
+                        </div>
+                    </div>
+                    <div class="multipliers">
+                        <button class="mult-btn" data-chance="30">30%</button>
+                        <button class="mult-btn active" data-chance="50">50%</button>
+                        <button class="mult-btn" data-chance="70">70%</button>
+                    </div>
+                    <button class="btn" id="upgradeBtn" disabled>Прокачать</button>
+                    <div class="hint" id="hintLine">Выберите хотя бы один номер</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head"><span>Получите</span><span>Результат</span></div>
+                    <div id="targetSlot"><div class="target-empty">Определится автоматически</div></div>
+                    <div class="sumrow" style="margin-top:12px;">
+                        <span>Ожидаемая цена:</span><strong id="targetSum">0 ₽</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="inv-wrap">
+                <div class="inv-head">
+                    <h3>Мои номера — клик отправит в апгрейдер</h3>
+                    <span class="count" id="invCount">0 шт.</span>
+                </div>
+                <div class="inv-grid" id="invGrid"></div>
+            </div>
+        </div>
+
+        <!-- CASE -->
+        <div class="page" id="page-case">
+            <div id="casePickerScreen" class="case-picker-screen active">
+                <div class="page-title">
+                    Выберите кейс
+                    <small>клик по кейсу — переход к рулетке</small>
+                </div>
+                <div class="case-picker-grid" id="casePickerGrid"></div>
+            </div>
+            <div id="caseRouletteScreen" class="roulette-screen">
+                <button class="roulette-back-big" id="rouletteBack">← К кейсам</button>
+                <div class="page-title">
+                    Рулетка
+                    <small id="rouletteCaseName">—</small>
+                </div>
+                <div class="roulette-screen-header">
+                    <span id="rouletteCasePrice">Стоимость: 0 ₽</span>
+                    <span id="rouletteCaseChance">—</span>
+                </div>
+                <div style="display:flex;gap:6px;background:#090d12;padding:4px;border-radius:8px;border:1px solid #171e29;">
+                    <button class="mult-btn active" data-mode="1">×1</button>
+                    <button class="mult-btn" data-mode="3">×3</button>
+                </div>
+                <div class="roulette-multi">
+                    <div class="roulette" id="roulette1">
+                        <div class="roulette-track" id="rouletteTrack1"></div>
+                        <div class="roulette-pointer"></div>
+                    </div>
+                    <div class="roulette" id="roulette2" style="display:none;">
+                        <div class="roulette-track" id="rouletteTrack2"></div>
+                        <div class="roulette-pointer"></div>
+                    </div>
+                    <div class="roulette" id="roulette3" style="display:none;">
+                        <div class="roulette-track" id="rouletteTrack3"></div>
+                        <div class="roulette-pointer"></div>
+                    </div>
+                </div>
+                <div class="case-actions">
+                    <button class="btn" id="spinBtn">Открыть</button>
+                    <button class="btn secondary skip-btn" id="skipCaseBtn" style="display:none;">ПРОПУСТИТЬ</button>
+                </div>
+                <div class="win-box" id="winDisplay">
+                    <div class="win-title">Вы получили</div>
+                    <div class="win-multi-wrap" id="winMultiWrap"></div>
+                    <div class="win-actions">
+                        <button class="btn" id="keepBtn">Забрать всё</button>
+                        <button class="btn secondary" id="sellWinBtn">Продать 80%</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CRAFT -->
+        <div class="page" id="page-craft">
+            <div class="page-title">
+                Крафт номеров
+                <small>5 одинаковых → 1 следующей редкости</small>
+            </div>
+            <div class="craft-wrap">
+                <div class="craft-info">
+                    Положите <strong>5 номеров одной редкости</strong> и получите
+                    <strong>1 номер следующей редкости</strong>.
+                    Дипломат в крафте не участвует.
+                </div>
+                <div class="craft-slots" id="craftSlots"></div>
+                <div class="craft-arrow">▼</div>
+                <div class="craft-result" id="craftResult">
+                    <div class="craft-result-label">Результат</div>
+                    <div style="color:#52627a;font-size:12px;font-weight:700;">Положите 5 номеров</div>
+                </div>
+                <div class="multipliers">
+                    <button class="mult-btn" data-craft-chance="30">30% шанс</button>
+                    <button class="mult-btn active" data-craft-chance="50">50% шанс</button>
+                    <button class="mult-btn" data-craft-chance="70">70% шанс</button>
+                </div>
+                <div class="add-money-box" style="max-width:600px;width:100%;">
+                    <div class="add-money-head">
+                        <span>Добавить к ставке</span>
+                        <span class="val" id="craftAddMoneyVal">0.00 ₽</span>
+                    </div>
+                    <input type="range" class="add-money-input" id="craftAddMoneySlider" min="0" max="100000" value="0" step="0.01">
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;width:100%;">
+                    <button class="btn secondary" id="craftClearBtn" style="max-width:200px;">Очистить</button>
+                    <button class="btn" id="craftBtn" disabled style="max-width:280px;">Скрафтить</button>
+                </div>
+            </div>
+            <div class="inv-wrap">
+                <div class="inv-head">
+                    <h3>Ваши номера</h3>
+                    <span class="count" id="invCountCraft">0 шт.</span>
+                </div>
+                <div class="inv-grid" id="invGridCraft"></div>
+            </div>
+        </div>
+
+        <!-- BLACK MARKET -->
+        <div class="page" id="page-blackmarket">
+            <div class="page-title">
+                Чёрный рынок
+                <small>эксклюзивные лоты — обновление раз в 5 минут</small>
+            </div>
+            <div class="blackmarket-header">
+                <div class="bm-title">◆ ЭЛИТНЫЕ ЛОТЫ</div>
+                <div class="bm-timer">Обновление: <span id="bmTimer">05:00</span></div>
+            </div>
+            <div class="blackmarket-grid" id="blackmarketGrid"></div>
+        </div>
+
+        <!-- INVENTORY -->
+        <div class="page" id="page-inventory">
+            <div class="page-title">
+                Инвентарь
+                <small>все ваши номера</small>
+            </div>
+            <div class="inv-wrap" style="margin-top:0;">
+                <div class="inv-head">
+                    <h3>Содержимое</h3>
+                    <span class="count" id="invCount2">0 шт.</span>
+                </div>
+                <div class="inv-grid" id="invGrid2"></div>
+            </div>
+        </div>
+
+        <!-- MINING -->
+        <div class="page" id="page-mining">
+            <div class="page-title">
+                Майнинг номеров
+                <small>загружайте номера — они приносят доход</small>
+            </div>
+            <div class="mining-header">
+                <div class="mining-stat">
+                    <div class="lbl">Доход в час</div>
+                    <div class="val green" id="miningRateHour">0 ₽</div>
+                </div>
+                <div class="mining-stat">
+                    <div class="lbl">Накоплено</div>
+                    <div class="val" id="miningAccumulated">0.00 ₽</div>
+                </div>
+                <div class="mining-stat">
+                    <div class="lbl">Занято</div>
+                    <div class="val" id="miningSlotsUsed">0 / 10</div>
+                </div>
+                <div class="mining-stat">
+                    <div class="lbl">До лимита</div>
+                    <div class="val" id="miningLimit">08:00:00</div>
+                </div>
+            </div>
+
+            <div class="mining-grid-wrap">
+                <div class="mining-grid" id="miningGrid"></div>
+                <div class="sets-panel">
+                    <div class="sets-title">АКТИВНЫЕ СЕТЫ</div>
+                    <div id="setsList"></div>
+                </div>
+            </div>
+
+            <div class="mining-actions">
+                <button class="btn" id="collectBtn">Собрать доход</button>
+            </div>
+            <div class="autorepair-row">
+                <input type="checkbox" id="autorepairCheck">
+                <label for="autorepairCheck">Авторемонт (5% от дохода при поломке)</label>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- МОДАЛКА ВЫБОРА -->
+<div class="modal-bg" id="pickerModal">
+    <div class="modal">
+        <button class="close" id="closePickerModal">×</button>
+        <h3 id="pickerTitle">Выберите номер</h3>
+        <div class="inv-grid" id="pickerGrid"></div>
+    </div>
+</div>
+
+<!-- МОДАЛКА ПРОФИЛЯ -->
+<div class="modal-bg" id="profileModal">
+    <div class="modal" style="max-width:440px;">
+        <button class="close" id="closeProfileModal">×</button>
+        <h3>Профиль</h3>
+        <div class="profile-modal-content">
+            <div class="prof-row"><span class="lbl">Всего заработано</span><span class="val" id="pdEarned">0 ₽</span></div>
+            <div class="prof-row"><span class="lbl">Апгрейдов успешно</span><span class="val" id="pdUpgrades">0</span></div>
+            <div class="prof-row"><span class="lbl">Крафтов успешно</span><span class="val" id="pdCrafts">0</span></div>
+            <div class="prof-row"><span class="lbl">Кейсов открыто</span><span class="val" id="pdCases">0</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- МОДАЛКА ИНФО О НОМЕРЕ -->
+<div class="modal-bg plate-info-modal" id="plateInfoModal">
+    <div class="modal">
+        <button class="close" id="closePlateInfoModal">×</button>
+        <h3>Информация о номере</h3>
+        <div id="plateInfoPlate"></div>
+        <div class="plate-info-chars" id="plateInfoChars"></div>
+        <div style="margin-top:8px;">
+            <div class="plate-info-row"><span class="lbl">Редкость</span><span class="val" id="plateInfoRarity">—</span></div>
+            <div class="plate-info-row"><span class="lbl">Регион</span><span class="val" id="plateInfoRegion">—</span></div>
+            <div class="plate-info-row"><span class="lbl">Паттерн</span><span class="val" id="plateInfoPattern">—</span></div>
+            <div class="plate-info-row"><span class="lbl">Цена</span><span class="val" id="plateInfoPrice">—</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- МОДАЛКА РЕЗУЛЬТАТА -->
+<div class="modal-bg result-modal" id="resultModal">
+    <div class="modal" id="resultModalBox">
+        <div class="result-title" id="resultTitle">—</div>
+        <div class="result-plate" id="resultPlateWrap" style="display:none;"></div>
+        <div class="result-price" id="resultPrice" style="display:none;">—</div>
+        <div class="result-loss" id="resultLoss" style="display:none;">—</div>
+        <div class="result-actions" id="resultActions" style="display:none;">
+            <button class="btn secondary" id="resultSellBtn">Продать 80%</button>
+            <button class="btn" id="resultKeepBtn">Забрать</button>
+        </div>
+        <button class="btn" id="resultOkBtn" style="max-width:200px;margin:20px auto 0;">ОК</button>
+    </div>
+</div>
+
+<script>
+(function(){
+    'use strict';
+
+    const RARITY = { STANDARD:0, TAXI:1, POLICE:2, MILITARY:3, DIPLOMAT:4 };
+    const RARITY_NAMES = ['Стандарт','Таксист','Мусарской','Военка','Дипломат'];
+    const RARITY_MULT = [1, 1.15, 1.4, 1.8, 5000];
+    const BASE_PRICE = { 0: 3000, 1: 5750, 2: 16800, 3: 45000, 4: 300000000 };
+
+    const CASE_TYPES = {
+        free: { name: 'Бесплатный', price: 0, free: true,
+            table: [
+                { rarity: RARITY.STANDARD, chance: 55.0 },
+                { rarity: RARITY.TAXI,     chance: 30.0 },
+                { rarity: RARITY.POLICE,   chance: 12.0 },
+                { rarity: RARITY.MILITARY, chance: 2.9  },
+                { rarity: RARITY.DIPLOMAT, chance: 0.1  }
+            ]},
+        standard: { name: 'Стандартный', price: 50000,
+            table: [
+                { rarity: RARITY.STANDARD, chance: 55.0 },
+                { rarity: RARITY.TAXI,     chance: 30.0 },
+                { rarity: RARITY.POLICE,   chance: 12.0 },
+                { rarity: RARITY.MILITARY, chance: 2.9  },
+                { rarity: RARITY.DIPLOMAT, chance: 0.001 }
+            ]},
+        yellow: { name: 'Жёлтый', price: 500000,
+            table: [
+                { rarity: RARITY.STANDARD, chance: 15.0 },
+                { rarity: RARITY.TAXI,     chance: 70.0 },
+                { rarity: RARITY.POLICE,   chance: 13.0 },
+                { rarity: RARITY.MILITARY, chance: 1.9  },
+                { rarity: RARITY.DIPLOMAT, chance: 0.001 }
+            ]},
+        blue: { name: 'Синий', price: 5000000,
+            table: [
+                { rarity: RARITY.STANDARD, chance: 5.0  },
+                { rarity: RARITY.TAXI,     chance: 25.0 },
+                { rarity: RARITY.POLICE,   chance: 63.0 },
+                { rarity: RARITY.MILITARY, chance: 6.995 },
+                { rarity: RARITY.DIPLOMAT, chance: 0.005 }
+            ]},
+        black: { name: 'Чёрный', price: 75000000,
+            table: [
+                { rarity: RARITY.STANDARD, chance: 2.0  },
+                { rarity: RARITY.TAXI,     chance: 18.0 },
+                { rarity: RARITY.POLICE,   chance: 35.0 },
+                { rarity: RARITY.MILITARY, chance: 44.99 },
+                { rarity: RARITY.DIPLOMAT, chance: 0.01 }
+            ]}
+    };
+
+    const REGION_MULT = {
+        '77': 15, '99': 15, '97': 15, '177': 15, '199': 15, '197': 15, '777': 20,
+        '78': 8, '98': 8, '178': 8, '198': 8,
+        '50': 8, '90': 8, '150': 8, '190': 8, '750': 8, '790': 8,
+        '23': 3, '93': 3, '123': 3, '193': 3, '223': 3,
+        '66': 3, '96': 3, '196': 3, '16': 3, '116': 3, '716': 3,
+        '52': 3, '152': 3, '252': 3, '61': 3, '161': 3, '261': 3,
+        '74': 3, '174': 3, '274': 3, '54': 3, '154': 3, '254': 3,
+        '02': 3, '102': 3, '702': 3, '34': 3, '134': 3, '234': 3,
+        '39': 3, '139': 3, '26': 3, '126': 3, '226': 3,
+        '63': 3, '163': 3, '263': 3, '72': 3, '172': 3, '272': 3,
+        '86': 3, '186': 3, '286': 3, '47': 3, '147': 3, '247': 3
+    };
+
+    const REGIONS = Object.keys(REGION_MULT);
+
+    const BLAT_SERIES = {
+        'А777АА77': 250000000, 'А001АА77': 50000000, 'А002АА77': 45000000,
+        'О001ОО77': 60000000, 'О777ОО77': 150000000, 'О002ОО77': 50000000,
+        'Е001ЕЕ77': 55000000, 'ЕКХ00777': 220000000, 'АМР00777': 180000000,
+        'С001СС77': 35000000, 'В001ВВ77': 40000000, 'М001ММ77': 45000000,
+        'К001КК77': 30000000, 'Н001НН77': 32000000, 'Т001ТТ77': 28000000
+    };
+
+    const LETTERS = 'АВЕКМНОРСТУХ';
+    const HOUSE_EDGE = 0.90;
+    const UPGRADE_META_BOOST = 1.4;
+    const SAVE_KEY = 'numbgrader_save_v13'; // НЕ сбрасываем прогресс
+    const MINING_RATE = 0.00001;
+    const MINING_SLOTS = 10;
+    const MINING_SLOT_COST = i => i === 0 ? 0 : 50000 * i;
+    const MINING_LIMIT_SEC = 8 * 3600;
+    const DAILY_FREE_COOLDOWN = 24 * 60 * 60 * 1000;
+    const BLACKMARKET_REFRESH = 5 * 60 * 1000;
+    const MARKET_UPDATE_INTERVAL = 60 * 60 * 1000;
+    const BREAK_CHECK_INTERVAL = 30 * 60 * 1000;
+    const BREAK_CHANCE = 0.05;
+    const AUTOREPAIR_PERCENT = 0.05;
+
+    const $ = id => document.getElementById(id);
+    function fmt(n){ return Math.round(n).toLocaleString('ru-RU') + ' ₽'; }
+    function fmtDec(n){ return n.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' ₽'; }
+    function randInt(max){ return Math.floor(Math.random() * max); }
+    function randFrom(arr){ return arr[randInt(arr.length)]; }
+
+    function genPlate(rarity){
+        const region = randFrom(REGIONS);
+        let main = '';
+        if(rarity === RARITY.STANDARD){
+            main = randFrom(LETTERS) + String(randInt(1000)).padStart(3,'0') + randFrom(LETTERS) + randFrom(LETTERS);
+        } else if(rarity === RARITY.TAXI){
+            main = randFrom(LETTERS) + randFrom(LETTERS) + String(randInt(1000)).padStart(3,'0');
+        } else if(rarity === RARITY.POLICE){
+            main = randFrom(LETTERS) + String(randInt(10000)).padStart(4,'0');
+        } else if(rarity === RARITY.MILITARY){
+            main = String(randInt(10000)).padStart(4,'0') + randFrom(LETTERS) + randFrom(LETTERS);
+        } else {
+            main = String(randInt(1000)).padStart(3,'0') + randFrom(LETTERS) + randFrom(LETTERS) + randInt(10);
+        }
+        return { plate: main, region };
+    }
+
+    function getPlatePatterns(plate){
+        const digits = plate.replace(/\D/g,'');
+        const letters = plate.replace(/[^А-ЯЁ]/g,'');
+        const patterns = [];
+        if(digits.includes('777')) patterns.push('777');
+        if(/^00[1-3]/.test(digits) || digits.includes('001')) patterns.push('001-003');
+        if(/[1-9]00/.test(digits)) patterns.push('круглые');
+        if(/^(\d)\1\1$/.test(digits)) patterns.push('три подряд');
+        else if(/(\d)\1/.test(digits)) patterns.push('два подряд');
+        if(digits.length === 3 && digits[0] === digits[2]) patterns.push('ABA');
+        if(digits.length === 4 && digits[0] === digits[3] && digits[1] === digits[2]) patterns.push('ABBA');
+        if(plate === plate.split('').reverse().join('') && plate.length >= 4) patterns.push('палиндром');
+        if(letters.length >= 3 && /^([А-ЯЁ])\1\1$/.test(letters)) patterns.push('AAA');
+        else if(letters.length >= 2 && /^([А-ЯЁ])\1/.test(letters)) patterns.push('AA');
+        if(digits.includes('007')) patterns.push('007');
+        if(digits.includes('666')) patterns.push('666');
+        if(digits.includes('888')) patterns.push('888');
+        return patterns;
+    }
+
+    function calcPatternMultiplier(plate){
+        const digits = plate.replace(/\D/g,'');
+        const letters = plate.replace(/[^А-ЯЁ]/g,'');
+        let mult = 1, topPattern = false;
+        if(digits.length >= 3){
+            if(digits.includes('777')) { mult *= 50; topPattern = true; }
+            else if(/^00[1-3]/.test(digits) || digits.includes('001')) mult *= 15;
+            else if(/[1-9]00/.test(digits)) mult *= 10;
+            else if(/^(\d)\1\1$/.test(digits)) { mult *= 30; topPattern = true; }
+            else if(/(\d)\1/.test(digits)) mult *= 4;
+        }
+        if(digits.length === 3 && digits[0] === digits[2]) mult *= 5;
+        if(digits.length === 4 && digits[0] === digits[3] && digits[1] === digits[2]) mult *= 20;
+        if(plate.length === 6){
+            const m = plate.match(/^([А-ЯЁ])(\d{3})\1$/);
+            if(m && m[2][0] === m[2][2]) mult *= 40;
+            if(plate === plate.split('').reverse().join('')) mult *= 150;
+        }
+        if(plate.length >= 5 && plate === plate.split('').reverse().join('')) mult *= 120;
+        if(letters.length >= 3 && /^([А-ЯЁ])\1\1$/.test(letters)) mult *= 25;
+        else if(letters.length >= 2 && /^([А-ЯЁ])\1/.test(letters)) mult *= 3;
+        if(letters.startsWith('С')) mult *= 1.15;
+        if(digits.includes('007')) mult *= 3;
+        if(digits.includes('666')) mult *= 0.3;
+        if(digits.includes('013')) mult *= 1.5;
+        if(digits.includes('888')) mult *= 8;
+        return { mult, topPattern };
+    }
+
+    function calcPrice(rarity, plate, region){
+        let price = BASE_PRICE[rarity] || 100;
+        const { mult: patternMult, topPattern } = calcPatternMultiplier(plate);
+        price *= patternMult;
+        const regionMult = REGION_MULT[region] || 3;
+        price *= regionMult;
+        if(topPattern && regionMult >= 8) price *= 1.3;
+        price *= state.marketMult;
+        price *= 0.95 + Math.random() * 0.1;
+        return Math.max(500, Math.round(price));
+    }
+
+    function rollRarityFromTable(table){
+        const roll = Math.random() * 100;
+        let acc = 0;
+        for(const row of table){
+            acc += row.chance;
+            if(roll < acc) return row.rarity;
+        }
+        return RARITY.STANDARD;
+    }
+
+    function makeNumber(caseType){
+        const type = caseType || 'standard';
+        const rarity = rollRarityFromTable(CASE_TYPES[type].table);
+        const { plate, region } = genPlate(rarity);
+        const price = calcPrice(rarity, plate, region);
+        return { plate, region, rarity, price, id: Date.now() + Math.random() };
+    }
+
+    function rarityForPrice(price){
+        if(price >= 100000000000) return RARITY.DIPLOMAT;
+        if(price >= 5000000) return RARITY.MILITARY;
+        if(price >= 500000) return RARITY.POLICE;
+        if(price >= 50000) return RARITY.TAXI;
+        return RARITY.STANDARD;
+    }
+
+    // Рендер номера с пробелами между группами символов
+    function renderPlate(plate, region, rarity){
+        let formatted = '';
+        let prevType = null;
+        for(let i = 0; i < plate.length; i++){
+            const ch = plate[i];
+            const isDigit = /\d/.test(ch);
+            const type = isDigit ? 'digit' : 'letter';
+            if(prevType !== null && prevType !== type){
+                formatted += ' ';
+            }
+            formatted += ch;
+            prevType = type;
+        }
+        return `<div class="plate rarity-${rarity}">
+            <div class="main">${formatted}</div>
+            <div class="right">
+                <div class="region">${region}</div>
+                <div class="rus">RUS<span class="flag"></span></div>
+            </div>
+        </div>`;
+    }
+
+    let state = {
+        balance: 100000,
+        inventory: [],
+        inputSlots: [null,null,null,null],
+        addMoney: 0,
+        miningSlots: new Array(MINING_SLOTS).fill(null),
+        miningBroken: new Array(MINING_SLOTS).fill(false),
+        miningUnlocked: 1,
+        miningAccumulated: 0,
+        miningLastCollect: Date.now(),
+        autorepair: false,
+        freeCaseAvailable: true,
+        lastFreeCaseTime: 0,
+        caseMode: 1,
+        currentCaseType: 'standard',
+        spinning: false,
+        spinLocked: false,
+        currentWins: [],
+        desiredChance: 50,
+        upgradeRunning: false,
+        history: [],
+        stats: { earned: 0, spent: 0, cases: 0, upgrades: 0, crafts: 0, crafts_failed: 0 },
+        craftSlots: [null,null,null,null,null],
+        craftChance: 50,
+        craftAddMoney: 0,
+        lastTickTime: Date.now(),
+        blackmarketLots: [],
+        blackmarketLastRefresh: 0,
+        marketMult: 1.0,
+        marketLastUpdate: Date.now(),
+        lastBreakCheck: Date.now(),
+        lastResultItem: null,
+        selectedInvCard: null,
+    };
+
+    function save(){
+        try{
+            localStorage.setItem(SAVE_KEY, JSON.stringify({
+                balance: state.balance, inventory: state.inventory,
+                miningSlots: state.miningSlots, miningBroken: state.miningBroken,
+                miningUnlocked: state.miningUnlocked, miningAccumulated: state.miningAccumulated,
+                miningLastCollect: state.miningLastCollect, autorepair: state.autorepair,
+                freeCaseAvailable: state.freeCaseAvailable, lastFreeCaseTime: state.lastFreeCaseTime,
+                history: state.history, stats: state.stats, craftChance: state.craftChance,
+                blackmarketLots: state.blackmarketLots, blackmarketLastRefresh: state.blackmarketLastRefresh,
+                marketMult: state.marketMult, marketLastUpdate: state.marketLastUpdate,
+                lastBreakCheck: state.lastBreakCheck, lastTickTime: Date.now()
+            }));
+        }catch(e){}
+    }
+
+    function load(){
+        try{
+            const raw = localStorage.getItem(SAVE_KEY);
+            if(!raw) return;
+            const d = JSON.parse(raw);
+            if(typeof d.balance === 'number') state.balance = d.balance;
+            if(Array.isArray(d.inventory)) state.inventory = d.inventory;
+            if(Array.isArray(d.miningSlots)){
+                state.miningSlots = new Array(MINING_SLOTS).fill(null);
+                d.miningSlots.forEach((s,i) => { if(i < MINING_SLOTS) state.miningSlots[i] = s; });
+            }
+            if(Array.isArray(d.miningBroken)){
+                state.miningBroken = new Array(MINING_SLOTS).fill(false);
+                d.miningBroken.forEach((b,i) => { if(i < MINING_SLOTS) state.miningBroken[i] = b; });
+            }
+            if(typeof d.miningUnlocked === 'number') state.miningUnlocked = d.miningUnlocked;
+            if(typeof d.miningAccumulated === 'number') state.miningAccumulated = d.miningAccumulated;
+            if(typeof d.miningLastCollect === 'number') state.miningLastCollect = d.miningLastCollect;
+            if(typeof d.autorepair === 'boolean') state.autorepair = d.autorepair;
+            if(typeof d.freeCaseAvailable === 'boolean') state.freeCaseAvailable = d.freeCaseAvailable;
+            if(typeof d.lastFreeCaseTime === 'number') state.lastFreeCaseTime = d.lastFreeCaseTime;
+            if(Array.isArray(d.history)) state.history = d.history;
+            if(d.stats) state.stats = Object.assign(state.stats, d.stats);
+            if(typeof d.craftChance === 'number') state.craftChance = d.craftChance;
+            if(Array.isArray(d.blackmarketLots)) state.blackmarketLots = d.blackmarketLots;
+            if(typeof d.blackmarketLastRefresh === 'number') state.blackmarketLastRefresh = d.blackmarketLastRefresh;
+            if(typeof d.marketMult === 'number') state.marketMult = d.marketMult;
+            if(typeof d.marketLastUpdate === 'number') state.marketLastUpdate = d.marketLastUpdate;
+            if(typeof d.lastBreakCheck === 'number') state.lastBreakCheck = d.lastBreakCheck;
+            if(typeof d.lastTickTime === 'number'){
+                const seconds = Math.min(MINING_LIMIT_SEC, Math.floor((Date.now() - d.lastTickTime)/1000));
+                state.miningAccumulated += calcMiningRate() * seconds;
+                if(state.miningAccumulated > calcMiningRate() * MINING_LIMIT_SEC){
+                    state.miningAccumulated = calcMiningRate() * MINING_LIMIT_SEC;
+                }
+            }
+            if(!state.freeCaseAvailable && state.lastFreeCaseTime &&
+               (Date.now() - state.lastFreeCaseTime) >= DAILY_FREE_COOLDOWN){
+                state.freeCaseAvailable = true;
+            }
+        }catch(e){}
+    }
+
+    function getActiveSets(){
+        const sets = [
+            { key: 'standard', name: 'Парковка',   rarity: RARITY.STANDARD, need: 5, need5: 8, mult3: 1.05, mult5: 1.03 },
+            { key: 'taxi',     name: 'Таксопарк',  rarity: RARITY.TAXI,     need: 5, need5: 8, mult3: 1.08, mult5: 1.04 },
+            { key: 'police',   name: 'Отдел',      rarity: RARITY.POLICE,   need: 5, need5: 8, mult3: 1.12, mult5: 1.05 },
+            { key: 'military', name: 'Взвод',      rarity: RARITY.MILITARY, need: 5, need5: 8, mult3: 1.15, mult5: 1.06 }
+        ];
+        const counts = {};
+        state.miningSlots.forEach((slot, i) => {
+            if(!slot) return;
+            if(state.miningBroken[i]) return;
+            counts[slot.rarity] = (counts[slot.rarity] || 0) + 1;
+        });
+        const result = sets.map(s => {
+            const count = counts[s.rarity] || 0;
+            let level = 0, mult = 1;
+            if(count >= s.need5){ level = 2; mult = s.mult3 * s.mult5; }
+            else if(count >= s.need){ level = 1; mult = s.mult3; }
+            return { ...s, count, level, mult, active: level > 0 };
+        });
+        const activeCount = result.filter(r => r.active).length;
+        let penalty = 1;
+        if(activeCount === 2) penalty = 0.7;
+        else if(activeCount === 3) penalty = 0.5;
+        else if(activeCount >= 4) penalty = 0.3;
+        return { sets: result, activeCount, penalty };
+    }
+
+    function getTotalSetMultiplier(){
+        const { sets, activeCount, penalty } = getActiveSets();
+        let mult = 1;
+        sets.forEach(s => { if(s.active) mult *= s.mult; });
+        if(activeCount >= 2) mult *= penalty;
+        const lbBonus = getLeaderboardBonus();
+        mult *= (1 + lbBonus);
+        return mult;
+    }
+
+    function getLeaderboardBonus(){
+        const bots = getBotsLeaderboard();
+        const myRate = calcMiningRateRaw();
+        const all = [...bots, { name: 'Вы', rate: myRate, me: true }].sort((a,b) => b.rate - a.rate);
+        const myRank = all.findIndex(p => p.me) + 1;
+        if(myRank === 1) return 0.10;
+        if(myRank === 2) return 0.05;
+        if(myRank === 3) return 0.03;
+        return 0;
+    }
+
+    function calcMiningRateRaw(){
+        let rate = 0;
+        state.miningSlots.forEach((slot, i) => {
+            if(!slot) return;
+            if(state.miningBroken[i]) return;
+            rate += slot.price * MINING_RATE;
+        });
+        return rate;
+    }
+
+    function calcMiningRate(){
+        return calcMiningRateRaw() * getTotalSetMultiplier();
+    }
+
+    function getBotsLeaderboard(){
+        return [
+            { name: 'Майор', rate: 125000 }, { name: 'Дипломат', rate: 98000 },
+            { name: 'Барс', rate: 87000 }, { name: 'Седой', rate: 72000 },
+            { name: 'Кобра', rate: 64000 }, { name: 'Штык', rate: 51000 },
+            { name: 'Купол', rate: 43000 }, { name: 'Тайфун', rate: 38000 },
+            { name: 'Гранит', rate: 29000 }, { name: 'Штиль', rate: 21000 }
+        ];
+    }
+
+    function updateMarket(){
+        const now = Date.now();
+        if(now - state.marketLastUpdate < MARKET_UPDATE_INTERVAL) return;
+        state.marketLastUpdate = now;
+        state.marketMult = 0.85 + Math.random() * 0.3;
+        renderMarketIndicator();
+        save();
+    }
+
+    function renderMarketIndicator(){
+        const box = $('marketBox');
+        const val = $('marketVal');
+        val.textContent = '×' + state.marketMult.toFixed(2);
+        box.classList.remove('up','down');
+        if(state.marketMult > 1.02) box.classList.add('up');
+        else if(state.marketMult < 0.98) box.classList.add('down');
+    }
+
+    function renderInputSlots(){
+        const wrap = $('inputSlots');
+        wrap.innerHTML = '';
+        state.inputSlots.forEach((item, i) => {
+            const div = document.createElement('div');
+            if(item){
+                div.className = 'slot filled';
+                div.innerHTML = renderPlate(item.plate, item.region, item.rarity)
+                    + `<div style="color:#f0b90b;font-weight:900;font-size:11px;margin-top:6px;">${fmt(item.price)}</div>`;
+                div.addEventListener('click', () => {
+                    if(state.upgradeRunning) return;
+                    state.inventory.push(item);
+                    state.inputSlots[i] = null;
+                    renderInputSlots(); renderInventory(); save();
+                });
+            } else {
+                div.className = 'slot empty';
+                div.addEventListener('click', () => {
+                    if(state.upgradeRunning) return;
+                    openPicker(i, 'upgrade');
+                });
+            }
+            wrap.appendChild(div);
+        });
+        const filled = state.inputSlots.filter(Boolean);
+        $('inputCount').textContent = filled.length + '/4';
+        $('inputSum').textContent = fmt(filled.reduce((a,b) => a+b.price, 0) + state.addMoney);
+        $('addMoneySlider').max = Math.max(0, state.balance);
+        updateChance();
+    }
+
+    function updateChance(){
+        const filled = state.inputSlots.filter(Boolean);
+        const sum = filled.reduce((a,b) => a+b.price, 0) + state.addMoney;
+        const btn = $('upgradeBtn');
+        if(state.upgradeRunning) return;
+        if(!filled.length){
+            $('chanceBig').textContent = '0.00%';
+            $('chanceLabel').textContent = 'Шанс';
+            $('circleFill').setAttribute('stroke-dashoffset', 326.7);
+            btn.disabled = true;
+            $('hintLine').textContent = 'Выберите хотя бы один номер';
+            $('targetSlot').innerHTML = '<div class="target-empty">Определится автоматически</div>';
+            $('targetSum').textContent = '0 ₽';
+            return;
+        }
+        if(state.addMoney > state.balance){
+            btn.disabled = true;
+            $('hintLine').textContent = 'Недостаточно средств для добавки';
+            return;
+        }
+        const chance = state.desiredChance;
+        const realChance = (chance/100) * HOUSE_EDGE;
+        const targetPrice = Math.round((sum / realChance) * UPGRADE_META_BOOST);
+        $('chanceBig').textContent = chance + '%';
+        $('chanceLabel').textContent = chance < 40 ? 'низкий шанс' : chance < 60 ? 'средний шанс' : 'высокий шанс';
+        const dash = 326.7;
+        $('circleFill').setAttribute('stroke-dashoffset', dash - (dash*chance/100));
+        btn.disabled = false;
+        $('hintLine').textContent = `Ставка: ${fmt(sum)} → Ожидаемая цель: ${fmt(targetPrice)}`;
+        $('targetSlot').innerHTML = `<div class="target-empty" style="border-style:solid;border-color:#233044;color:#7d8ca3;">~ ${fmt(targetPrice)}</div>`;
+        $('targetSum').textContent = fmt(targetPrice);
+        document.querySelectorAll('.mult-btn[data-chance]').forEach(b => {
+            b.classList.toggle('active', state.desiredChance === +b.dataset.chance);
+        });
+    }
+
+    function openPicker(slotIndex, mode){
+        const modal = $('pickerModal');
+        modal.classList.add('open');
+        $('pickerTitle').textContent = mode === 'craft' ? 'Выберите номер для крафта' :
+            (mode === 'mining' ? 'Выберите номер для майнинга' : 'Выберите номер');
+        const grid = $('pickerGrid');
+        grid.innerHTML = '';
+        let pool = state.inventory;
+        if(mode === 'craft'){
+            const currentRarity = state.craftSlots.find(Boolean)?.rarity ?? null;
+            pool = state.inventory.filter(i => i.rarity !== RARITY.DIPLOMAT)
+                .filter(i => currentRarity === null || i.rarity === currentRarity);
+        }
+        if(!pool.length){
+            grid.innerHTML = '<div class="inv-empty">Нет подходящих номеров</div>';
+            return;
+        }
+        [...pool].sort((a,b) => b.price - a.price).forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'inv-card rarity-' + item.rarity;
+            card.innerHTML = `${renderPlate(item.plate, item.region, item.rarity)}
+                <div class="inv-rarity">${RARITY_NAMES[item.rarity]}</div>
+                <div class="inv-price">${fmt(item.price)}</div>`;
+            card.addEventListener('click', () => {
+                if(mode === 'craft'){
+                    state.craftSlots[slotIndex] = item;
+                    state.inventory = state.inventory.filter(x => x.id !== item.id);
+                    renderCraft(); renderInventory();
+                } else if(mode === 'mining'){
+                    state.miningSlots[slotIndex] = item;
+                    state.inventory = state.inventory.filter(x => x.id !== item.id);
+                    renderMining(); renderInventory();
+                } else {
+                    state.inputSlots[slotIndex] = item;
+                    state.inventory = state.inventory.filter(x => x.id !== item.id);
+                    renderInputSlots(); renderInventory();
+                }
+                modal.classList.remove('open');
+                save();
+            });
+            grid.appendChild(card);
+        });
+    }
+
+    function performUpgrade(){
+        if(state.upgradeRunning) return;
+        const filled = state.inputSlots.filter(Boolean);
+        if(!filled.length) return;
+        if(state.addMoney > state.balance){ notify('Недостаточно средств', 'error'); return; }
+        const sum = filled.reduce((a,b) => a+b.price, 0) + state.addMoney;
+        const chance = state.desiredChance;
+        const realChance = (chance/100) * HOUSE_EDGE;
+        const targetPrice = Math.round((sum / realChance) * UPGRADE_META_BOOST);
+        const targetRarity = rarityForPrice(targetPrice);
+        state.upgradeRunning = true;
+        state.inputSlots = [null,null,null,null];
+        const betAmount = sum;
+        if(state.addMoney > 0){
+            state.balance -= state.addMoney;
+            state.stats.spent += state.addMoney;
+        }
+        state.addMoney = 0;
+        $('addMoneySlider').value = 0;
+        $('addMoneyVal').textContent = '0.00 ₽';
+        renderInputSlots();
+
+        const wrap = $('circleWrap');
+        const chanceBig = $('chanceBig');
+        const chanceLabel = $('chanceLabel');
+        const btn = $('upgradeBtn');
+        wrap.classList.remove('result-win','result-lose');
+        wrap.classList.add('spinning');
+        btn.disabled = true;
+        btn.textContent = 'Крутим...';
+
+        const duration = 3000;
+        const spinInterval = setInterval(() => {
+            chanceBig.textContent = (Math.random()*90 + 5).toFixed(2) + '%';
+            chanceLabel.textContent = 'крутим...';
+        }, 70);
+
+        const skipBtn = document.createElement('button');
+        skipBtn.className = 'skip-btn';
+        skipBtn.textContent = 'ПРОПУСТИТЬ';
+        skipBtn.style.cssText = 'width:100%;max-width:280px;margin-top:10px;';
+        btn.parentNode.insertBefore(skipBtn, btn.nextSibling);
+
+        let finished = false;
+        skipBtn.addEventListener('click', () => finishUpgrade());
+        const timer = setTimeout(() => finishUpgrade(), duration);
+
+        function finishUpgrade(){
+            if(finished) return;
+            finished = true;
+            clearTimeout(timer);
+            clearInterval(spinInterval);
+            skipBtn.remove();
+            wrap.classList.remove('spinning');
+
+            const roll = Math.random() * 100;
+            const success = roll < (chance * HOUSE_EDGE);
+
+            let newItem = null;
+            if(success){
+                let attempts = 0;
+                while(attempts < 40){
+                    const item = makeNumber('black');
+                    const ratio = item.price / targetPrice;
+                    if(ratio > 0.5 && ratio < 1.5 && item.rarity >= targetRarity - 1){
+                        newItem = item; break;
+                    }
+                    attempts++;
+                }
+                if(!newItem){
+                    const { plate, region } = genPlate(targetRarity);
+                    newItem = { plate, region, rarity: targetRarity, price: targetPrice, id: Date.now()+Math.random() };
+                }
+                state.inventory.push(newItem);
+                wrap.classList.add('result-win');
+                chanceBig.textContent = 'УСПЕХ';
+                chanceLabel.textContent = newItem.plate;
+                addHistory('Апгрейд', `Успех: ${newItem.plate}`, newItem.price);
+                state.stats.earned += newItem.price;
+                state.lastResultItem = newItem;
+            } else {
+                wrap.classList.add('result-lose');
+                chanceBig.textContent = 'ПРОВАЛ';
+                chanceLabel.textContent = '−' + fmt(betAmount);
+                addHistory('Апгрейд', `Провал`, -betAmount);
+                state.lastResultItem = null;
+            }
+            state.stats.upgrades++;
+            renderInventory();
+            updateBalance();
+            save();
+
+            setTimeout(() => {
+                wrap.classList.remove('result-win','result-lose');
+                chanceBig.textContent = '0.00%';
+                chanceLabel.textContent = 'Шанс';
+                $('circleFill').setAttribute('stroke-dashoffset', 326.7);
+                state.upgradeRunning = false;
+                btn.disabled = false;
+                btn.textContent = 'Прокачать';
+                renderInputSlots();
+                showResultModal(success, newItem, betAmount);
+            }, 400);
+        }
+    }
+
+    function showResultModal(success, item, betAmount){
+        const modal = $('resultModal');
+        const box = $('resultModalBox');
+        const title = $('resultTitle');
+        const plateWrap = $('resultPlateWrap');
+        const priceEl = $('resultPrice');
+        const lossEl = $('resultLoss');
+        const actions = $('resultActions');
+        const okBtn = $('resultOkBtn');
+        box.classList.remove('win','lose');
+        if(success){
+            box.classList.add('win');
+            title.className = 'result-title win';
+            title.textContent = 'УСПЕХ';
+            plateWrap.innerHTML = renderPlate(item.plate, item.region, item.rarity);
+            plateWrap.style.display = 'flex';
+            priceEl.textContent = fmt(item.price);
+            priceEl.style.display = 'block';
+            lossEl.style.display = 'none';
+            actions.style.display = 'flex';
+            okBtn.style.display = 'none';
+        } else {
+            box.classList.add('lose');
+            title.className = 'result-title lose';
+            title.textContent = 'ПРОВАЛ';
+            plateWrap.style.display = 'none';
+            priceEl.style.display = 'none';
+            lossEl.textContent = 'Потеряно: ' + fmt(betAmount);
+            lossEl.style.display = 'block';
+            actions.style.display = 'none';
+            okBtn.style.display = 'block';
+        }
+        modal.classList.add('open');
+    }
+
+    function showPlateInfo(item){
+        const modal = $('plateInfoModal');
+        $('plateInfoPlate').innerHTML = renderPlate(item.plate, item.region, item.rarity);
+        let charsHTML = '';
+        for(const ch of item.plate){
+            const type = /\d/.test(ch) ? 'цифра' : 'буква';
+            charsHTML += `<div class="char"><span class="sym">${ch}</span><span class="type">${type}</span></div>`;
+        }
+        $('plateInfoChars').innerHTML = charsHTML;
+        $('plateInfoRarity').textContent = RARITY_NAMES[item.rarity];
+        $('plateInfoRegion').textContent = item.region;
+        const patterns = getPlatePatterns(item.plate);
+        $('plateInfoPattern').textContent = patterns.length ? patterns.join(', ') : 'нет';
+        $('plateInfoPrice').textContent = fmt(item.price);
+        modal.classList.add('open');
+    }
+
+    function renderInventory(){
+        const grids = [$('invGrid'), $('invGrid2'), $('invGridCraft')];
+        grids.forEach(g => { if(g) g.innerHTML = ''; });
+        $('invCount').textContent = state.inventory.length + ' шт.';
+        $('invCount2').textContent = state.inventory.length + ' шт.';
+        $('invCountCraft').textContent = state.inventory.length + ' шт.';
+        if(!state.inventory.length){
+            grids.forEach(g => { if(g) g.innerHTML = '<div class="inv-empty">Инвентарь пуст</div>'; });
+            return;
+        }
+        const sorted = [...state.inventory].sort((a,b) => b.price - a.price);
+        grids.forEach((grid, gridIdx) => {
+            if(!grid) return;
+            sorted.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'inv-card rarity-' + item.rarity;
+                // Сравнение по цене для выделения (чтобы выделять можно было уникально)
+                const isSelected = state.selectedInvCard === item.id;
+                if(isSelected && gridIdx === 1) card.classList.add('selected');
+                card.innerHTML = `${renderPlate(item.plate, item.region, item.rarity)}
+                    <div class="inv-rarity">${RARITY_NAMES[item.rarity]}</div>
+                    <div class="inv-price">${fmt(item.price)}</div>
+                    <button class="sell">Продать за ${fmt(item.price*0.8)}</button>`;
+                card.querySelector('.sell').addEventListener('click', e => {
+                    e.stopPropagation(); sellItem(item.id);
+                });
+                card.addEventListener('click', (e) => {
+                    // Правый клик — инфо
+                    if(e.button === 2){
+                        e.preventDefault();
+                        showPlateInfo(item);
+                        return;
+                    }
+                    // Левый клик в инвентаре — выделение
+                    if(gridIdx === 1){
+                        if(state.selectedInvCard === item.id){
+                            state.selectedInvCard = null;
+                        } else {
+                            state.selectedInvCard = item.id;
+                        }
+                        renderInventory();
+                        return;
+                    }
+                    // Левый клик в апгрейдер-инвентаре или крафт-инвентаре — обычное действие
+                    if(gridIdx === 2){
+                        const freeIdx = state.craftSlots.indexOf(null);
+                        if(freeIdx === -1){ notify('Крафт-слоты заняты', 'error'); return; }
+                        const currentRarity = state.craftSlots.find(Boolean)?.rarity ?? null;
+                        if(currentRarity !== null && item.rarity !== currentRarity){
+                            notify('Только одной редкости', 'error'); return;
+                        }
+                        if(item.rarity === RARITY.DIPLOMAT){ notify('Дипломат нельзя', 'error'); return; }
+                        state.craftSlots[freeIdx] = item;
+                        state.inventory = state.inventory.filter(x => x.id !== item.id);
+                        renderCraft(); renderInventory(); save();
+                        return;
+                    }
+                    const freeIdx = state.inputSlots.indexOf(null);
+                    if(freeIdx === -1){ notify('Все слоты заняты', 'error'); return; }
+                    state.inputSlots[freeIdx] = item;
+                    state.inventory = state.inventory.filter(x => x.id !== item.id);
+                    renderInputSlots(); renderInventory(); save();
+                });
+                grid.appendChild(card);
+            });
+        });
+    }
+
+    function sellItem(id){
+        const idx = state.inventory.findIndex(i => i.id === id);
+        if(idx === -1) return;
+        const item = state.inventory[idx];
+        const sellPrice = Math.floor(item.price * 0.8);
+        state.balance += sellPrice;
+        state.inventory.splice(idx, 1);
+        updateBalance(); renderInventory(); flashBalance();
+        addHistory('Продажа', `${item.plate}`, sellPrice);
+        state.stats.earned += sellPrice;
+        notify(`Продано: ${item.plate} за ${fmt(sellPrice)}`, 'success');
+        save();
+    }
+
+    const ITEM_W = 180;
+
+    function renderCasePicker(){
+        const grid = $('casePickerGrid');
+        const order = ['free','standard','yellow','blue','black'];
+        grid.innerHTML = '';
+        order.forEach(key => {
+            const c = CASE_TYPES[key];
+            const freeAvailable = key === 'free' && state.freeCaseAvailable;
+            const card = document.createElement('div');
+            card.className = 'case-picker-card ' + key;
+            const priceStr = key === 'free'
+                ? (freeAvailable ? 'Бесплатно' : 'Использован') : fmt(c.price);
+            card.innerHTML = `
+                <div class="case-scene">
+                    <div class="case-3d ${key}">
+                        <div class="case-back"></div>
+                        <div class="case-front"></div>
+                        <div class="case-lock-tl"></div>
+                        <div class="case-lock-tr"></div>
+                        <div class="case-handle"></div>
+                    </div>
+                </div>
+                <div class="case-picker-name">${c.name}</div>
+                <div class="case-picker-price">${priceStr}</div>
+                <div class="case-picker-desc">${getCaseDesc(key)}</div>
+                <div class="case-picker-chance">${getCaseChanceStr(c.table)}</div>
+            `;
+            card.addEventListener('click', () => {
+                if(key === 'free' && !state.freeCaseAvailable){
+                    notify('Бесплатный кейс уже использован сегодня', 'error'); return;
+                }
+                openRoulette(key);
+            });
+            grid.appendChild(card);
+        });
+    }
+
+    function getCaseDesc(key){
+        return { free: 'Раз в день бесплатно', standard: 'Базовый кейс',
+            yellow: 'Фокус на таксисте', blue: 'Фокус на мусарском',
+            black: 'Фокус на военке' }[key] || '';
+    }
+    function getCaseChanceStr(table){
+        return table.filter(r => r.chance > 0)
+            .map(r => `${RARITY_NAMES[r.rarity]} ${r.chance}%`).join(' · ');
+    }
+
+    function openRoulette(caseKey){
+        state.currentCaseType = caseKey;
+        // Запрет ×3 для бесплатного
+        if(caseKey === 'free' && state.caseMode > 1){
+            state.caseMode = 1;
+        }
+        $('casePickerScreen').classList.remove('active');
+        $('caseRouletteScreen').classList.add('active');
+        $('rouletteCaseName').textContent = CASE_TYPES[caseKey].name + ' кейс';
+        updateCaseUI();
+        resetRoulettes();
+        renderInitialTrack(caseKey);
+    }
+
+    function backToPicker(){
+        if(state.spinning) return;
+        $('caseRouletteScreen').classList.remove('active');
+        $('casePickerScreen').classList.add('active');
+        renderCasePicker();
+    }
+
+    function renderInitialTrack(caseKey){
+        const track = $('rouletteTrack1');
+        track.innerHTML = '';
+        track.style.transition = 'none';
+        track.style.transform = 'translateX(0)';
+        for(let i = 0; i < 20; i++){
+            const item = makeNumber(caseKey);
+            const el = document.createElement('div');
+            el.className = 'roulette-item rarity-' + item.rarity;
+            el.innerHTML = `${renderPlate(item.plate, item.region, item.rarity)}
+                <div class="rou-price">${fmt(item.price)}</div>
+                <div class="rou-rarity">${RARITY_NAMES[item.rarity]}</div>`;
+            track.appendChild(el);
+        }
+    }
+
+    function buildRoulette(trackEl, winItem, winIndex, caseType){
+        trackEl.innerHTML = '';
+        trackEl.style.transition = 'none';
+        trackEl.style.transform = 'translateX(0)';
+        for(let i = 0; i < 60; i++){
+            const item = (i === winIndex) ? winItem : makeNumber(caseType);
+            const el = document.createElement('div');
+            el.className = 'roulette-item rarity-' + item.rarity;
+            el.innerHTML = `${renderPlate(item.plate, item.region, item.rarity)}
+                <div class="rou-price">${fmt(item.price)}</div>
+                <div class="rou-rarity">${RARITY_NAMES[item.rarity]}</div>`;
+            trackEl.appendChild(el);
+        }
+    }
+
+    function spinCase(){
+        if(state.spinning || state.spinLocked) return;
+        const type = state.currentCaseType;
+        const isFree = type === 'free';
+        // Запрет ×3 для бесплатного
+        if(isFree && state.caseMode > 1){
+            state.caseMode = 1;
+            notify('Бесплатный кейс только ×1', 'error');
+            updateCaseUI();
+            return;
+        }
+        if(isFree && !state.freeCaseAvailable){ notify('Бесплатный использован', 'error'); return; }
+        const price = isFree ? 0 : CASE_TYPES[type].price * state.caseMode;
+        if(state.balance < price){ notify(`Недостаточно средств (нужно ${fmt(price)})`, 'error'); return; }
+        state.balance -= price;
+        state.stats.spent += price;
+        if(isFree){ state.freeCaseAvailable = false; state.lastFreeCaseTime = Date.now(); }
+        updateBalance(); flashBalance(); updateCaseUI();
+
+        state.spinning = true;
+        state.spinLocked = true;
+        $('spinBtn').disabled = true;
+        $('winDisplay').classList.remove('show');
+        state.currentWins = [];
+
+        const roulettes = [
+            { track: $('rouletteTrack1'), wrap: $('roulette1') },
+            { track: $('rouletteTrack2'), wrap: $('roulette2') },
+            { track: $('rouletteTrack3'), wrap: $('roulette3') }
+        ];
+        roulettes.forEach((r,i) => { r.wrap.style.display = i < state.caseMode ? 'block' : 'none'; });
+
+        const winners = [];
+        const spinData = [];
+        for(let i = 0; i < state.caseMode; i++){
+            const winItem = makeNumber(type);
+            const winIndex = 45;
+            buildRoulette(roulettes[i].track, winItem, winIndex, type);
+            winners.push(winItem);
+            const wrapWidth = roulettes[i].wrap.offsetWidth;
+            const centerOffset = wrapWidth / 2 - ITEM_W / 2;
+            const targetX = -(winIndex * ITEM_W) + centerOffset;
+            const jitter = (Math.random() - 0.5) * (ITEM_W * 0.5);
+            spinData.push({ track: roulettes[i].track, finalX: targetX + jitter });
+        }
+        state.currentWins = winners;
+
+        setTimeout(() => {
+            spinData.forEach(({track, finalX}) => {
+                track.style.transition = 'transform 6s cubic-bezier(0.12, 0.85, 0.2, 1)';
+                track.style.transform = `translateX(${finalX}px)`;
+            });
+        }, 20);
+
+        const skipBtn = $('skipCaseBtn');
+        skipBtn.style.display = 'block';
+        skipBtn.onclick = () => finishSpin();
+        const timer = setTimeout(finishSpin, 6300);
+        let finished = false;
+
+        function finishSpin(){
+            if(finished) return;
+            finished = true;
+            clearTimeout(timer);
+            skipBtn.style.display = 'none';
+            spinData.forEach(({track, finalX}) => {
+                track.style.transition = 'transform 0.3s ease';
+                track.style.transform = `translateX(${finalX}px)`;
+            });
+            state.spinning = false;
+            state.stats.cases += state.caseMode;
+            showWin(winners);
+            save();
+        }
+    }
+
+    function updateCaseUI(){
+        const type = state.currentCaseType;
+        const info = CASE_TYPES[type];
+        const isFree = type === 'free';
+        const freeUsed = isFree && !state.freeCaseAvailable;
+        const btn = $('spinBtn');
+        btn.disabled = state.spinLocked || freeUsed;
+        btn.textContent = state.spinLocked ? 'Решите с выигрышем'
+            : freeUsed ? 'Использован'
+            : isFree ? 'Открыть бесплатно'
+            : `Открыть за ${fmt(info.price * state.caseMode)}`;
+        $('rouletteCasePrice').textContent = isFree
+            ? (state.freeCaseAvailable ? 'Бесплатно' : 'Сегодня использован')
+            : `Стоимость: ${fmt(info.price)}`;
+        $('rouletteCaseChance').textContent = info.table.filter(r => r.chance > 0)
+            .map(r => `${RARITY_NAMES[r.rarity]} ${r.chance}%`).join(' · ');
+        // Блокировка ×3 для бесплатного
+        document.querySelectorAll('.mult-btn[data-mode]').forEach(b => {
+            b.classList.toggle('active', state.caseMode === +b.dataset.mode);
+            if(isFree && +b.dataset.mode > 1){
+                b.disabled = true;
+                b.style.opacity = '0.3';
+                b.style.cursor = 'not-allowed';
+            } else {
+                b.disabled = false;
+                b.style.opacity = '';
+                b.style.cursor = '';
+            }
+        });
+    }
+
+    function showWin(items){
+        const wrap = $('winMultiWrap');
+        wrap.innerHTML = '';
+        const colors = ['#ffffff','#f5d76e','#6ea8ff','#ffffff','#ff6b6b'];
+        items.forEach(item => {
+            const box = document.createElement('div');
+            box.className = 'win-item-box';
+            box.innerHTML = `
+                <div>${renderPlate(item.plate, item.region, item.rarity)}</div>
+                <div class="win-price">${fmt(item.price)}</div>
+                <div class="win-rarity" style="color:${colors[item.rarity]}">${RARITY_NAMES[item.rarity]}</div>`;
+            wrap.appendChild(box);
+        });
+        $('winDisplay').classList.add('show');
+    }
+
+    function resetRoulettes(){
+        $('roulette1').style.display = 'block';
+        $('roulette2').style.display = 'none';
+        $('roulette3').style.display = 'none';
+        ['rouletteTrack1','rouletteTrack2','rouletteTrack3'].forEach(id => {
+            const t = $(id);
+            if(t){ t.style.transition = 'none'; t.style.transform = 'translateX(0)'; }
+        });
+    }
+
+    function keepWin(){
+        if(!state.currentWins.length) return;
+        state.currentWins.forEach(item => state.inventory.push(item));
+        notify(`Получено ${state.currentWins.length} номер(ов)`, 'success');
+        state.currentWins.forEach(i => addHistory('Кейс', `Получен ${i.plate}`, i.price));
+        state.currentWins = [];
+        $('winDisplay').classList.remove('show');
+        state.spinLocked = false;
+        state.caseMode = 1;
+        resetRoulettes();
+        renderInventory(); updateCaseUI(); save();
+    }
+
+    function sellWin(){
+        if(!state.currentWins.length) return;
+        let total = 0;
+        state.currentWins.forEach(item => { total += Math.floor(item.price * 0.8); });
+        state.balance += total;
+        state.stats.earned += total;
+        updateBalance(); flashBalance();
+        notify(`Продано за ${fmt(total)}`, 'success');
+        addHistory('Продажа', `Продано ${state.currentWins.length} номер(ов)`, total);
+        state.currentWins = [];
+        $('winDisplay').classList.remove('show');
+        state.spinLocked = false;
+        state.caseMode = 1;
+        resetRoulettes();
+        updateCaseUI(); save();
+    }
+
+    function renderCraft(){
+        const grid = $('craftSlots');
+        grid.innerHTML = '';
+        state.craftSlots.forEach((item, i) => {
+            const div = document.createElement('div');
+            if(item){
+                div.className = 'craft-slot filled';
+                div.innerHTML = renderPlate(item.plate, item.region, item.rarity)
+                    + `<div class="craft-price">${fmt(item.price)}</div>`;
+                div.addEventListener('click', () => {
+                    state.inventory.push(item);
+                    state.craftSlots[i] = null;
+                    renderCraft(); renderInventory(); save();
+                });
+            } else {
+                div.className = 'craft-slot empty';
+                div.addEventListener('click', () => openPicker(i, 'craft'));
+            }
+            grid.appendChild(div);
+        });
+        updateCraftResult();
+    }
+
+    function updateCraftResult(){
+        const filled = state.craftSlots.filter(Boolean);
+        const result = $('craftResult');
+        const btn = $('craftBtn');
+        if(filled.length === 5
+            && filled.every(i => i.rarity === filled[0].rarity)
+            && filled[0].rarity < RARITY.MILITARY){
+            const nextRarity = filled[0].rarity + 1;
+            result.classList.add('ready');
+            result.innerHTML = `
+                <div class="craft-result-label">Результат</div>
+                <div style="font-size:14px;color:#f0b90b;font-weight:900;">${RARITY_NAMES[nextRarity]}</div>
+                <div style="font-size:11px;color:#7d8ca3;font-weight:700;">случайный номер</div>
+                <div style="font-size:11px;color:#22c55e;font-weight:800;margin-top:6px;">
+                    Шанс: ${state.craftChance}% · Добавка: ${fmt(state.craftAddMoney)}
+                </div>`;
+            btn.disabled = false;
+        } else {
+            result.classList.remove('ready');
+            result.innerHTML = `
+                <div class="craft-result-label">Результат</div>
+                <div style="color:#52627a;font-size:12px;font-weight:700;">Положите 5 номеров одной редкости</div>`;
+            btn.disabled = true;
+        }
+    }
+
+    function doCraft(){
+        const filled = state.craftSlots.filter(Boolean);
+        if(filled.length !== 5) return;
+        if(!filled.every(i => i.rarity === filled[0].rarity)) return;
+        if(filled[0].rarity >= RARITY.MILITARY) return;
+
+        if(state.craftAddMoney > state.balance){ notify('Недостаточно средств', 'error'); return; }
+
+        const nextRarity = filled[0].rarity + 1;
+        const success = Math.random() < (state.craftChance / 100);
+        const totalBet = filled.reduce((s, i) => s + i.price, 0) + state.craftAddMoney;
+        const priceMult = state.craftChance === 30 ? 1.5 : state.craftChance === 50 ? 1.0 : 0.7;
+
+        if(state.craftAddMoney > 0){
+            state.balance -= state.craftAddMoney;
+            state.stats.spent += state.craftAddMoney;
+        }
+
+        let newItem = null;
+        if(success){
+            state.craftSlots = [null,null,null,null,null];
+            const { plate, region } = genPlate(nextRarity);
+            const basePrice = calcPrice(nextRarity, plate, region);
+            const finalPrice = Math.round(basePrice * priceMult + state.craftAddMoney);
+            newItem = { plate, region, rarity: nextRarity, price: finalPrice, id: Date.now()+Math.random() };
+            state.inventory.push(newItem);
+            state.stats.crafts++;
+            addHistory('Крафт', `Успех: ${newItem.plate}`, newItem.price);
+            notify(`Скрафчен ${newItem.plate}`, 'success');
+            state.lastResultItem = newItem;
+        } else {
+            state.craftSlots = [null,null,null,null,null];
+            state.stats.crafts_failed++;
+            addHistory('Крафт', `Провал — все номера потеряны`, 0);
+            notify(`Провал крафта! Все 5 номеров потеряны`, 'error');
+            state.lastResultItem = null;
+        }
+
+        state.craftAddMoney = 0;
+        $('craftAddMoneySlider').value = 0;
+        $('craftAddMoneyVal').textContent = '0.00 ₽';
+        updateBalance();
+
+        renderCraft(); renderInventory(); save();
+        setTimeout(() => showResultModal(success, newItem, totalBet), 300);
+    }
+
+    function generateBlackmarket(){
+        const lots = [];
+        const count = 4 + randInt(3);
+        for(let i = 0; i < count; i++){
+            const isBlat = Math.random() < 0.3;
+            if(isBlat){
+                const keys = Object.keys(BLAT_SERIES);
+                const fullPlate = randFrom(keys);
+                const main = fullPlate.slice(0, 6);
+                const region = fullPlate.slice(6) || '77';
+                const basePrice = BLAT_SERIES[fullPlate];
+                const price = Math.round(basePrice * (0.9 + Math.random() * 0.3));
+                lots.push({ id: Date.now()+Math.random()+i, plate: main, region,
+                    rarity: RARITY.DIPLOMAT, price, isBlat: true });
+            } else {
+                const rarity = randFrom([RARITY.STANDARD, RARITY.TAXI, RARITY.POLICE, RARITY.MILITARY]);
+                let best = null;
+                for(let j = 0; j < 30; j++){
+                    const { plate, region } = genPlate(rarity);
+                    const price = calcPrice(rarity, plate, region);
+                    if(!best || price > best.price) best = { plate, region, rarity, price };
+                }
+                best.price = Math.round(best.price * (1.3 + Math.random() * 0.5));
+                best.id = Date.now()+Math.random()+i;
+                best.isBlat = false;
+                lots.push(best);
+            }
+        }
+        return lots;
+    }
+
+    function renderBlackmarket(){
+        const now = Date.now();
+        if(now - state.blackmarketLastRefresh > BLACKMARKET_REFRESH || !state.blackmarketLots.length){
+            state.blackmarketLots = generateBlackmarket();
+            state.blackmarketLastRefresh = now;
+            save();
+        }
+        const grid = $('blackmarketGrid');
+        grid.innerHTML = '';
+        state.blackmarketLots.forEach(lot => {
+            const card = document.createElement('div');
+            card.className = 'bm-card' + (lot.isBlat ? '' : ' standard');
+            const canAfford = state.balance >= lot.price;
+            card.innerHTML = `
+                <div class="bm-label">${lot.isBlat ? 'БЛАТНОЙ' : RARITY_NAMES[lot.rarity].toUpperCase()}</div>
+                <div class="bm-plate">${renderPlate(lot.plate, lot.region, lot.rarity)}</div>
+                <div class="bm-price">${fmt(lot.price)}</div>
+                <button class="bm-buy" ${canAfford ? '' : 'disabled'}>${canAfford ? 'Купить' : 'Недостаточно'}</button>`;
+            card.querySelector('.bm-buy').addEventListener('click', () => buyFromBlackmarket(lot.id));
+            grid.appendChild(card);
+        });
+        updateBlackmarketTimer();
+    }
+
+    function updateBlackmarketTimer(){
+        const elapsed = Date.now() - state.blackmarketLastRefresh;
+        const left = Math.max(0, BLACKMARKET_REFRESH - elapsed);
+        const min = Math.floor(left / 60000);
+        const sec = Math.floor((left % 60000) / 1000);
+        $('bmTimer').textContent = String(min).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+    }
+
+    function buyFromBlackmarket(lotId){
+        const lot = state.blackmarketLots.find(l => l.id === lotId);
+        if(!lot) return;
+        if(state.balance < lot.price){ notify('Недостаточно средств', 'error'); return; }
+        state.balance -= lot.price;
+        state.stats.spent += lot.price;
+        state.inventory.push({ plate: lot.plate, region: lot.region, rarity: lot.rarity, price: lot.price, id: Date.now()+Math.random() });
+        state.blackmarketLots = state.blackmarketLots.filter(l => l.id !== lotId);
+        updateBalance(); flashBalance();
+        renderBlackmarket(); renderInventory();
+        notify(`Куплен ${lot.plate}`, 'success');
+        addHistory('Покупка', `Чёрный рынок: ${lot.plate}`, -lot.price);
+        save();
+    }
+
+    function renderMining(){
+        const grid = $('miningGrid');
+        grid.innerHTML = '';
+        state.miningSlots.forEach((item, i) => {
+            const div = document.createElement('div');
+            const unlocked = i < state.miningUnlocked;
+            const broken = state.miningBroken[i];
+            if(!unlocked){
+                div.className = 'mining-slot locked';
+                div.innerHTML = `<div class="locked-icon">🔒</div>
+                    <div class="locked-price">${fmt(MINING_SLOT_COST(i))}</div>
+                    <div class="locked-label">Открыть</div>`;
+                div.addEventListener('click', () => {
+                    const cost = MINING_SLOT_COST(i);
+                    if(state.balance < cost){ notify(`Нужно ${fmt(cost)}`, 'error'); return; }
+                    state.balance -= cost;
+                    state.stats.spent += cost;
+                    state.miningUnlocked = i + 1;
+                    updateBalance(); flashBalance(); renderMining();
+                    addHistory('Покупка', `Открыта ячейка ${i+1}`, -cost);
+                    notify(`Ячейка ${i+1} открыта!`, 'success');
+                    save();
+                });
+            } else if(item){
+                if(broken){
+                    div.className = 'mining-slot broken';
+                    const repairCost = Math.round(item.price * 0.2);
+                    div.innerHTML = `
+                        <div class="broken-icon">⚠</div>
+                        <div class="broken-label">СЛОМАНА</div>
+                        <div class="broken-repair">${fmt(repairCost)}</div>`;
+                    div.addEventListener('click', () => {
+                        if(state.balance < repairCost){ notify(`Нужно ${fmt(repairCost)}`, 'error'); return; }
+                        state.balance -= repairCost;
+                        state.miningBroken[i] = false;
+                        updateBalance(); flashBalance(); renderMining(); renderSetsPanel();
+                        notify('Ячейка починена', 'success');
+                        save();
+                    });
+                } else {
+                    div.className = 'mining-slot filled';
+                    const rate = item.price * MINING_RATE;
+                    div.innerHTML = `
+                        <div class="remove-mining" data-remove="${i}">×</div>
+                        <div class="mining-plate">${renderPlate(item.plate, item.region, item.rarity)}</div>
+                        <div class="mining-rate">+${fmtDec(rate)}/с</div>`;
+                    div.querySelector('.remove-mining').addEventListener('click', e => {
+                        e.stopPropagation();
+                        state.inventory.push(item);
+                        state.miningSlots[i] = null;
+                        state.miningBroken[i] = false;
+                        renderMining(); renderInventory(); renderSetsPanel(); save();
+                        notify('Номер снят', '');
+                    });
+                }
+            } else {
+                div.className = 'mining-slot';
+                div.innerHTML = `<div class="empty-icon">+</div>
+                    <div class="empty-label">${i+1}</div>`;
+                div.addEventListener('click', () => openPicker(i, 'mining'));
+            }
+            grid.appendChild(div);
+        });
+
+        const ratePerHour = calcMiningRate() * 3600;
+        $('miningRateHour').textContent = fmt(ratePerHour);
+        $('miningAccumulated').textContent = fmtDec(state.miningAccumulated);
+        $('miningSlotsUsed').textContent = state.miningSlots.filter(Boolean).length + ' / ' + MINING_SLOTS;
+        const rate = calcMiningRate();
+        let limitSec = MINING_LIMIT_SEC;
+        if(rate > 0){
+            const leftSec = Math.max(0, MINING_LIMIT_SEC - (state.miningAccumulated / rate));
+            limitSec = leftSec;
+        }
+        const hours = Math.floor(limitSec / 3600);
+        const mins = Math.floor((limitSec % 3600) / 60);
+        const secs = Math.floor(limitSec % 60);
+        $('miningLimit').textContent =
+            String(hours).padStart(2,'0') + ':' +
+            String(mins).padStart(2,'0') + ':' +
+            String(secs).padStart(2,'0');
+        renderSetsPanel();
+    }
+
+    function renderSetsPanel(){
+        const { sets, activeCount, penalty } = getActiveSets();
+        const list = $('setsList');
+        list.innerHTML = '';
+        sets.forEach(s => {
+            const row = document.createElement('div');
+            row.className = 'set-row' + (s.active ? ' active' : '');
+            const progressText = s.level === 2 ? `${s.count}/${s.need5} (ур. 2)` :
+                s.level === 1 ? `${s.count}/${s.need} (ур. 1)` :
+                `${s.count}/${s.need}`;
+            row.innerHTML = `
+                <div>
+                    <div class="set-name">${s.name}</div>
+                    <div class="set-progress">${progressText}</div>
+                </div>
+                <div class="set-bonus">${s.active ? '×' + s.mult.toFixed(2) : '—'}</div>`;
+            list.appendChild(row);
+        });
+        if(activeCount >= 2){
+            const pRow = document.createElement('div');
+            pRow.className = 'set-row failed';
+            pRow.innerHTML = `<div><div class="set-name">Штраф за пересечение</div>
+                <div class="set-progress">${activeCount} активных сетов</div></div>
+                <div class="set-bonus">×${penalty.toFixed(2)}</div>`;
+            list.appendChild(pRow);
+        }
+        const lbBonus = getLeaderboardBonus();
+        if(lbBonus > 0){
+            const bRow = document.createElement('div');
+            bRow.className = 'set-row active';
+            bRow.innerHTML = `<div><div class="set-name">Бонус лидерборда</div>
+                <div class="set-progress">Топ-3 майнеров</div></div>
+                <div class="set-bonus">+${(lbBonus*100).toFixed(0)}%</div>`;
+            list.appendChild(bRow);
+        }
+    }
+
+    function collectMining(){
+        if(state.miningAccumulated < 1){ notify('Недостаточно накоплено', 'error'); return; }
+        const amount = Math.floor(state.miningAccumulated);
+        state.miningAccumulated -= amount;
+        state.balance += amount;
+        state.stats.earned += amount;
+        state.miningLastCollect = Date.now();
+        updateBalance(); flashBalance();
+        notify(`Собрано ${fmt(amount)}`, 'success');
+        addHistory('Майнинг', `Собран доход`, amount);
+        renderMining(); save();
+    }
+
+    function checkBreaks(){
+        const now = Date.now();
+        if(now - state.lastBreakCheck < BREAK_CHECK_INTERVAL) return;
+        state.lastBreakCheck = now;
+        state.miningSlots.forEach((slot, i) => {
+            if(!slot) return;
+            if(state.miningBroken[i]) return;
+            if(Math.random() < BREAK_CHANCE){
+                state.miningBroken[i] = true;
+                if(state.autorepair){
+                    const repairCost = Math.min(state.miningAccumulated * AUTOREPAIR_PERCENT, slot.price * 0.2);
+                    if(state.miningAccumulated >= repairCost){
+                        state.miningAccumulated -= repairCost;
+                        state.miningBroken[i] = false;
+                    }
+                }
+            }
+        });
+        renderMining();
+        save();
+    }
+
+    function tickMining(){
+        const now = Date.now();
+        const dt = (now - state.lastTickTime) / 1000;
+        state.lastTickTime = now;
+        const rate = calcMiningRate();
+        if(rate > 0){
+            const maxAccum = rate * MINING_LIMIT_SEC;
+            if(state.miningAccumulated < maxAccum){
+                state.miningAccumulated = Math.min(maxAccum, state.miningAccumulated + rate * dt);
+            }
+        }
+        if($('page-mining').classList.contains('active')){
+            $('miningAccumulated').textContent = fmtDec(state.miningAccumulated);
+            $('miningRateHour').textContent = fmt(rate * 3600);
+            let limitSec = MINING_LIMIT_SEC;
+            if(rate > 0){
+                const leftSec = Math.max(0, MINING_LIMIT_SEC - (state.miningAccumulated / rate));
+                limitSec = leftSec;
+            }
+            const hours = Math.floor(limitSec / 3600);
+            const mins = Math.floor((limitSec % 3600) / 60);
+            const secs = Math.floor(limitSec % 60);
+            $('miningLimit').textContent =
+                String(hours).padStart(2,'0') + ':' +
+                String(mins).padStart(2,'0') + ':' +
+                String(secs).padStart(2,'0');
+        }
+        if(!state.freeCaseAvailable && state.lastFreeCaseTime &&
+           (Date.now() - state.lastFreeCaseTime) >= DAILY_FREE_COOLDOWN){
+            state.freeCaseAvailable = true;
+            renderCasePicker();
+        }
+        updateMarket();
+        checkBreaks();
+    }
+
+    function renderProfileModal(){
+        $('pdEarned').textContent = fmt(state.stats.earned);
+        $('pdUpgrades').textContent = state.stats.upgrades;
+        $('pdCrafts').textContent = state.stats.crafts;
+        $('pdCases').textContent = state.stats.cases;
+    }
+
+    function addHistory(type, desc, amount){
+        state.history.unshift({ type, desc, amount, time: Date.now() });
+        if(state.history.length > 100) state.history.length = 100;
+    }
+
+    function updateBalance(){ $('balanceDisplay').textContent = fmt(state.balance); }
+    function flashBalance(){
+        const box = $('balanceBox');
+        box.classList.add('flash');
+        setTimeout(() => box.classList.remove('flash'), 400);
+    }
+
+    function notify(text, type){
+        const n = document.createElement('div');
+        n.className = 'notify' + (type ? ' ' + type : '');
+        n.textContent = text;
+        document.body.appendChild(n);
+        setTimeout(() => n.remove(), 3200);
+    }
+
+    document.querySelectorAll('.tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            $('page-' + btn.dataset.tab).classList.add('active');
+            if(btn.dataset.tab === 'inventory') renderInventory();
+            if(btn.dataset.tab === 'mining') renderMining();
+            if(btn.dataset.tab === 'case') renderCasePicker();
+            if(btn.dataset.tab === 'craft') renderCraft();
+            if(btn.dataset.tab === 'blackmarket') renderBlackmarket();
+        });
+    });
+
+    $('upgradeBtn').addEventListener('click', performUpgrade);
+    $('spinBtn').addEventListener('click', spinCase);
+    $('keepBtn').addEventListener('click', keepWin);
+    $('sellWinBtn').addEventListener('click', sellWin);
+    $('collectBtn').addEventListener('click', collectMining);
+    $('craftBtn').addEventListener('click', doCraft);
+    $('craftClearBtn').addEventListener('click', () => {
+        state.craftSlots.forEach(i => { if(i) state.inventory.push(i); });
+        state.craftSlots = [null,null,null,null,null];
+        renderCraft(); renderInventory(); save();
+    });
+    $('closePickerModal').addEventListener('click', () => $('pickerModal').classList.remove('open'));
+    $('pickerModal').addEventListener('click', e => {
+        if(e.target === $('pickerModal')) $('pickerModal').classList.remove('open');
+    });
+    $('rouletteBack').addEventListener('click', backToPicker);
+
+    $('addMoneySlider').addEventListener('input', e => {
+        const max = Math.max(0, state.balance);
+        const val = Math.min(+e.target.value, max);
+        state.addMoney = val;
+        $('addMoneySlider').max = max;
+        $('addMoneyVal').textContent = fmtDec(val);
+        renderInputSlots();
+    });
+    $('craftAddMoneySlider').addEventListener('input', e => {
+        const max = Math.max(0, state.balance - state.craftAddMoney);
+        const val = Math.min(+e.target.value, max);
+        state.craftAddMoney = val;
+        $('craftAddMoneySlider').max = max;
+        $('craftAddMoneyVal').textContent = fmtDec(val);
+        updateCraftResult();
+    });
+    $('autorepairCheck').addEventListener('change', e => {
+        state.autorepair = e.target.checked;
+        save();
+    });
+
+    $('avatarBtn').addEventListener('click', () => {
+        renderProfileModal();
+        $('profileModal').classList.add('open');
+    });
+    $('closeProfileModal').addEventListener('click', () => $('profileModal').classList.remove('open'));
+    $('profileModal').addEventListener('click', e => {
+        if(e.target === $('profileModal')) $('profileModal').classList.remove('open');
+    });
+    $('closePlateInfoModal').addEventListener('click', () => $('plateInfoModal').classList.remove('open'));
+    $('plateInfoModal').addEventListener('click', e => {
+        if(e.target === $('plateInfoModal')) $('plateInfoModal').classList.remove('open');
+    });
+
+    document.querySelectorAll('.mult-btn[data-chance]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if(state.upgradeRunning) return;
+            state.desiredChance = +btn.dataset.chance;
+            updateChance();
+        });
+    });
+    document.querySelectorAll('.mult-btn[data-craft-chance]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.mult-btn[data-craft-chance]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.craftChance = +btn.dataset.craftChance;
+            updateCraftResult();
+            save();
+        });
+    });
+    document.querySelectorAll('.mult-btn[data-mode]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if(state.spinLocked) return;
+            if(state.currentCaseType === 'free' && +btn.dataset.mode > 1){
+                notify('Бесплатный кейс только ×1', 'error');
+                return;
+            }
+            document.querySelectorAll('.mult-btn[data-mode]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.caseMode = +btn.dataset.mode;
+            updateCaseUI();
+        });
+    });
+
+    $('resultOkBtn').addEventListener('click', () => $('resultModal').classList.remove('open'));
+    $('resultSellBtn').addEventListener('click', () => {
+        if(!state.lastResultItem) return;
+        const sellPrice = Math.floor(state.lastResultItem.price * 0.8);
+        state.balance += sellPrice;
+        state.stats.earned += sellPrice;
+        updateBalance(); flashBalance();
+        addHistory('Продажа', `${state.lastResultItem.plate}`, sellPrice);
+        notify(`Продано за ${fmt(sellPrice)}`, 'success');
+        state.lastResultItem = null;
+        $('resultModal').classList.remove('open');
+        renderInventory(); save();
+    });
+    $('resultKeepBtn').addEventListener('click', () => {
+        state.lastResultItem = null;
+        $('resultModal').classList.remove('open');
+        renderInventory(); save();
+    });
+
+    // Запрет контекстного меню для правого клика по картам
+    document.addEventListener('contextmenu', e => {
+        if(e.target.closest('.inv-card')) e.preventDefault();
+    });
+
+    load();
+    updateBalance();
+    renderMarketIndicator();
+    renderInputSlots();
+    renderInventory();
+    renderMining();
+    renderCraft();
+    renderBlackmarket();
+    updateCaseUI();
+    renderCasePicker();
+    $('autorepairCheck').checked = state.autorepair;
+    $('addMoneySlider').max = Math.max(0, state.balance);
+    $('craftAddMoneySlider').max = Math.max(0, state.balance);
+
+    (function initTrack(){
+        const track = $('rouletteTrack1');
+        for(let i = 0; i < 20; i++){
+            const item = makeNumber('standard');
+            const el = document.createElement('div');
+            el.className = 'roulette-item rarity-' + item.rarity;
+            el.innerHTML = `${renderPlate(item.plate, item.region, item.rarity)}
+                <div class="rou-price">${fmt(item.price)}</div>
+                <div class="rou-rarity">${RARITY_NAMES[item.rarity]}</div>`;
+            track.appendChild(el);
+        }
+    })();
+
+    setInterval(tickMining, 1000);
+    setInterval(save, 5000);
+    window.addEventListener('beforeunload', save);
+    setInterval(updateBlackmarketTimer, 1000);
+    setInterval(() => {
+        if($('page-blackmarket').classList.contains('active')) renderBlackmarket();
+    }, 10000);
+    updateMarket();
+
+})();
+</script>
+</body>
+</html>
