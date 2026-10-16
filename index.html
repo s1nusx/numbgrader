@@ -130,6 +130,11 @@ display:block;}
 .plate.plate-large .region{font-size:20px;}
 .plate.plate-large .rus{font-size:7px;}
 .plate.plate-large .flag{width:15px;height:10px;}
+.plate.plate-tiny{height:26px;}
+.plate.plate-tiny .main{font-size:11px;letter-spacing:0.3px;}
+.plate.plate-tiny .region{font-size:9px;}
+.plate.plate-tiny .rus{font-size:4px;}
+.plate.plate-tiny .flag{width:8px;height:5px;}
 .plate .right.two-digits .region{font-size:1.15em;}
 .plate .right.three-digits .region{font-size:0.9em;}
 .plate.rarity-0{background:#fff;color:#0a0a0a;border-color:#0a0a0a;}
@@ -167,7 +172,6 @@ animation:glowRed 1.8s ease-in-out infinite;}
 .wheel-svg{width:100%;height:100%;display:block;overflow:visible;}
 .wheel-arc-bg{fill:none;stroke:#151c26;stroke-width:14;}
 .wheel-arc-fill{fill:none;stroke:url(#wheelGrad);stroke-width:14;stroke-linecap:butt;
-transition:d 0.5s cubic-bezier(0.2,0.9,0.3,1),stroke 0.4s ease,filter 0.4s ease;
 filter:drop-shadow(0 0 8px rgba(240,185,11,0.35));}
 .wheel-wrap.result-win .wheel-arc-fill{filter:drop-shadow(0 0 18px rgba(34,197,94,0.9));}
 .wheel-wrap.result-lose .wheel-arc-fill{filter:drop-shadow(0 0 18px rgba(239,68,68,0.9));}
@@ -238,6 +242,9 @@ box-shadow:0 3px 0 #a37a08;}
 .btn.secondary{background:linear-gradient(180deg,#1a2533,#131c28);color:#cfd8e6;
 box-shadow:0 3px 0 #0a1018;border:1px solid #2c3b50;}
 .btn.secondary:hover:not(:disabled){border-color:#f0b90b;color:#f0b90b;}
+.btn.danger{background:linear-gradient(180deg,#e63e3e,#a02525);color:#fff;
+box-shadow:0 3px 0 #5a1010;border:1px solid #ff5c5c;}
+.btn.danger:hover:not(:disabled){filter:brightness(1.1);}
 .btn.refresh{background:linear-gradient(180deg,#1a2533,#131c28);color:#cfd8e6;
 box-shadow:0 3px 0 #0a1018;border:1px solid #2c3b50;
 padding:8px 14px;font-size:11px;width:auto;letter-spacing:0.8px;
@@ -619,17 +626,17 @@ text-transform:uppercase;padding:4px 10px;border-radius:20px;
 background:#080b10;border:1px solid #1a2230;color:#7d8ca3;}
 .deal-room-side-head .status.ready{color:#22c55e;border-color:#22c55e;
 background:rgba(34,197,94,0.1);}
-.deal-room-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.deal-room-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
 .deal-room-slot{aspect-ratio:1/1;background:linear-gradient(180deg,#090d12,#070a0e);
 border:1px dashed #1e2a3a;border-radius:10px;display:flex;flex-direction:column;
 align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;
-padding:6px;position:relative;overflow:hidden;}
+padding:8px 4px;position:relative;overflow:hidden;}
 .deal-room-slot:hover{border-color:#f0b90b;}
 .deal-room-slot.filled{border-style:solid;border-color:#233044;}
 .deal-room-slot.empty::before{content:"+";font-size:20px;color:#28374b;font-weight:200;}
 .deal-room-slot.locked{cursor:not-allowed;opacity:0.6;}
 .deal-room-slot.locked:hover{border-color:#1e2a3a;}
-.deal-room-slot .slot-price{color:#f0b90b;font-weight:900;font-size:9px;margin-top:4px;}
+.deal-room-slot .slot-price{color:#f0b90b;font-weight:900;font-size:10px;margin-top:4px;}
 .deal-room-money{background:linear-gradient(180deg,#0a0e15,#080b10);
 border:1px solid #1a2230;border-radius:10px;padding:12px 14px;margin-bottom:12px;}
 .deal-room-money-head{display:flex;justify-content:space-between;align-items:center;
@@ -638,13 +645,13 @@ text-transform:uppercase;margin-bottom:8px;}
 .deal-room-money-head .val{color:#f0b90b;font-weight:900;font-variant-numeric:tabular-nums;}
 .deal-room-inv-title{font-size:10px;color:#6d7c92;font-weight:800;letter-spacing:1.5px;
 text-transform:uppercase;margin-bottom:8px;}
-.deal-room-inv{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;
-max-height:180px;overflow-y:auto;padding:4px;}
+.deal-room-inv{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;
+max-height:220px;overflow-y:auto;padding:6px;}
 .deal-room-inv::-webkit-scrollbar{width:4px;}
 .deal-room-inv::-webkit-scrollbar-thumb{background:#2c3b50;border-radius:2px;}
-.deal-room-inv-item{background:#080b10;border:1px solid #1a2230;border-radius:6px;
-padding:6px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;
-align-items:center;gap:3px;}
+.deal-room-inv-item{background:#080b10;border:1px solid #1a2230;border-radius:8px;
+padding:8px 4px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;
+align-items:center;gap:4px;overflow:hidden;}
 .deal-room-inv-item:hover{border-color:#f0b90b;transform:translateY(-1px);}
 .deal-room-inv-item.disabled{cursor:not-allowed;opacity:0.4;}
 .deal-room-inv-item.disabled:hover{border-color:#1a2230;transform:none;}
@@ -661,8 +668,9 @@ font-variant-numeric:tabular-nums;letter-spacing:3px;margin:8px 0;
 text-shadow:0 0 24px rgba(240,185,11,0.6);}
 .deal-room-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
 .deal-room-actions .btn{max-width:220px;}
-.deal-room-actions .btn.ready-active{background:linear-gradient(180deg,#22c55e,#16a34a);
-color:#fff;box-shadow:0 3px 0 #0f5c2c;}
+.deal-room-actions .btn.ready-active{background:linear-gradient(180deg,#ef4444,#b91c1c);
+color:#fff;box-shadow:0 3px 0 #7a1010;}
+.deal-room-actions .btn.ready-active:hover:not(:disabled){filter:brightness(1.1);}
 
 .deals-wrap{display:flex;flex-direction:column;gap:18px;}
 .deals-tabs{display:flex;gap:4px;background:#090d12;padding:4px;border-radius:10px;
@@ -784,6 +792,13 @@ align-items:center;gap:10px;transition:all 0.2s;width:100%;}
 .friend-info{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;}
 .friend-name{font-size:14px;font-weight:900;color:#fff;}
 .friend-id{font-size:11px;color:#7d8ca3;font-family:'Courier New',monospace;letter-spacing:1.5px;}
+.friend-actions{display:flex;gap:6px;flex-shrink:0;}
+.friend-btn{width:34px;height:34px;border-radius:8px;border:1px solid #2c3b50;
+background:linear-gradient(180deg,#1a2533,#131c28);color:#cfd8e6;
+font-size:14px;cursor:pointer;transition:all 0.2s;
+display:flex;align-items:center;justify-content:center;}
+.friend-btn:hover{border-color:#f0b90b;color:#f0b90b;transform:translateY(-1px);}
+.friend-btn.danger:hover{border-color:#ef4444;color:#ef4444;}
 .friends-empty{text-align:center;padding:40px 20px;color:#52627a;font-size:12px;
 letter-spacing:1px;font-weight:800;text-transform:uppercase;}
 .bell-modal .modal{max-width:520px;padding:0;}
@@ -1071,9 +1086,11 @@ body{padding:8px;}
 <div style="color:#52627a;font-size:12px;font-weight:700;">Положите 5 номеров</div>
 </div>
 <div class="multipliers">
+<button class="mult-btn" data-craft-chance="10">10% шанс</button>
 <button class="mult-btn" data-craft-chance="30">30% шанс</button>
 <button class="mult-btn active" data-craft-chance="50">50% шанс</button>
 <button class="mult-btn" data-craft-chance="70">70% шанс</button>
+<button class="mult-btn" data-craft-chance="90">90% шанс</button>
 </div>
 <div class="add-money-box" style="max-width:600px;width:100%;">
 <div class="add-money-head"><span>Добавить к ставке</span>
@@ -1716,11 +1733,75 @@ notify('Сохранено: @'+trimmed,'success');}catch(e){console.error(e);not
 function openUsernameModal(){if(!fbProfile)return;const now=Date.now();const cooldownMs=7*24*60*60*1000;
 if(fbProfile.usernameChangedAt&&(now-fbProfile.usernameChangedAt)<cooldownMs){const daysLeft=Math.ceil((cooldownMs-(now-fbProfile.usernameChangedAt))/(24*60*60*1000));notify('Смена через '+daysLeft+' дн.','error');return;}
 $('usernameInput').value=fbProfile.username||'';updateUsernameValidation();$('usernameModal').classList.add('open');setTimeout(()=>$('usernameInput').focus(),100);}
-async function loadFriends(){if(!fbProfile)return;const friends=fbProfile.friends||[];friendsList=[];const{doc,getDoc}=window.fbFuncs;
-for(const uid of friends){try{const snap=await getDoc(doc(window.fbDb,'users',uid));if(snap.exists())friendsList.push(snap.data());}catch(e){}}
-renderFriendsList();}
-function renderFriendsList(){const list=$('friendsList');if(!friendsList.length){list.innerHTML='<div class="friends-empty">Пока никого нет<br>Добавь друга по ID или @username</div>';return;}
-list.innerHTML=friendsList.map(f=>`<div class="friend-row"><div class="friend-info"><div class="friend-name">${f.name||'Игрок '+f.id}</div><div class="friend-id">[id:${f.id}]${f.username?' · @'+f.username:''}</div></div></div>`).join('');}
+
+async function loadFriends(){
+if(!fbProfile)return;
+const friends=fbProfile.friends||[];
+friendsList=[];
+const{doc,getDoc}=window.fbFuncs;
+for(const uid of friends){
+try{
+const snap=await getDoc(doc(window.fbDb,'users',uid));
+if(snap.exists()){
+const data=snap.data();
+data.uid=uid;
+friendsList.push(data);
+}
+}catch(e){}
+}
+renderFriendsList();
+}
+
+function renderFriendsList(){
+const list=$('friendsList');
+if(!friendsList.length){list.innerHTML='<div class="friends-empty">Пока никого нет<br>Добавь друга по ID или @username</div>';return;}
+list.innerHTML=friendsList.map(f=>`
+<div class="friend-row" data-uid="${f.uid||''}">
+<div class="friend-info">
+<div class="friend-name">${f.name||'Игрок '+f.id}</div>
+<div class="friend-id">[id:${f.id}]${f.username?' · @'+f.username:''}</div>
+</div>
+<div class="friend-actions">
+<button class="friend-btn" data-action="profile" data-uid="${f.uid||''}" title="Профиль">👁</button>
+<button class="friend-btn" data-action="deal" data-uid="${f.uid||''}" data-id="${f.id}" title="Сделка">🤝</button>
+<button class="friend-btn danger" data-action="remove" data-uid="${f.uid||''}" title="Удалить">✕</button>
+</div>
+</div>`).join('');
+list.querySelectorAll('.friend-btn').forEach(btn=>{
+btn.addEventListener('click',async()=>{
+const action=btn.dataset.action;
+const uid=btn.dataset.uid;
+if(!uid)return;
+if(action==='profile'){ openPlayerProfile(uid); return; }
+if(action==='deal'){
+$('profileScreen').classList.remove('active');
+document.querySelector('.tab[data-tab="deals"]').click();
+setTimeout(()=>{
+const f=friendsList.find(x=>x.uid===uid);
+if(f)$('dealTargetId').value=f.id;
+findDealTarget();
+},80);
+return;
+}
+if(action==='remove'){ removeFriend(uid); }
+});
+});
+}
+
+async function removeFriend(uid){
+if(!fbUser||!fbProfile)return;
+if(!confirm('Удалить из друзей?'))return;
+try{
+const{doc,updateDoc,arrayRemove}=window.fbFuncs;
+await updateDoc(doc(window.fbDb,'users',fbUser.uid),{friends:arrayRemove(uid)});
+await updateDoc(doc(window.fbDb,'users',uid),{friends:arrayRemove(fbUser.uid)});
+fbProfile.friends=(fbProfile.friends||[]).filter(x=>x!==uid);
+friendsList=friendsList.filter(f=>f.uid!==uid);
+renderFriendsList();
+notify('Удалён из друзей','success');
+}catch(e){console.error(e);notify('Ошибка','error');}
+}
+
 async function loadFriendRequests(){if(!fbProfile)return;const requests=fbProfile.friendRequests||[];friendRequests=[];const{doc,getDoc}=window.fbFuncs;
 for(const uid of requests){try{const snap=await getDoc(doc(window.fbDb,'users',uid));if(snap.exists())friendRequests.push(snap.data());}catch(e){}}
 renderBellBadge();}
@@ -1849,21 +1930,24 @@ html+=`<line class="${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
 }
 g.innerHTML=html;
 }
+
+const WHEEL_R=120;
+const WHEEL_CIRC=2*Math.PI*WHEEL_R;
+
 function drawWheelArc(chance){
 const arc=$('wheelArcFill');
 if(!arc)return;
-const cx=140,cy=140,r=120;
-const totalArc=360*(chance/100);
-if(totalArc<=0.1){arc.setAttribute('d','');return;}
-const startAngle=180-totalArc/2;
-const endAngle=180+totalArc/2;
-const toRad=d=>(d-90)*Math.PI/180;
-const x1=cx+r*Math.cos(toRad(startAngle));
-const y1=cy+r*Math.sin(toRad(startAngle));
-const x2=cx+r*Math.cos(toRad(endAngle));
-const y2=cy+r*Math.sin(toRad(endAngle));
-const largeArc=totalArc>180?1:0;
-arc.setAttribute('d',`M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`);
+const cx=140,cy=140,r=WHEEL_R;
+if(!arc.dataset.full){
+const d=`M ${cx} ${cy-r} A ${r} ${r} 0 1 1 ${cx-0.001} ${cy-r}`;
+arc.setAttribute('d',d);
+arc.dataset.full='1';
+}
+const pct=Math.max(0,Math.min(1,chance/100));
+const visible=WHEEL_CIRC*pct;
+const hidden=WHEEL_CIRC-visible;
+arc.style.strokeDasharray=`${visible} ${hidden+1}`;
+arc.style.strokeDashoffset=`${-visible/2}`;
 }
 drawWheelTicks();
 
@@ -1938,7 +2022,7 @@ void arrow.offsetWidth;
 setTimeout(()=>{
 arrow.classList.add('spinning');
 arrow.style.transform=`rotate(${finalRotation}deg)`;
-},30);
+},20);
 const spinInterval=setInterval(()=>{
 percentEl.textContent=(Math.random()*90+5).toFixed(0)+'%';
 labelEl.textContent='крутим...';
@@ -1949,13 +2033,16 @@ skipBtn.style.cssText='width:100%;max-width:280px;margin-top:10px;';
 btn.parentNode.insertBefore(skipBtn,btn.nextSibling);
 let finished=false;
 skipBtn.addEventListener('click',()=>finishUpgrade());
-const timer=setTimeout(()=>finishUpgrade(),5500);
+const SPIN_MS=5600;
+const timer=setTimeout(()=>finishUpgrade(),SPIN_MS);
 function finishUpgrade(){
 if(finished)return;finished=true;
 clearTimeout(timer);clearInterval(spinInterval);
 skipBtn.remove();
 arrow.classList.remove('spinning');
+arrow.style.transition='none';
 arrow.style.transform=`rotate(${targetAngle-180}deg)`;
+void arrow.offsetWidth;
 percentEl.textContent=chance+'%';
 let newItem=null;
 if(success){
@@ -2309,9 +2396,11 @@ if(!filled.every(i=>i.rarity===filled[0].rarity))return;
 if(filled[0].rarity>=RARITY.MILITARY)return;
 if(state.craftAddMoney>state.balance){notify('Недостаточно средств','error');return;}
 const nextRarity=filled[0].rarity+1;
-const success=Math.random()<(state.craftChance/100);
+const realCraftChance=Math.min(95,state.craftChance*1.35);
+const success=Math.random()<(realCraftChance/100);
 const totalBet=filled.reduce((s,i)=>s+i.price,0)+state.craftAddMoney;
-const priceMult=state.craftChance===30?1.5:state.craftChance===50?1.0:0.7;
+const craftPriceMult={10:2.0,30:1.5,50:1.0,70:0.85,90:0.6}[state.craftChance]||1.0;
+const priceMult=craftPriceMult;
 if(state.craftAddMoney>0){state.balance-=state.craftAddMoney;state.stats.spent+=state.craftAddMoney;}
 let newItem=null;
 if(success){state.craftSlots=[null,null,null,null,null];
@@ -2856,7 +2945,7 @@ myInvEl.innerHTML='<div style="color:#52627a;font-size:11px;padding:8px;">Пус
 availableInv.sort((a,b)=>b.price-a.price).slice(0,30).forEach(item=>{
 const card=document.createElement('div');
 card.className='deal-room-inv-item'+(myReady?' disabled':'');
-card.innerHTML=`${renderPlate(item.plate,item.region,item.rarity,'small')}<div class="price">${fmt(item.price)}</div>`;
+card.innerHTML=`${renderPlate(item.plate,item.region,item.rarity,'tiny')}<div class="price">${fmt(item.price)}</div>`;
 if(!myReady){
 card.addEventListener('click',()=>addItemToMyDeal(item));
 }
@@ -2871,7 +2960,7 @@ theirInvEl.innerHTML='<div style="color:#52627a;font-size:11px;padding:8px;">П�
 theirInv.slice(0,30).forEach(item=>{
 const card=document.createElement('div');
 card.className='deal-room-inv-item disabled';
-card.innerHTML=`${renderPlate(item.plate,item.region,item.rarity,'small')}<div class="price">${fmt(item.price)}</div>`;
+card.innerHTML=`${renderPlate(item.plate,item.region,item.rarity,'tiny')}<div class="price">${fmt(item.price)}</div>`;
 theirInvEl.appendChild(card);
 });
 }
