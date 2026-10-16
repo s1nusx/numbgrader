@@ -721,15 +721,15 @@ border-radius:12px;padding:16px;}
 .deal-side-title{font-size:12px;color:#8a9bb5;font-weight:900;letter-spacing:1.5px;
 text-transform:uppercase;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
 .deal-side-title .player-name{color:#fff;font-size:13px;}
-.deal-slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.deal-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;}
 .deal-slot{aspect-ratio:1/1;background:linear-gradient(180deg,#090d12,#070a0e);
 border:1px dashed #1e2a3a;border-radius:10px;display:flex;flex-direction:column;
 align-items:center;justify-content:center;cursor:pointer;transition:all 0.25s;
-padding:8px;position:relative;}
+padding:5px;position:relative;}
 .deal-slot:hover{border-color:#f0b90b;}
 .deal-slot.filled{border-style:solid;border-color:#233044;}
-.deal-slot.empty::before{content:"+";font-size:28px;color:#28374b;font-weight:200;}
-.deal-slot .deal-slot-price{color:#f0b90b;font-weight:900;font-size:10px;margin-top:6px;}
+.deal-slot.empty::before{content:"+";font-size:20px;color:#28374b;font-weight:200;}
+.deal-slot .deal-slot-price{color:#f0b90b;font-weight:900;font-size:9px;margin-top:4px;}
 .deal-slot.locked{cursor:not-allowed;opacity:0.7;}
 .deal-slot.locked:hover{border-color:#1e2a3a;}
 .deal-money-block{background:linear-gradient(180deg,#0a0e15,#080b10);border:1px solid #1a2230;
@@ -1073,6 +1073,8 @@ body{padding:8px;}
 <div class="deal-slots" id="dealMySlots">
 <div class="deal-slot empty"></div>
 <div class="deal-slot empty"></div>
+<div class="deal-slot empty"></div>
+<div class="deal-slot empty"></div>
 </div>
 <div class="deal-money-block">
 <div class="deal-money-head"><span>Деньги</span>
@@ -1084,6 +1086,8 @@ body{padding:8px;}
 <div class="deal-side-title"><span>Инвентарь получателя</span>
 <span class="player-name" id="dealTheirName">—</span></div>
 <div class="deal-slots" id="dealTheirSlots">
+<div class="deal-slot empty"></div>
+<div class="deal-slot empty"></div>
 <div class="deal-slot empty"></div>
 <div class="deal-slot empty"></div>
 </div>
@@ -1343,12 +1347,12 @@ const snap=await getDoc(userRef);
 if(snap.exists()){
 fbProfile=snap.data();fbProfileLoaded=true;
 renderProfileScreen();loadFriendRequests();loadFriends();syncProfileBalance();setupDealsListener();
-if(fbProfile.createdAt&&!fbProfile.name){$('nameModal').classList.add('open');setTimeout(()=>$('firstNameInput').focus(),200);}
+if(fbProfile.createdAt&&!fbProfile.name&&!sessionStorage.getItem('nameModalSkipped')){$('nameModal').classList.add('open');setTimeout(()=>$('firstNameInput').focus(),200);}
 }else{
 const newId=await generateUniqueId();
 fbProfile={uid:user.uid,id:newId,name:null,username:null,usernameChangedAt:0,createdAt:Date.now(),friendRequests:[],friends:[],balance:state.balance,active:false,inventoryCount:0,miningRate:0,bestPlate:0,totalInventoryValue:0};
 await setDoc(userRef,fbProfile);fbProfileLoaded=true;
-$('nameModal').classList.add('open');setTimeout(()=>$('firstNameInput').focus(),200);
+if(!sessionStorage.getItem('nameModalSkipped')){$('nameModal').classList.add('open');setTimeout(()=>$('firstNameInput').focus(),200);}
 }}catch(e){console.error('Profile load error:',e);}});}
 async function generateUniqueId(){
 const{doc,getDoc,setDoc}=window.fbFuncs;
@@ -1501,9 +1505,17 @@ function updateFirstNameValidation(){const raw=$('firstNameInput').value;const t
 if(trimmed.length<4){hint.textContent='Минимум 4 символа';hint.className='edit-name-hint error';btn.disabled=true;}
 else{hint.textContent='Готово';hint.className='edit-name-hint success';btn.disabled=false;}}
 async function saveFirstName(){const raw=$('firstNameInput').value;const trimmed=raw.replace(/^\s+|\s+$/g,'');if(trimmed.length<4||!fbUser)return;
-try{await window.fbFuncs.updateDoc(doc(window.fbDb,'users',fbUser.uid),{name:trimmed});fbProfile.name=trimmed;$('nameModal').classList.remove('open');renderProfileScreen();notify('Добро пожаловать!','success');}catch(e){console.error(e);}}
+$('nameModal').classList.remove('open');
+sessionStorage.setItem('nameModalSkipped','1');
+if(fbProfile)fbProfile.name=trimmed;
+renderProfileScreen();
+try{await window.fbFuncs.updateDoc(doc(window.fbDb,'users',fbUser.uid),{name:trimmed});notify('Добро пожаловать!','success');}catch(e){console.error(e);}}
 async function skipFirstName(){if(!fbUser)return;
-try{await window.fbFuncs.updateDoc(doc(window.fbDb,'users',fbUser.uid),{name:fbProfile.id});fbProfile.name=fbProfile.id;$('nameModal').classList.remove('open');renderProfileScreen();}catch(e){console.error(e);}}
+$('nameModal').classList.remove('open');
+sessionStorage.setItem('nameModalSkipped','1');
+if(fbProfile)fbProfile.name=fbProfile.id;
+renderProfileScreen();
+try{await window.fbFuncs.updateDoc(doc(window.fbDb,'users',fbUser.uid),{name:fbProfile.id});}catch(e){console.error(e);}}
 function updateUsernameValidation(){const raw=$('usernameInput').value;const trimmed=raw.replace(/^\s+|\s+$/g,'').toLowerCase();const hint=$('usernameHint');const btn=$('saveUsernameBtn');const valid=/^[a-z0-9_]+$/.test(trimmed);
 if(trimmed.length<4){hint.textContent='Минимум 4 символа';hint.className='username-hint error';btn.disabled=true;}
 else if(!valid){hint.textContent='Только латиница, цифры и _';hint.className='username-hint error';btn.disabled=true;}
@@ -1547,7 +1559,8 @@ await updateDoc(doc(window.fbDb,'users',fbUser.uid),{friendRequests:arrayRemove(
 fbProfile.friendRequests=(fbProfile.friendRequests||[]).filter(x=>x!==uid);
 friendRequests=friendRequests.filter(r=>r.uid!==uid);
 renderBellBadge();renderBellList();notify('Запрос отклонён','');}catch(e){}}
-async function sendFriendRequest(){const input=$('friendIdInput');let raw=input.value.replace(/^\s+|\s+$/g,'');if(!raw)return;
+async function sendFriendRequest(){const input=$('friendIdInput');let raw=input.value.replace(/^\s+|\s+$/g,'');if(!raw){notify('Введите ID или @username','error');return;}
+if(!fbUser||!fbProfile){notify('Профиль не загружен','error');return;}
 try{const{collection,query,where,getDocs,doc,updateDoc,arrayUnion}=window.fbFuncs;
 let targetData=null,targetUid=null;
 if(raw.startsWith('@')){const uname=raw.slice(1).toLowerCase();
@@ -1561,18 +1574,23 @@ if(fbProfile&&id===fbProfile.id){notify('Это ваш ID','error');return;}
 const q=query(collection(window.fbDb,'users'),where('id','==',id));
 const snap=await getDocs(q);if(snap.empty){notify('Игрок не найден','error');return;}
 targetData=snap.docs[0].data();targetUid=snap.docs[0].id;}
+if(targetUid===fbUser.uid){notify('Это вы','error');return;}
 if((targetData.friends||[]).includes(fbUser.uid)){notify('Уже в друзьях','error');return;}
 if((targetData.friendRequests||[]).includes(fbUser.uid)){notify('Запрос уже отправлен','error');return;}
 await updateDoc(doc(window.fbDb,'users',targetUid),{friendRequests:arrayUnion(fbUser.uid)});
-notify('Запрос отправлен','success');input.value='';}catch(e){notify('Ошибка','error');}}
+notify('Запрос отправлен','success');input.value='';}catch(e){console.error('Friend req:',e);notify('Ошибка: '+e.message,'error');}}
 async function loadTopSorted(sortBy){currentTopSort=sortBy;
 const field=sortBy==='mining'?'miningRate':sortBy==='inventory'?'totalInventoryValue':'balance';
 try{const{collection,query,orderBy,limit,getDocs,where}=window.fbFuncs;
 const usersRef=collection(window.fbDb,'users');let top=[];
-try{const q=query(usersRef,where('active','==',true),orderBy(field,'desc'),limit(10));
+try{const q=query(usersRef,where('active','==',true),orderBy(field,'desc'),limit(30));
 const snap=await getDocs(q);snap.forEach(d=>top.push(d.data()));}
-catch(innerErr){const q=query(usersRef,orderBy(field,'desc'),limit(10));
+catch(innerErr){const q=query(usersRef,orderBy(field,'desc'),limit(50));
 const snap=await getDocs(q);snap.forEach(d=>top.push(d.data()));}
+top=top.filter(p=>{const invVal=p.totalInventoryValue||0;const bal=p.balance||0;const rate=p.miningRate||0;
+if(sortBy==='mining')return rate>0;
+if(sortBy==='inventory')return invVal>0;
+return bal>100000||invVal>0||rate>0;}).slice(0,10);
 renderTopListSorted(top,sortBy);}catch(e){renderTopListSorted([],sortBy);}}
 function renderTopListSorted(top,sortBy){const list=$('topList');if(!list)return;
 if(!top.length){list.innerHTML='<div class="friends-empty">Рейтинг пока пуст</div>';$('topCount').textContent='0';return;}
@@ -1635,7 +1653,7 @@ currentDealRoomId=roomRef.id;subscribeDealRoom(roomRef.id);showDealRoomView();
 notify('Комната создана, ждём второго игрока','success');}catch(e){notify('Ошибка создания комнаты','error');}}
 function showDealRoomView(){if(!$('dealRoomView')){
 const v=document.createElement('div');v.id='dealRoomView';
-v.innerHTML=`<div class="deal-grid"><div class="deal-side"><div class="deal-side-title"><span>Ваш инвентарь</span><span class="player-name" id="roomMyName">—</span></div><div class="deal-slots" id="roomMySlots"><div class="deal-slot empty"></div><div class="deal-slot empty"></div></div><div class="deal-money-block"><div class="deal-money-head"><span>Ваши деньги</span><span class="val" id="roomMyMoneyVal">0.00 ₽</span></div></div><div style="margin-top:14px;"><div class="deal-status waiting" id="roomMyStatus">Ожидание</div></div></div><div class="deal-side"><div class="deal-side-title"><span>Инвентарь получателя</span><span class="player-name" id="roomTheirName">—</span></div><div class="deal-slots" id="roomTheirSlots"><div class="deal-slot empty"></div><div class="deal-slot empty"></div></div><div class="deal-money-block"><div class="deal-money-head"><span>Деньги получателя</span><span class="val" id="roomTheirMoneyVal">0.00 ₽</span></div></div><div style="margin-top:14px;"><div class="deal-status waiting" id="roomTheirStatus">Ожидание</div></div></div></div><div class="deal-center"><div class="deal-center-title">Ход сделки</div><div class="deal-status" id="roomStatusText">Ожидание подтверждения</div><div class="deal-timer" id="roomTimer" style="display:none;">3</div><div class="deal-actions"><button class="btn" id="roomReadyBtn">Готово</button><button class="btn secondary" id="roomCancelBtn">Отмена</button></div></div>`;
+v.innerHTML=`<div class="deal-grid"><div class="deal-side"><div class="deal-side-title"><span>Ваш инвентарь</span><span class="player-name" id="roomMyName">—</span></div><div class="deal-slots" id="roomMySlots"><div class="deal-slot empty"></div><div class="deal-slot empty"></div><div class="deal-slot empty"></div><div class="deal-slot empty"></div></div><div class="deal-money-block"><div class="deal-money-head"><span>Ваши деньги</span><span class="val" id="roomMyMoneyVal">0.00 ₽</span></div></div><div style="margin-top:14px;"><div class="deal-status waiting" id="roomMyStatus">Ожидание</div></div></div><div class="deal-side"><div class="deal-side-title"><span>Инвентарь получателя</span><span class="player-name" id="roomTheirName">—</span></div><div class="deal-slots" id="roomTheirSlots"><div class="deal-slot empty"></div><div class="deal-slot empty"></div><div class="deal-slot empty"></div><div class="deal-slot empty"></div></div><div class="deal-money-block"><div class="deal-money-head"><span>Деньги получателя</span><span class="val" id="roomTheirMoneyVal">0.00 ₽</span></div></div><div style="margin-top:14px;"><div class="deal-status waiting" id="roomTheirStatus">Ожидание</div></div></div></div><div class="deal-center"><div class="deal-center-title">Ход сделки</div><div class="deal-status" id="roomStatusText">Ожидание подтверждения</div><div class="deal-timer" id="roomTimer" style="display:none;">3</div><div class="deal-actions"><button class="btn" id="roomReadyBtn">Готово</button><button class="btn secondary" id="roomCancelBtn">Отмена</button></div></div>`;
 document.querySelector('.deals-wrap').appendChild(v);
 $('roomReadyBtn').addEventListener('click',markDealReady);
 $('roomCancelBtn').addEventListener('click',cancelDealRoom);}
@@ -1665,7 +1683,7 @@ if(room.status==='both_ready'){$('roomStatusText').textContent='Обмен...';$
 else if(myReady&&!theirReady){$('roomStatusText').textContent='Ждём второго игрока';$('roomStatusText').className='deal-status waiting';}
 else{$('roomStatusText').textContent='Ожидание подтверждения';$('roomStatusText').className='deal-status waiting';}}
 function renderRoomSlots(containerId,items){const el=$(containerId);if(!el)return;el.innerHTML='';
-for(let i=0;i<2;i++){const div=document.createElement('div');const item=items[i];
+for(let i=0;i<4;i++){const div=document.createElement('div');const item=items[i];
 if(item){div.className='deal-slot filled';div.innerHTML=renderPlate(item.plate,item.region,item.rarity,'small')+`<div class="deal-slot-price">${fmt(item.price)}</div>`;}
 else{div.className='deal-slot empty';}
 el.appendChild(div);}}
@@ -2212,7 +2230,7 @@ function notify(text,type){const n=document.createElement('div');
 n.className='notify'+(type?' '+type:'');
 n.textContent=text;document.body.appendChild(n);
 setTimeout(()=>n.remove(),3200);}
-let dealBuilderTarget=null,dealMySlots=[null,null],dealTheirSlots=[null,null],dealMyMoney=0,dealTheirMoney=0;
+let dealBuilderTarget=null,dealMySlots=[null,null,null,null],dealTheirSlots=[null,null,null,null],dealMyMoney=0,dealTheirMoney=0;
 function initDealsTabs(){document.querySelectorAll('.deals-tab').forEach(tab=>{
 tab.addEventListener('click',()=>{document.querySelectorAll('.deals-tab').forEach(t=>t.classList.remove('active'));
 tab.classList.add('active');const v=tab.dataset.dealsTab;
@@ -2222,7 +2240,8 @@ $('deals-outgoing-view').style.display=v==='outgoing'?'block':'none';
 const roomV=$('dealRoomView');if(roomV)roomV.style.display='none';
 if(v==='incoming')loadIncomingDeals();
 if(v==='outgoing')loadOutgoingDeals();});});}
-async function findDealTarget(){const raw=$('dealTargetId').value.replace(/^\s+|\s+$/g,'');
+async function findDealTarget(){
+const raw=$('dealTargetId').value.replace(/^\s+|\s+$/g,'');
 if(!raw)return;
 try{const{collection,query,where,getDocs}=window.fbFuncs;
 let snap;
@@ -2237,15 +2256,18 @@ snap=await getDocs(query(collection(window.fbDb,'users'),where('id','==',id)));}
 if(snap.empty){notify('Игрок не найден','error');return;}
 dealBuilderTarget=snap.docs[0].data();
 dealBuilderTarget.uid=snap.docs[0].id;
-dealMySlots=[null,null];dealTheirSlots=[null,null];
+dealMySlots=[null,null,null,null];
+dealTheirSlots=[null,null,null,null];
 dealMyMoney=0;dealTheirMoney=0;
 $('dealMyMoney').value=0;$('dealTheirMoney').value=0;
 $('dealMyMoneyVal').textContent='0.00 ₽';$('dealTheirMoneyVal').textContent='0.00 ₽';
 $('dealMyName').textContent=fbProfile.name||('ID '+fbProfile.id);
 $('dealTheirName').textContent=dealBuilderTarget.name||('ID '+dealBuilderTarget.id);
 $('dealBuilder').style.display='block';
-renderDealBuilder();}catch(e){notify('Ошибка','error');}}
-function renderDealBuilder(){const mySlotsEl=$('dealMySlots');mySlotsEl.innerHTML='';
+renderDealBuilder();
+}catch(e){console.error(e);notify('Ошибка','error');}}
+function renderDealBuilder(){
+const mySlotsEl=$('dealMySlots');mySlotsEl.innerHTML='';
 dealMySlots.forEach((item,i)=>{const div=document.createElement('div');
 if(item){div.className='deal-slot filled';
 div.innerHTML=renderPlate(item.plate,item.region,item.rarity,'small')+`<div class="deal-slot-price">${fmt(item.price)}</div>`;
@@ -2273,34 +2295,61 @@ card.addEventListener('click',()=>{dealMySlots[slotIdx]=item;
 state.inventory=state.inventory.filter(x=>x.id!==item.id);
 renderDealBuilder();renderInventory();modal.classList.remove('open');});
 grid.appendChild(card);});}
-async function sendDeal(){if(!fbUser||!fbProfile||!dealBuilderTarget)return;
-await createDealRoom(dealBuilderTarget.uid);}
-function resetDealBuilder(){dealBuilderTarget=null;
-dealMySlots=[null,null];dealTheirSlots=[null,null];
+async function sendDeal(){
+if(!fbUser||!fbProfile||!dealBuilderTarget)return;
+if(dealMySlots.filter(Boolean).length===0&&dealMyMoney===0){notify('Добавьте номер или деньги','error');return;}
+try{const{collection,addDoc}=window.fbFuncs;
+await addDoc(collection(window.fbDb,'deals'),{
+fromUid:fbUser.uid,
+fromId:fbProfile.id,
+fromName:fbProfile.name||('ID '+fbProfile.id),
+toUid:dealBuilderTarget.uid,
+toId:dealBuilderTarget.id,
+toName:dealBuilderTarget.name||('ID '+dealBuilderTarget.id),
+myItems:dealMySlots.filter(Boolean),
+theirItems:[],
+myMoney:dealMyMoney,
+theirMoney:0,
+status:'pending',
+createdAt:Date.now()
+});
+if(dealMyMoney>0){state.balance-=dealMyMoney;updateBalance();}
+renderInventory();save();syncProfileBalance();
+notify('Сделка отправлена','success');resetDealBuilder();
+}catch(e){console.error('Deal send:',e);notify('Ошибка: '+e.message,'error');}}
+function resetDealBuilder(){
+dealBuilderTarget=null;
+dealMySlots=[null,null,null,null];
+dealTheirSlots=[null,null,null,null];
 dealMyMoney=0;dealTheirMoney=0;
 $('dealBuilder').style.display='none';
 $('dealTargetId').value='';}
-async function loadIncomingDeals(){const list=$('incomingList');
+async function loadIncomingDeals(){
+const list=$('incomingList');
 try{const{collection,query,where,getDocs}=window.fbFuncs;
 const q=query(collection(window.fbDb,'deals'),where('toUid','==',fbUser.uid));
 const snap=await getDocs(q);const deals=[];
 snap.forEach(d=>deals.push({id:d.id,...d.data()}));
 if(!deals.length){list.innerHTML='<div class="friends-empty">Входящих сделок нет</div>';return;}
-list.innerHTML=deals.map(d=>`<div class="incoming-deal"><div class="incoming-deal-header"><div class="incoming-deal-title">Сделка от ${d.fromName}</div><div class="incoming-deal-meta">${new Date(d.createdAt).toLocaleString('ru-RU')}</div></div><div class="incoming-deal-actions"><button class="btn" data-deal-accept="${d.id}">Принять</button><button class="btn secondary" data-deal-decline="${d.id}">Отклонить</button></div></div>`).join('');
+list.innerHTML=deals.map(d=>{
+const itemsHtml=(d.myItems||[]).map(i=>renderPlate(i.plate,i.region,i.rarity,'small')).join('');
+return`<div class="incoming-deal"><div class="incoming-deal-header"><div class="incoming-deal-title">От ${d.fromName}</div><div class="incoming-deal-meta">${new Date(d.createdAt).toLocaleString('ru-RU')}</div></div><div style="background:#080b10;border:1px solid #1a2230;border-radius:8px;padding:10px;margin:10px 0;"><div style="font-size:10px;color:#6d7c92;font-weight:800;text-transform:uppercase;margin-bottom:8px;">Он даёт вам</div><div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">${itemsHtml||'<span style="color:#52627a;font-size:11px;">только деньги</span>'}</div>${d.myMoney>0?`<div style="text-align:center;margin-top:8px;color:#f0b90b;font-weight:900;">+${fmt(d.myMoney)}</div>`:''}</div><div class="incoming-deal-actions"><button class="btn" data-deal-accept="${d.id}">Принять</button><button class="btn secondary" data-deal-decline="${d.id}">Отклонить</button></div></div>`;}).join('');
 list.querySelectorAll('[data-deal-accept]').forEach(b=>{b.addEventListener('click',()=>acceptDeal(b.dataset.dealAccept));});
 list.querySelectorAll('[data-deal-decline]').forEach(b=>{b.addEventListener('click',()=>declineDeal(b.dataset.dealDecline));});
-}catch(e){list.innerHTML='<div class="friends-empty">Ошибка загрузки</div>';}}
-async function acceptDeal(dealId){try{const{doc,getDoc,updateDoc,deleteDoc}=window.fbFuncs;
+}catch(e){console.error(e);list.innerHTML='<div class="friends-empty">Ошибка загрузки</div>';}}
+async function acceptDeal(dealId){
+try{const{doc,getDoc,updateDoc,deleteDoc}=window.fbFuncs;
 const snap=await getDoc(doc(window.fbDb,'deals',dealId));
 if(!snap.exists())return;const d=snap.data();
-if(d.theirMoney>state.balance){notify('Недостаточно денег','error');return;}
 state.inventory=state.inventory.concat(d.myItems||[]);
-state.inventory=state.inventory.filter(i=>!(d.theirItems||[]).some(x=>x.id===i.id));
-state.balance+=(d.myMoney||0)-(d.theirMoney||0);
+state.balance+=(d.myMoney||0);
 updateBalance();renderInventory();save();syncProfileBalance();
+try{const fromSnap=await getDoc(doc(window.fbDb,'users',d.fromUid));
+if(fromSnap.exists()){await updateDoc(doc(window.fbDb,'users',d.fromUid),{balance:(fromSnap.data().balance||0)+(d.theirMoney||0)-(d.myMoney||0)});}}catch(e){console.error(e);}
 await deleteDoc(doc(window.fbDb,'deals',dealId));
-addHistory('Сделка',`Принята от ${d.fromName}`,(d.myMoney||0)-(d.theirMoney||0));
-notify('Сделка принята!','success');loadIncomingDeals();}catch(e){notify('Ошибка','error');}}
+addHistory('Сделка',`Принята от ${d.fromName}`,d.myMoney||0);
+notify('Сделка принята!','success');loadIncomingDeals();
+}catch(e){console.error('Accept:',e);notify('Ошибка: '+e.message,'error');}}
 async function declineDeal(dealId){const{doc,deleteDoc}=window.fbFuncs;
 await deleteDoc(doc(window.fbDb,'deals',dealId));
 notify('Сделка отклонена','');loadIncomingDeals();}
