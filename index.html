@@ -162,17 +162,23 @@ animation:glowRed 1.8s ease-in-out infinite;}
 50%{box-shadow:0 2px 6px rgba(0,0,0,0.5),0 0 38px rgba(255,255,255,0.55);}}
 .center-col{text-align:center;}
 
+/* ============ НОВОЕ КОЛЕСО АПГРЕЙДЕРА ============ */
 .wheel-wrap{position:relative;width:280px;height:280px;margin:0 auto 18px;}
 .wheel-svg{width:100%;height:100%;display:block;overflow:visible;}
 .wheel-arc-bg{fill:none;stroke:#151c26;stroke-width:14;}
 .wheel-arc-fill{fill:none;stroke:url(#wheelGrad);stroke-width:14;stroke-linecap:butt;
-transition:stroke-dashoffset 0.5s cubic-bezier(0.2,0.9,0.3,1);}
+transition:d 0.5s cubic-bezier(0.2,0.9,0.3,1),stroke 0.4s ease,filter 0.4s ease;
+filter:drop-shadow(0 0 8px rgba(240,185,11,0.35));}
+.wheel-wrap.result-win .wheel-arc-fill{filter:drop-shadow(0 0 18px rgba(34,197,94,0.9));}
+.wheel-wrap.result-lose .wheel-arc-fill{filter:drop-shadow(0 0 18px rgba(239,68,68,0.9));}
 .wheel-tick{stroke:#2a3442;stroke-width:2;opacity:0.6;}
 .wheel-tick.major{stroke:#3a4555;stroke-width:2.5;opacity:0.9;}
 .wheel-center{position:absolute;inset:0;display:flex;flex-direction:column;
 align-items:center;justify-content:center;pointer-events:none;}
 .wheel-percent{font-size:44px;font-weight:900;color:#fff;letter-spacing:-1.5px;
-line-height:1;font-variant-numeric:tabular-nums;transition:color 0.3s;}
+line-height:1;font-variant-numeric:tabular-nums;
+transition:color 0.3s,text-shadow 0.3s;
+text-shadow:0 0 20px rgba(255,255,255,0.15);}
 .wheel-label{font-size:11px;color:#6d7c92;font-weight:800;letter-spacing:1.5px;
 text-transform:uppercase;margin-top:10px;transition:color 0.3s;}
 .wheel-label.win{color:#22c55e;}
@@ -180,20 +186,28 @@ text-transform:uppercase;margin-top:10px;transition:color 0.3s;}
 .wheel-arrow{position:absolute;left:50%;top:50%;width:0;height:0;
 transform-origin:0 0;pointer-events:none;transition:transform 0s;
 will-change:transform;}
-.wheel-arrow::before{content:"";position:absolute;left:-9px;top:-120px;
-width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;
-border-bottom:16px solid #f0b90b;
-filter:drop-shadow(0 0 8px rgba(240,185,11,0.9));}
-.wheel-arrow::after{content:"";position:absolute;left:-2px;top:-108px;
-width:4px;height:22px;background:linear-gradient(180deg,#f0b90b,#c99300);
-border-radius:2px;box-shadow:0 0 8px rgba(240,185,11,0.7);}
+.wheel-arrow::before{content:"";position:absolute;left:-10px;top:104px;
+width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;
+border-top:18px solid #f0b90b;
+filter:drop-shadow(0 0 10px rgba(240,185,11,1));
+transition:border-top-color 0.3s ease,filter 0.3s ease;}
+.wheel-arrow::after{content:"";position:absolute;left:-3px;top:84px;
+width:6px;height:24px;background:linear-gradient(180deg,#c99300,#ffd966);
+border-radius:3px;box-shadow:0 0 10px rgba(240,185,11,0.9);}
 .wheel-arrow.spinning{transition:transform 5.5s cubic-bezier(0.15,0.9,0.15,1);}
-.wheel-wrap.result-win .wheel-percent{color:#22c55e;}
-.wheel-wrap.result-lose .wheel-percent{color:#ef4444;}
-.wheel-wrap.result-win .wheel-arrow::before{border-bottom-color:#22c55e;
-filter:drop-shadow(0 0 12px rgba(34,197,94,1));}
-.wheel-wrap.result-lose .wheel-arrow::before{border-bottom-color:#ef4444;
-filter:drop-shadow(0 0 12px rgba(239,68,68,1));}
+.wheel-wrap.result-win .wheel-percent{color:#22c55e;text-shadow:0 0 28px rgba(34,197,94,0.9);}
+.wheel-wrap.result-lose .wheel-percent{color:#ef4444;text-shadow:0 0 28px rgba(239,68,68,0.9);}
+.wheel-wrap.result-win .wheel-arrow::before{border-top-color:#22c55e;
+filter:drop-shadow(0 0 14px rgba(34,197,94,1));}
+.wheel-wrap.result-lose .wheel-arrow::before{border-top-color:#ef4444;
+filter:drop-shadow(0 0 14px rgba(239,68,68,1));}
+.wheel-wrap.result-win{animation:winPulse 0.8s ease-in-out 2;}
+.wheel-wrap.result-lose{animation:losePulse 0.8s ease-in-out 2;}
+@keyframes winPulse{0%,100%{filter:drop-shadow(0 0 0 rgba(34,197,94,0));}
+50%{filter:drop-shadow(0 0 30px rgba(34,197,94,0.9));}}
+@keyframes losePulse{0%,100%{filter:drop-shadow(0 0 0 rgba(239,68,68,0));}
+50%{filter:drop-shadow(0 0 30px rgba(239,68,68,0.9));}}
+/* ============ /НОВОЕ КОЛЕСО ============ */
 
 .multipliers{display:flex;justify-content:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
 .mult-btn{background:linear-gradient(180deg,#0b0f15,#090d12);
@@ -903,8 +917,8 @@ body{padding:8px;}
 .history-summary{grid-template-columns:1fr;}
 .wheel-wrap{width:240px;height:240px;}
 .wheel-percent{font-size:38px;}
-.wheel-arrow::before{top:-104px;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid #f0b90b;}
-.wheel-arrow::after{top:-94px;height:20px;left:-2px;}
+.wheel-arrow::before{top:88px;border-left:9px solid transparent;border-right:9px solid transparent;border-top:16px solid #f0b90b;}
+.wheel-arrow::after{top:70px;height:22px;left:-3px;}
 .deal-room-slots{grid-template-columns:repeat(2,1fr);}
 .deal-room-actions .btn{max-width:100%;}
 }
@@ -915,8 +929,8 @@ body{padding:8px;}
 .market-indicator .lbl{display:none;}
 .wheel-wrap{width:220px;height:220px;}
 .wheel-percent{font-size:34px;}
-.wheel-arrow::before{top:-94px;}
-.wheel-arrow::after{top:-86px;height:18px;}
+.wheel-arrow::before{top:80px;}
+.wheel-arrow::after{top:64px;height:20px;}
 }
 </style>
 </head>
@@ -972,14 +986,13 @@ body{padding:8px;}
 <svg class="wheel-svg" viewBox="0 0 280 280">
 <defs>
 <linearGradient id="wheelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-<stop offset="0%" stop-color="#22c55e"/>
+<stop offset="0%" stop-color="#e63e3e"/>
 <stop offset="50%" stop-color="#f0b90b"/>
-<stop offset="100%" stop-color="#e63e3e"/>
+<stop offset="100%" stop-color="#22c55e"/>
 </linearGradient>
 </defs>
 <circle class="wheel-arc-bg" cx="140" cy="140" r="120"/>
-<circle class="wheel-arc-fill" id="wheelArcFill" cx="140" cy="140" r="120"
-stroke-dasharray="753.98" stroke-dashoffset="753.98"/>
+<path class="wheel-arc-fill" id="wheelArcFill" d=""/>
 <g id="wheelTicks"></g>
 </svg>
 <div class="wheel-center">
@@ -1454,7 +1467,6 @@ window.dispatchEvent(new Event('fb-ready'));
 'use strict';
 let fbUser=null,fbProfile=null,fbProfileLoaded=false,friendRequests=[],friendsList=[],myDealsUnsub=null,currentTopSort='balance',profileUnsub=null;
 
-// ============ СОСТОЯНИЕ СДЕЛОК (глобальное) ============
 let currentDealInviteId=null;
 let currentDealInviteTimer=null;
 let currentDealRoomId=null;
@@ -1477,7 +1489,6 @@ try{
 const snap=await getDoc(userRef);
 if(snap.exists()){
 fbProfile=snap.data();fbProfileLoaded=true;
-// Мерж серверного прогресса с локальным (не затираем)
 if(typeof fbProfile.balance==='number'&&fbProfile.balance>state.balance)state.balance=fbProfile.balance;
 if(Array.isArray(fbProfile.inventory)&&fbProfile.inventory.length>state.inventory.length)state.inventory=fbProfile.inventory;
 if(fbProfile.stats&&typeof fbProfile.stats.earned==='number'&&fbProfile.stats.earned>state.stats.earned)state.stats=Object.assign(state.stats,fbProfile.stats);
@@ -1553,7 +1564,7 @@ black:{name:'Чёрный',price:75000000,table:[{rarity:RARITY.STANDARD,chance:
 const REGION_MULT={'77':15,'99':15,'97':15,'177':15,'199':15,'197':15,'777':20,'78':8,'98':8,'178':8,'198':8,'50':8,'90':8,'150':8,'190':8,'750':8,'790':8,'23':3,'93':3,'123':3,'193':3,'223':3,'66':3,'96':3,'196':3,'16':3,'116':3,'716':3,'52':3,'152':3,'252':3,'61':3,'161':3,'261':3,'74':3,'174':3,'274':3,'54':3,'154':3,'254':3,'02':3,'102':3,'702':3,'34':3,'134':3,'234':3,'39':3,'139':3,'26':3,'126':3,'226':3,'63':3,'163':3,'263':3,'72':3,'172':3,'272':3,'86':3,'186':3,'286':3,'47':3,'147':3,'247':3};
 const REGIONS=Object.keys(REGION_MULT);
 const BLAT_SERIES={'А777АА77':250000000,'А001АА77':50000000,'А002АА77':45000000,'О001ОО77':60000000,'О777ОО77':150000000,'О002ОО77':50000000,'Е001ЕЕ77':55000000,'ЕКХ00777':220000000,'АМР00777':180000000,'С001СС77':35000000,'В001ВВ77':40000000,'М001ММ77':45000000,'К001КК77':30000000,'Н001НН77':32000000,'Т001ТТ77':28000000};
-const LETTERS='АВЕКМНОРСТУХ',HOUSE_EDGE=0.90,UPGRADE_META_BOOST=1.4,SAVE_KEY='numbgrader_save_v13',MINING_RATE=0.00001,MINING_SLOTS=10,MINING_SLOT_COST=i=>i===0?0:50000*i,MINING_LIMIT_SEC=8*3600,DAILY_FREE_COOLDOWN=24*60*60*1000,BLACKMARKET_REFRESH=5*60*1000,MARKET_UPDATE_INTERVAL=60*60*1000,BREAK_CHECK_INTERVAL=30*60*1000,BREAK_CHANCE=0.05,AUTOREPAIR_PERCENT=0.05,DEAL_TIMER_SEC=3,DEAL_INVITE_TIMEOUT=60000,WHEEL_CIRCUMFERENCE=753.98;
+const LETTERS='АВЕКМНОРСТУХ',HOUSE_EDGE=0.90,UPGRADE_META_BOOST=1.4,SAVE_KEY='numbgrader_save_v13',MINING_RATE=0.00001,MINING_SLOTS=10,MINING_SLOT_COST=i=>i===0?0:50000*i,MINING_LIMIT_SEC=8*3600,DAILY_FREE_COOLDOWN=24*60*60*1000,BLACKMARKET_REFRESH=5*60*1000,MARKET_UPDATE_INTERVAL=60*60*1000,BREAK_CHECK_INTERVAL=30*60*1000,BREAK_CHANCE=0.05,AUTOREPAIR_PERCENT=0.05,DEAL_TIMER_SEC=3,DEAL_INVITE_TIMEOUT=60000;
 const $=id=>document.getElementById(id);
 function fmt(n){return Math.round(n).toLocaleString('ru-RU')+' ₽';}
 function fmtDec(n){return n.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₽';}
@@ -1803,7 +1814,7 @@ const dealBtn=$('pvDeal');
 if(dealBtn){dealBtn.addEventListener('click',()=>{$('profileViewModal').classList.remove('open');document.querySelector('.tab[data-tab="deals"]').click();$('dealTargetId').value=p.id;findDealTarget();});}
 }catch(e){notify('Ошибка загрузки профиля','error');}}
 function refreshInventory(btn){if(btn)btn.classList.add('loading');
-save(); // сохраняем текущее состояние перед чтением
+save();
 try{const raw=localStorage.getItem(SAVE_KEY);
 if(raw){const d=JSON.parse(raw);
 if(Array.isArray(d.inventory))state.inventory=d.inventory;
@@ -1841,13 +1852,18 @@ g.innerHTML=html;
 function drawWheelArc(chance){
 const arc=$('wheelArcFill');
 if(!arc)return;
-const circumference=WHEEL_CIRCUMFERENCE;
-const fillFraction=chance/100;
-const arcLen=circumference*fillFraction;
-arc.setAttribute('stroke-dasharray',`${arcLen} ${circumference}`);
-const totalArc=360*fillFraction;
-const startAngle=90-totalArc/2;
-arc.setAttribute('transform',`rotate(${startAngle} 140 140)`);
+const cx=140,cy=140,r=120;
+const totalArc=360*(chance/100);
+if(totalArc<=0.1){arc.setAttribute('d','');return;}
+const startAngle=180-totalArc/2;
+const endAngle=180+totalArc/2;
+const toRad=d=>(d-90)*Math.PI/180;
+const x1=cx+r*Math.cos(toRad(startAngle));
+const y1=cy+r*Math.sin(toRad(startAngle));
+const x2=cx+r*Math.cos(toRad(endAngle));
+const y2=cy+r*Math.sin(toRad(endAngle));
+const largeArc=totalArc>180?1:0;
+arc.setAttribute('d',`M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`);
 }
 drawWheelTicks();
 
@@ -1907,13 +1923,15 @@ const arcStart=180-arcDeg/2;
 const arcEnd=180+arcDeg/2;
 let targetAngle;
 if(success){
-targetAngle=arcStart+Math.random()*(arcEnd-arcStart);
+const center=180;
+const spread=Math.max(2,arcDeg/2-4);
+targetAngle=center+(Math.random()*2-1)*spread;
 }else{
 const darkStart=arcEnd;
 const darkEnd=arcStart+360;
 targetAngle=darkStart+Math.random()*(darkEnd-darkStart);
 }
-const finalRotation=targetAngle+360*5;
+const finalRotation=(targetAngle-180)+360*5;
 arrow.style.transition='none';
 arrow.style.transform='rotate(0deg)';
 void arrow.offsetWidth;
@@ -1937,7 +1955,7 @@ if(finished)return;finished=true;
 clearTimeout(timer);clearInterval(spinInterval);
 skipBtn.remove();
 arrow.classList.remove('spinning');
-arrow.style.transform=`rotate(${targetAngle}deg)`;
+arrow.style.transform=`rotate(${targetAngle-180}deg)`;
 percentEl.textContent=chance+'%';
 let newItem=null;
 if(success){
@@ -2481,7 +2499,6 @@ n.className='notify'+(type?' '+type:'');
 n.textContent=text;document.body.appendChild(n);
 setTimeout(()=>n.remove(),3200);}
 
-// ==================== НОВАЯ СИСТЕМА СДЕЛОК ====================
 let dealTargetCandidate=null;
 
 function initDealsTabs(){
@@ -3056,7 +3073,6 @@ notify('Сделка отменена','');
 function closeDealRoomLocal(){
 if(currentDealRoomUnsub){currentDealRoomUnsub();currentDealRoomUnsub=null;}
 if(roomTimerInterval){clearInterval(roomTimerInterval);roomTimerInterval=null;}
-// Очищаем кэш инвентаря партнёра
 Object.keys(partnerInvCache).forEach(k=>delete partnerInvCache[k]);
 $('roomTimer').style.display='none';
 $('dealRoomScreen').classList.remove('active');
@@ -3067,7 +3083,6 @@ roomMySlots=[null,null,null,null];
 renderInventory();
 }
 
-// ==================== ОБРАБОТЧИКИ ====================
 document.querySelectorAll('.tab').forEach(btn=>{btn.addEventListener('click',()=>{
 document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -3195,7 +3210,6 @@ $('closeProfileViewModal').addEventListener('click',()=>$('profileViewModal').cl
 $('profileViewModal').addEventListener('click',e=>{if(e.target===$('profileViewModal'))$('profileViewModal').classList.remove('open');});
 document.addEventListener('contextmenu',e=>{if(e.target.closest('.inv-card'))e.preventDefault();});
 
-// ==================== СТАРТ ====================
 load();
 updateBalance();
 renderMarketIndicator();
@@ -3235,6 +3249,7 @@ if(fbUser){
 const{doc,updateDoc}=window.fbFuncs;
 updateDoc(doc(window.fbDb,'users',fbUser.uid),{lastSeen:Date.now()}).catch(()=>{});
 }
+initFirebaseProfile();
 })();
 </script>
 </body>
