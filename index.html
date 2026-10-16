@@ -90,7 +90,7 @@ border:1px dashed #1e2a3a;border-radius:8px;display:flex;flex-direction:column;
 align-items:center;justify-content:center;cursor:pointer;transition:all 0.25s;
 padding:6px;position:relative;overflow:hidden;}
 .slot:hover{border-color:#f0b90b;transform:translateY(-2px);}
-.slot.filled{border-style:solid;border-color:#233044;cursor:default;}
+.slot.filled{border-style:solid;border-color:#233044;cursor:pointer;}
 .slot.filled:hover{border-color:#ef4444;}
 .slot.empty::before{content:"+";font-size:32px;color:#28374b;font-weight:200;}
 .slot.empty:hover::before{color:#f0b90b;}
@@ -161,31 +161,40 @@ animation:glowRed 1.8s ease-in-out infinite;}
 @keyframes glowRed{0%,100%{box-shadow:0 2px 6px rgba(0,0,0,0.5),0 0 22px rgba(255,255,255,0.3);}
 50%{box-shadow:0 2px 6px rgba(0,0,0,0.5),0 0 38px rgba(255,255,255,0.55);}}
 .center-col{text-align:center;}
-.circle-wrap{position:relative;width:260px;height:260px;margin:0 auto 14px;perspective:600px;}
-.circle-svg{transform:rotate(-90deg);width:100%;height:100%;display:block;}
-.circle-bg{fill:none;stroke:#151c26;stroke-width:12;}
-.circle-fill{fill:none;stroke:url(#grad);stroke-width:12;stroke-linecap:round;
-transition:stroke-dashoffset 0.4s;}
-.circle-inner{position:absolute;inset:0;display:flex;flex-direction:column;
+
+.wheel-wrap{position:relative;width:280px;height:280px;margin:0 auto 18px;}
+.wheel-svg{width:100%;height:100%;display:block;overflow:visible;}
+.wheel-arc-bg{fill:none;stroke:#151c26;stroke-width:14;}
+.wheel-arc-fill{fill:none;stroke:url(#wheelGrad);stroke-width:14;stroke-linecap:butt;
+transition:stroke-dashoffset 0.5s cubic-bezier(0.2,0.9,0.3,1);}
+.wheel-tick{stroke:#2a3442;stroke-width:2;opacity:0.6;}
+.wheel-tick.major{stroke:#3a4555;stroke-width:2.5;opacity:0.9;}
+.wheel-center{position:absolute;inset:0;display:flex;flex-direction:column;
 align-items:center;justify-content:center;pointer-events:none;}
-.chance-big{font-size:42px;font-weight:900;color:#fff;letter-spacing:-1px;
+.wheel-percent{font-size:44px;font-weight:900;color:#fff;letter-spacing:-1.5px;
 line-height:1;font-variant-numeric:tabular-nums;transition:color 0.3s;}
-.chance-sub{font-size:11px;color:#6d7c92;font-weight:800;letter-spacing:1.4px;
-text-transform:uppercase;margin-top:8px;}
-.circle-pointer{position:absolute;top:-2px;left:50%;width:0;height:0;margin-left:-8px;
-border-left:8px solid transparent;border-right:8px solid transparent;
-border-top:14px solid #f0b90b;filter:drop-shadow(0 0 6px rgba(240,185,11,0.9));z-index:5;}
-.circle-wrap.spinning .circle-svg{animation:wheelSpin 0.7s linear infinite;transform-origin:50% 50%;}
-.circle-wrap.spinning .circle-fill{stroke:#f0b90b;transition:none;}
-.circle-wrap.spinning .chance-big{color:#f0b90b;}
-.circle-wrap.spinning .chance-sub{color:#f0b90b;}
-.circle-wrap.spinning .circle-pointer{animation:pointerBlink 0.3s linear infinite alternate;}
-@keyframes wheelSpin{from{transform:rotate(-90deg) scale(1);}to{transform:rotate(270deg) scale(1.03);}}
-@keyframes pointerBlink{from{opacity:1;}to{opacity:0.4;}}
-.circle-wrap.result-win .circle-fill{stroke:#22c55e;}
-.circle-wrap.result-win .chance-big{color:#22c55e;}
-.circle-wrap.result-lose .circle-fill{stroke:#ef4444;}
-.circle-wrap.result-lose .chance-big{color:#ef4444;}
+.wheel-label{font-size:11px;color:#6d7c92;font-weight:800;letter-spacing:1.5px;
+text-transform:uppercase;margin-top:10px;transition:color 0.3s;}
+.wheel-label.win{color:#22c55e;}
+.wheel-label.lose{color:#ef4444;}
+.wheel-arrow{position:absolute;left:50%;top:50%;width:0;height:0;
+transform-origin:0 0;pointer-events:none;transition:transform 0s;
+will-change:transform;}
+.wheel-arrow::before{content:"";position:absolute;left:-9px;top:-120px;
+width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;
+border-bottom:16px solid #f0b90b;
+filter:drop-shadow(0 0 8px rgba(240,185,11,0.9));}
+.wheel-arrow::after{content:"";position:absolute;left:-2px;top:-108px;
+width:4px;height:22px;background:linear-gradient(180deg,#f0b90b,#c99300);
+border-radius:2px;box-shadow:0 0 8px rgba(240,185,11,0.7);}
+.wheel-arrow.spinning{transition:transform 5.5s cubic-bezier(0.15,0.9,0.15,1);}
+.wheel-wrap.result-win .wheel-percent{color:#22c55e;}
+.wheel-wrap.result-lose .wheel-percent{color:#ef4444;}
+.wheel-wrap.result-win .wheel-arrow::before{border-bottom-color:#22c55e;
+filter:drop-shadow(0 0 12px rgba(34,197,94,1));}
+.wheel-wrap.result-lose .wheel-arrow::before{border-bottom-color:#ef4444;
+filter:drop-shadow(0 0 12px rgba(239,68,68,1));}
+
 .multipliers{display:flex;justify-content:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
 .mult-btn{background:linear-gradient(180deg,#0b0f15,#090d12);
 border:1px solid #1a2230;color:#6d7c92;font-size:12px;font-weight:900;
@@ -264,6 +273,10 @@ transform:translate(-50%,-50%);opacity:0;pointer-events:none;z-index:1;}
 .inv-card.in-mining::before{content:"MINING";position:absolute;top:4px;right:4px;
 font-size:8px;font-weight:900;letter-spacing:0.8px;color:#22c55e;
 background:rgba(34,197,94,0.12);padding:2px 5px;border-radius:4px;z-index:2;}
+.inv-card.in-deal{opacity:0.55;border-left:3px solid #f5d76e !important;}
+.inv-card.in-deal::before{content:"В СДЕЛКЕ";position:absolute;top:4px;right:4px;
+font-size:8px;font-weight:900;letter-spacing:0.8px;color:#f5d76e;
+background:rgba(245,215,110,0.12);padding:2px 5px;border-radius:4px;z-index:2;}
 .inv-card .inv-price{color:#f0b90b;font-weight:900;font-size:13px;text-align:center;}
 .inv-card .inv-rarity{font-size:9px;letter-spacing:1.2px;font-weight:900;
 text-transform:uppercase;text-align:center;color:#6d7c92;}
@@ -544,6 +557,141 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 .plate-info-row:last-child{border-bottom:none;}
 .plate-info-row .lbl{color:#7d8ca3;font-weight:700;}
 .plate-info-row .val{color:#f0b90b;font-weight:900;}
+
+.deal-invite-modal .modal{max-width:440px;text-align:center;
+border-color:#f5d76e;box-shadow:0 30px 80px -20px #000,0 0 60px rgba(245,215,110,0.25);
+animation:inviteIn 0.4s;}
+@keyframes inviteIn{from{opacity:0;transform:scale(0.9);}to{opacity:1;transform:scale(1);}}
+.deal-invite-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:2px;
+text-transform:uppercase;margin-bottom:6px;}
+.deal-invite-sub{font-size:12px;color:#8a9bb5;font-weight:700;margin-bottom:20px;}
+.deal-invite-from{background:#080b10;border:1px solid #1a2230;border-radius:10px;
+padding:16px;margin-bottom:20px;}
+.deal-invite-from .lbl{font-size:10px;color:#6d7c92;font-weight:800;
+letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.deal-invite-from .name{font-size:18px;font-weight:900;color:#fff;margin-bottom:4px;}
+.deal-invite-from .id{font-size:12px;color:#7d8ca3;font-family:'Courier New',monospace;
+letter-spacing:1.5px;}
+.deal-invite-actions{display:flex;gap:10px;}
+.deal-invite-actions .btn{flex:1;}
+.deal-invite-timer{font-size:11px;color:#7d8ca3;font-weight:800;margin-top:14px;
+letter-spacing:0.5px;}
+.deal-invite-timer strong{color:#f0b90b;font-variant-numeric:tabular-nums;}
+
+.deal-room-screen{position:fixed;inset:0;background:#0a0d12;z-index:9600;
+display:none;flex-direction:column;animation:pageIn 0.3s ease;}
+.deal-room-screen.active{display:flex;}
+.deal-room-header{display:flex;align-items:center;justify-content:space-between;
+padding:14px 22px;background:linear-gradient(180deg,#0b0f15,#090d12);
+border-bottom:1px solid #171e29;gap:12px;flex-wrap:wrap;}
+.deal-room-title{font-size:15px;font-weight:900;color:#fff;letter-spacing:1.2px;
+text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.deal-room-title .vs{color:#f0b90b;font-size:13px;}
+.deal-room-content{flex:1;overflow-y:auto;padding:20px 22px;
+display:flex;flex-direction:column;gap:16px;max-width:1100px;width:100%;margin:0 auto;}
+.deal-room-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:900px){.deal-room-grid{grid-template-columns:1fr;}}
+.deal-room-side{background:linear-gradient(180deg,#0b0f15,#090d12);
+border:2px solid #171e29;border-radius:14px;padding:16px;transition:all 0.3s;}
+.deal-room-side.me{border-color:#2c3b50;}
+.deal-room-side.partner{border-color:#2c3b50;opacity:0.9;}
+.deal-room-side.ready{border-color:#22c55e;box-shadow:0 0 24px rgba(34,197,94,0.15);}
+.deal-room-side-head{display:flex;justify-content:space-between;align-items:center;
+margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #1a2230;}
+.deal-room-side-head .who{font-size:13px;font-weight:900;color:#fff;
+letter-spacing:0.5px;}
+.deal-room-side-head .status{font-size:10px;font-weight:900;letter-spacing:1.2px;
+text-transform:uppercase;padding:4px 10px;border-radius:20px;
+background:#080b10;border:1px solid #1a2230;color:#7d8ca3;}
+.deal-room-side-head .status.ready{color:#22c55e;border-color:#22c55e;
+background:rgba(34,197,94,0.1);}
+.deal-room-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.deal-room-slot{aspect-ratio:1/1;background:linear-gradient(180deg,#090d12,#070a0e);
+border:1px dashed #1e2a3a;border-radius:10px;display:flex;flex-direction:column;
+align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;
+padding:6px;position:relative;overflow:hidden;}
+.deal-room-slot:hover{border-color:#f0b90b;}
+.deal-room-slot.filled{border-style:solid;border-color:#233044;}
+.deal-room-slot.empty::before{content:"+";font-size:20px;color:#28374b;font-weight:200;}
+.deal-room-slot.locked{cursor:not-allowed;opacity:0.6;}
+.deal-room-slot.locked:hover{border-color:#1e2a3a;}
+.deal-room-slot .slot-price{color:#f0b90b;font-weight:900;font-size:9px;margin-top:4px;}
+.deal-room-money{background:linear-gradient(180deg,#0a0e15,#080b10);
+border:1px solid #1a2230;border-radius:10px;padding:12px 14px;margin-bottom:12px;}
+.deal-room-money-head{display:flex;justify-content:space-between;align-items:center;
+font-size:11px;color:#6d7c92;font-weight:800;letter-spacing:0.5px;
+text-transform:uppercase;margin-bottom:8px;}
+.deal-room-money-head .val{color:#f0b90b;font-weight:900;font-variant-numeric:tabular-nums;}
+.deal-room-inv-title{font-size:10px;color:#6d7c92;font-weight:800;letter-spacing:1.5px;
+text-transform:uppercase;margin-bottom:8px;}
+.deal-room-inv{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;
+max-height:180px;overflow-y:auto;padding:4px;}
+.deal-room-inv::-webkit-scrollbar{width:4px;}
+.deal-room-inv::-webkit-scrollbar-thumb{background:#2c3b50;border-radius:2px;}
+.deal-room-inv-item{background:#080b10;border:1px solid #1a2230;border-radius:6px;
+padding:6px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;
+align-items:center;gap:3px;}
+.deal-room-inv-item:hover{border-color:#f0b90b;transform:translateY(-1px);}
+.deal-room-inv-item.disabled{cursor:not-allowed;opacity:0.4;}
+.deal-room-inv-item.disabled:hover{border-color:#1a2230;transform:none;}
+.deal-room-inv-item .price{font-size:9px;color:#f0b90b;font-weight:900;}
+.deal-room-foot{background:linear-gradient(180deg,#0b0f15,#090d12);
+border:2px solid #171e29;border-radius:14px;padding:18px 20px;text-align:center;}
+.deal-room-status{font-size:13px;color:#cfd8e6;font-weight:800;
+padding:12px;background:#080b10;border-radius:10px;border:1px solid #1a2230;
+margin-bottom:14px;letter-spacing:0.3px;}
+.deal-room-status.ready{color:#22c55e;border-color:#22c55e;background:rgba(34,197,94,0.08);}
+.deal-room-status.waiting{color:#f0b90b;}
+.deal-room-timer{font-size:40px;font-weight:900;color:#f0b90b;
+font-variant-numeric:tabular-nums;letter-spacing:3px;margin:8px 0;
+text-shadow:0 0 24px rgba(240,185,11,0.6);}
+.deal-room-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.deal-room-actions .btn{max-width:220px;}
+.deal-room-actions .btn.ready-active{background:linear-gradient(180deg,#22c55e,#16a34a);
+color:#fff;box-shadow:0 3px 0 #0f5c2c;}
+
+.deals-wrap{display:flex;flex-direction:column;gap:18px;}
+.deals-tabs{display:flex;gap:4px;background:#090d12;padding:4px;border-radius:10px;
+border:1px solid #171e29;justify-content:center;width:fit-content;margin:0 auto;}
+.deals-tab{background:transparent;border:none;color:#6d7c92;font-size:12px;font-weight:800;
+padding:9px 22px;border-radius:7px;cursor:pointer;letter-spacing:0.6px;
+text-transform:uppercase;transition:all 0.25s;}
+.deals-tab:hover{color:#cfd8e6;}
+.deals-tab.active{background:linear-gradient(180deg,#1e2a3a,#16202c);color:#fff;
+box-shadow:inset 0 0 0 1px #2c3b50;}
+.deals-create{background:linear-gradient(180deg,#0b0f15,#090d12);border:1px solid #171e29;
+border-radius:12px;padding:20px;}
+.deals-input-row{display:flex;gap:10px;margin-bottom:18px;}
+.deals-input{flex:1;padding:14px 18px;background:#080b10;border:1px solid #1a2230;
+border-radius:10px;color:#fff;font-size:15px;font-weight:700;outline:none;transition:all 0.2s;
+font-family:'Courier New',monospace;letter-spacing:2px;}
+.deals-input:focus{border-color:#f0b90b;box-shadow:0 0 0 3px rgba(240,185,11,0.15);}
+.deals-find-btn{padding:14px 26px;background:linear-gradient(180deg,#ffd966,#f0b90b);
+border:none;border-radius:10px;color:#0a0d12;font-weight:900;font-size:13px;letter-spacing:1px;
+text-transform:uppercase;cursor:pointer;box-shadow:0 3px 0 #a37a08;transition:all 0.15s;}
+.deals-find-btn:hover{filter:brightness(1.07);}
+.deal-found-box{background:#080b10;border:1px solid #1a2230;border-radius:10px;
+padding:16px;margin-top:14px;display:flex;justify-content:space-between;
+align-items:center;gap:12px;flex-wrap:wrap;}
+.deal-found-box .info{display:flex;flex-direction:column;gap:4px;}
+.deal-found-box .name{font-size:14px;font-weight:900;color:#fff;}
+.deal-found-box .id{font-size:11px;color:#7d8ca3;font-family:'Courier New',monospace;
+letter-spacing:1.5px;}
+.deal-waiting-box{background:#080b10;border:1px solid #f5d76e;border-radius:10px;
+padding:18px;margin-top:14px;text-align:center;}
+.deal-waiting-box .txt{color:#f5d76e;font-weight:800;font-size:13px;
+letter-spacing:0.5px;margin-bottom:10px;}
+.deal-waiting-box .timer{font-size:28px;font-weight:900;color:#f5d76e;
+font-variant-numeric:tabular-nums;letter-spacing:2px;}
+.deal-waiting-box .actions{margin-top:12px;display:flex;gap:8px;justify-content:center;}
+.incoming-deal{background:linear-gradient(180deg,#0b0f15,#090d12);border:1px solid #171e29;
+border-radius:10px;padding:16px;margin-bottom:10px;transition:all 0.2s;}
+.incoming-deal:hover{border-color:#2c3b50;}
+.incoming-deal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.incoming-deal-title{font-size:13px;font-weight:900;color:#fff;}
+.incoming-deal-meta{font-size:11px;color:#7d8ca3;font-weight:700;}
+.incoming-deal-actions{display:flex;gap:8px;margin-top:10px;}
+
 .profile-screen{position:fixed;inset:0;background:#0a0d12;z-index:9500;display:none;
 flex-direction:column;animation:pageIn 0.3s ease;}
 .profile-screen.active{display:flex;}
@@ -694,69 +842,6 @@ border:2px solid #ffe066;flex-shrink:0;}
 letter-spacing:1.5px;margin-top:4px;}
 .profile-view-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;}
 .profile-view-actions .btn{flex:1;min-width:140px;padding:11px 16px;font-size:12px;}
-.deals-wrap{display:flex;flex-direction:column;gap:18px;}
-.deals-tabs{display:flex;gap:4px;background:#090d12;padding:4px;border-radius:10px;
-border:1px solid #171e29;justify-content:center;width:fit-content;margin:0 auto;}
-.deals-tab{background:transparent;border:none;color:#6d7c92;font-size:12px;font-weight:800;
-padding:9px 22px;border-radius:7px;cursor:pointer;letter-spacing:0.6px;
-text-transform:uppercase;transition:all 0.25s;}
-.deals-tab:hover{color:#cfd8e6;}
-.deals-tab.active{background:linear-gradient(180deg,#1e2a3a,#16202c);color:#fff;
-box-shadow:inset 0 0 0 1px #2c3b50;}
-.deals-create{background:linear-gradient(180deg,#0b0f15,#090d12);border:1px solid #171e29;
-border-radius:12px;padding:20px;}
-.deals-input-row{display:flex;gap:10px;margin-bottom:18px;}
-.deals-input{flex:1;padding:14px 18px;background:#080b10;border:1px solid #1a2230;
-border-radius:10px;color:#fff;font-size:15px;font-weight:700;outline:none;transition:all 0.2s;
-font-family:'Courier New',monospace;letter-spacing:2px;}
-.deals-input:focus{border-color:#f0b90b;box-shadow:0 0 0 3px rgba(240,185,11,0.15);}
-.deals-find-btn{padding:14px 26px;background:linear-gradient(180deg,#ffd966,#f0b90b);
-border:none;border-radius:10px;color:#0a0d12;font-weight:900;font-size:13px;letter-spacing:1px;
-text-transform:uppercase;cursor:pointer;box-shadow:0 3px 0 #a37a08;transition:all 0.15s;}
-.deals-find-btn:hover{filter:brightness(1.07);}
-.deal-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
-@media(max-width:900px){.deal-grid{grid-template-columns:1fr;}}
-.deal-side{background:linear-gradient(180deg,#0b0f15,#090d12);border:1px solid #171e29;
-border-radius:12px;padding:16px;}
-.deal-side-title{font-size:12px;color:#8a9bb5;font-weight:900;letter-spacing:1.5px;
-text-transform:uppercase;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
-.deal-side-title .player-name{color:#fff;font-size:13px;}
-.deal-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;}
-.deal-slot{aspect-ratio:1/1;background:linear-gradient(180deg,#090d12,#070a0e);
-border:1px dashed #1e2a3a;border-radius:10px;display:flex;flex-direction:column;
-align-items:center;justify-content:center;cursor:pointer;transition:all 0.25s;
-padding:5px;position:relative;}
-.deal-slot:hover{border-color:#f0b90b;}
-.deal-slot.filled{border-style:solid;border-color:#233044;}
-.deal-slot.empty::before{content:"+";font-size:20px;color:#28374b;font-weight:200;}
-.deal-slot .deal-slot-price{color:#f0b90b;font-weight:900;font-size:9px;margin-top:4px;}
-.deal-slot.locked{cursor:not-allowed;opacity:0.7;}
-.deal-slot.locked:hover{border-color:#1e2a3a;}
-.deal-money-block{background:linear-gradient(180deg,#0a0e15,#080b10);border:1px solid #1a2230;
-border-radius:10px;padding:12px 14px;}
-.deal-money-head{display:flex;justify-content:space-between;align-items:center;font-size:11px;
-color:#6d7c92;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;}
-.deal-money-head .val{color:#f0b90b;font-weight:900;font-variant-numeric:tabular-nums;}
-.deal-center{background:linear-gradient(180deg,#0b0f15,#090d12);border:1px solid #171e29;
-border-radius:12px;padding:24px;text-align:center;margin-top:16px;}
-.deal-center-title{font-size:11px;color:#6d7c92;font-weight:900;letter-spacing:2px;
-text-transform:uppercase;margin-bottom:16px;}
-.deal-status{font-size:14px;font-weight:800;color:#cfd8e6;margin-bottom:18px;padding:14px;
-background:#080b10;border-radius:10px;border:1px solid #1a2230;}
-.deal-status.ready{color:#22c55e;border-color:#22c55e;background:#0a1a10;}
-.deal-status.waiting{color:#f0b90b;}
-.deal-status.cancelled{color:#ef4444;border-color:#ef4444;background:#1a0a0a;}
-.deal-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
-.deal-actions .btn{max-width:200px;}
-.deal-timer{font-size:32px;font-weight:900;color:#f0b90b;font-variant-numeric:tabular-nums;
-margin:8px 0;letter-spacing:2px;text-shadow:0 0 20px rgba(240,185,11,0.5);}
-.incoming-deal{background:linear-gradient(180deg,#0b0f15,#090d12);border:1px solid #171e29;
-border-radius:10px;padding:16px;margin-bottom:10px;transition:all 0.2s;}
-.incoming-deal:hover{border-color:#2c3b50;}
-.incoming-deal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.incoming-deal-title{font-size:13px;font-weight:900;color:#fff;}
-.incoming-deal-meta{font-size:11px;color:#7d8ca3;font-weight:700;}
-.incoming-deal-actions{display:flex;gap:8px;margin-top:10px;}
 .history-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;
 max-width:640px;margin-bottom:16px;}
 .history-summary-item{background:linear-gradient(180deg,#0b0f15,#090d12);border:1px solid #171e29;
@@ -816,12 +901,22 @@ body{padding:8px;}
 .deal-grid{grid-template-columns:1fr;}
 .top-subtab{padding:7px 14px;font-size:11px;}
 .history-summary{grid-template-columns:1fr;}
+.wheel-wrap{width:240px;height:240px;}
+.wheel-percent{font-size:38px;}
+.wheel-arrow::before{top:-104px;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid #f0b90b;}
+.wheel-arrow::after{top:-94px;height:20px;left:-2px;}
+.deal-room-slots{grid-template-columns:repeat(2,1fr);}
+.deal-room-actions .btn{max-width:100%;}
 }
 @media(max-width:500px){
 .tab{padding:7px 10px;font-size:9px;}
 .balance{padding:6px 12px;font-size:11px;}
 .balance .lbl{display:none;}
 .market-indicator .lbl{display:none;}
+.wheel-wrap{width:220px;height:220px;}
+.wheel-percent{font-size:34px;}
+.wheel-arrow::before{top:-94px;}
+.wheel-arrow::after{top:-86px;height:18px;}
 }
 </style>
 </head>
@@ -873,26 +968,32 @@ body{padding:8px;}
 </div>
 </div>
 <div class="center-col">
-<div class="circle-wrap" id="circleWrap">
-<div class="circle-pointer"></div>
-<svg class="circle-svg" viewBox="0 0 120 120">
-<defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-<stop offset="0%" stop-color="#e63e3e"/>
+<div class="wheel-wrap" id="wheelWrap">
+<svg class="wheel-svg" viewBox="0 0 280 280">
+<defs>
+<linearGradient id="wheelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+<stop offset="0%" stop-color="#22c55e"/>
 <stop offset="50%" stop-color="#f0b90b"/>
-<stop offset="100%" stop-color="#7cff8b"/>
-</linearGradient></defs>
-<circle class="circle-bg" cx="60" cy="60" r="52"/>
-<circle class="circle-fill" id="circleFill" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+<stop offset="100%" stop-color="#e63e3e"/>
+</linearGradient>
+</defs>
+<circle class="wheel-arc-bg" cx="140" cy="140" r="120"/>
+<circle class="wheel-arc-fill" id="wheelArcFill" cx="140" cy="140" r="120"
+stroke-dasharray="753.98" stroke-dashoffset="753.98"/>
+<g id="wheelTicks"></g>
 </svg>
-<div class="circle-inner">
-<div class="chance-big" id="chanceBig">0.00%</div>
-<div class="chance-sub" id="chanceLabel">Шанс</div>
+<div class="wheel-center">
+<div class="wheel-percent" id="wheelPercent">0%</div>
+<div class="wheel-label" id="wheelLabel">Шанс</div>
 </div>
+<div class="wheel-arrow" id="wheelArrow"></div>
 </div>
 <div class="multipliers">
+<button class="mult-btn" data-chance="10">10%</button>
 <button class="mult-btn" data-chance="30">30%</button>
 <button class="mult-btn active" data-chance="50">50%</button>
 <button class="mult-btn" data-chance="70">70%</button>
+<button class="mult-btn" data-chance="90">90%</button>
 </div>
 <button class="btn" id="upgradeBtn" disabled>Прокачать</button>
 <div class="hint" id="hintLine">Выберите хотя бы один номер</div>
@@ -1052,11 +1153,10 @@ body{padding:8px;}
 </div>
 </div>
 <div class="page" id="page-deals">
-<div class="page-title">Сделки<small>обмен номерами и деньгами между игроками</small></div>
+<div class="page-title">Сделки<small>отправьте приглашение игроку — он получит его мгновенно</small></div>
 <div class="deals-wrap">
 <div class="deals-tabs">
 <button class="deals-tab active" data-deals-tab="create">Создать</button>
-<button class="deals-tab" data-deals-tab="incoming">Входящие <span id="incomingCount"></span></button>
 <button class="deals-tab" data-deals-tab="outgoing">Исходящие</button>
 </div>
 <div id="deals-create-view">
@@ -1065,59 +1165,13 @@ body{padding:8px;}
 <input type="text" class="deals-input" id="dealTargetId" placeholder="ID или @username" maxlength="20">
 <button class="deals-find-btn" id="dealFindBtn">Найти</button>
 </div>
-<div id="dealBuilder" style="display:none;">
-<div class="deal-grid">
-<div class="deal-side">
-<div class="deal-side-title"><span>Ваш инвентарь</span>
-<span class="player-name" id="dealMyName">—</span></div>
-<div class="deal-slots" id="dealMySlots">
-<div class="deal-slot empty"></div>
-<div class="deal-slot empty"></div>
-<div class="deal-slot empty"></div>
-<div class="deal-slot empty"></div>
-</div>
-<div class="deal-money-block">
-<div class="deal-money-head"><span>Деньги</span>
-<span class="val" id="dealMyMoneyVal">0.00 ₽</span></div>
-<input type="range" class="add-money-input" id="dealMyMoney" min="0" max="100000" value="0" step="0.01">
-</div>
-</div>
-<div class="deal-side">
-<div class="deal-side-title"><span>Инвентарь получателя</span>
-<span class="player-name" id="dealTheirName">—</span></div>
-<div class="deal-slots" id="dealTheirSlots">
-<div class="deal-slot empty"></div>
-<div class="deal-slot empty"></div>
-<div class="deal-slot empty"></div>
-<div class="deal-slot empty"></div>
-</div>
-<div class="deal-money-block">
-<div class="deal-money-head"><span>Деньги</span>
-<span class="val" id="dealTheirMoneyVal">0.00 ₽</span></div>
-<input type="range" class="add-money-input" id="dealTheirMoney" min="0" max="100000" value="0" step="0.01">
-</div>
-</div>
-</div>
-<div class="deal-center">
-<div class="deal-center-title">Ход сделки</div>
-<div class="deal-status waiting" id="dealStatus">Ожидание подтверждения от обоих</div>
-<div class="deal-actions">
-<button class="btn" id="dealSendBtn">Отправить сделку</button>
-<button class="btn secondary" id="dealCancelBtn">Отмена</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="deals-incoming-view" style="display:none;">
-<div class="inv-wrap" style="margin-top:0;">
-<div class="inv-head"><h3>Входящие сделки</h3></div>
-<div id="incomingList"></div>
+<div id="dealFoundWrap" style="display:none;"></div>
+<div id="dealWaitingWrap" style="display:none;"></div>
 </div>
 </div>
 <div id="deals-outgoing-view" style="display:none;">
 <div class="inv-wrap" style="margin-top:0;">
-<div class="inv-head"><h3>Исходящие сделки</h3></div>
+<div class="inv-head"><h3>Исходящие приглашения</h3></div>
 <div id="outgoingList"></div>
 </div>
 </div>
@@ -1294,13 +1348,77 @@ body{padding:8px;}
 <div id="profileViewContent"></div>
 </div>
 </div>
-<div class="modal-bg" id="dealViewModal">
-<div class="modal" style="max-width:600px;">
-<button class="close" id="closeDealView">×</button>
-<h3>Сделка</h3>
-<div id="dealViewContent"></div>
+
+<div class="modal-bg deal-invite-modal" id="dealInviteModal">
+<div class="modal">
+<div class="deal-invite-title">Вам сделка</div>
+<div class="deal-invite-sub">Игрок хочет обменяться с вами</div>
+<div class="deal-invite-from">
+<div class="lbl">От кого</div>
+<div class="name" id="dealInviteFromName">—</div>
+<div class="id" id="dealInviteFromId">[id:------]</div>
+</div>
+<div class="deal-invite-actions">
+<button class="btn secondary" id="dealInviteDecline">Отклонить</button>
+<button class="btn" id="dealInviteAccept">Принять</button>
+</div>
+<div class="deal-invite-timer">Авто-отмена через <strong id="dealInviteTimer">60</strong> сек.</div>
 </div>
 </div>
+
+<div id="dealRoomScreen" class="deal-room-screen">
+<div class="deal-room-header">
+<div class="deal-room-title">
+<span id="roomTitleA">—</span>
+<span class="vs">⇄</span>
+<span id="roomTitleB">—</span>
+</div>
+<button class="btn secondary" id="roomCancelBtn" style="width:auto;padding:10px 22px;font-size:12px;">Отмена</button>
+</div>
+<div class="deal-room-content">
+<div class="deal-room-grid">
+<div class="deal-room-side me" id="roomSideMe">
+<div class="deal-room-side-head">
+<div class="who" id="roomMyName">—</div>
+<div class="status" id="roomMyStatus">Не готов</div>
+</div>
+<div class="deal-room-slots" id="roomMySlots"></div>
+<div class="deal-room-money">
+<div class="deal-room-money-head">
+<span>Мои деньги</span>
+<span class="val" id="roomMyMoneyVal">0 ₽</span>
+</div>
+<input type="range" class="add-money-input" id="roomMyMoney" min="0" max="100000" value="0" step="1">
+</div>
+<div class="deal-room-inv-title">Мой инвентарь — клик добавит в ставку</div>
+<div class="deal-room-inv" id="roomMyInv"></div>
+</div>
+<div class="deal-room-side partner" id="roomSidePartner">
+<div class="deal-room-side-head">
+<div class="who" id="roomTheirName">—</div>
+<div class="status" id="roomTheirStatus">Не готов</div>
+</div>
+<div class="deal-room-slots" id="roomTheirSlots"></div>
+<div class="deal-room-money">
+<div class="deal-room-money-head">
+<span>Деньги партнёра</span>
+<span class="val" id="roomTheirMoneyVal">0 ₽</span>
+</div>
+</div>
+<div class="deal-room-inv-title">Инвентарь партнёра — только смотреть</div>
+<div class="deal-room-inv" id="roomTheirInv"></div>
+</div>
+</div>
+<div class="deal-room-foot">
+<div class="deal-room-status waiting" id="roomStatusText">Ожидание подтверждения</div>
+<div class="deal-room-timer" id="roomTimer" style="display:none;">3</div>
+<div class="deal-room-actions">
+<button class="btn" id="roomReadyBtn">Я готов</button>
+</div>
+</div>
+</div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged }
@@ -1334,26 +1452,60 @@ window.dispatchEvent(new Event('fb-ready'));
 <script>
 (function(){
 'use strict';
-let fbUser=null,fbProfile=null,fbProfileLoaded=false,friendRequests=[],friendsList=[],myDealsUnsub=null,currentTopSort='balance';
+let fbUser=null,fbProfile=null,fbProfileLoaded=false,friendRequests=[],friendsList=[],myDealsUnsub=null,currentTopSort='balance',profileUnsub=null;
+
+// ============ СОСТОЯНИЕ СДЕЛОК (глобальное) ============
+let currentDealInviteId=null;
+let currentDealInviteTimer=null;
+let currentDealRoomId=null;
+let currentDealRoomUnsub=null;
+let currentDealRoomData=null;
+let roomMyMoney=0;
+let roomMySlots=[null,null,null,null];
+let roomTimerInterval=null;
+let lastCompletedRoomId=null;
+
 function waitForFirebase(){return new Promise(r=>{if(window.fbReady)return r();window.addEventListener('fb-ready',()=>r(),{once:true});});}
+
 async function initFirebaseProfile(){
 await waitForFirebase();
 window.fbOnAuthStateChanged(window.fbAuth,async(user)=>{
 if(!user)return;fbUser=user;
-const{doc,getDoc,setDoc}=window.fbFuncs;
+const{doc,getDoc,setDoc,onSnapshot}=window.fbFuncs;
 const userRef=doc(window.fbDb,'users',user.uid);
 try{
 const snap=await getDoc(userRef);
 if(snap.exists()){
 fbProfile=snap.data();fbProfileLoaded=true;
-renderProfileScreen();loadFriendRequests();loadFriends();syncProfileBalance();setupDealsListener();
+// Мерж серверного прогресса с локальным (не затираем)
+if(typeof fbProfile.balance==='number'&&fbProfile.balance>state.balance)state.balance=fbProfile.balance;
+if(Array.isArray(fbProfile.inventory)&&fbProfile.inventory.length>state.inventory.length)state.inventory=fbProfile.inventory;
+if(fbProfile.stats&&typeof fbProfile.stats.earned==='number'&&fbProfile.stats.earned>state.stats.earned)state.stats=Object.assign(state.stats,fbProfile.stats);
+updateBalance();renderInventory();renderInputSlots();
+renderProfileScreen();loadFriendRequests();loadFriends();setupDealsListener();
 if(fbProfile.createdAt&&!fbProfile.name&&!sessionStorage.getItem('nameModalSkipped')){$('nameModal').classList.add('open');setTimeout(()=>$('firstNameInput').focus(),200);}
 }else{
 const newId=await generateUniqueId();
 fbProfile={uid:user.uid,id:newId,name:null,username:null,usernameChangedAt:0,createdAt:Date.now(),friendRequests:[],friends:[],balance:state.balance,active:false,inventoryCount:0,miningRate:0,bestPlate:0,totalInventoryValue:0};
 await setDoc(userRef,fbProfile);fbProfileLoaded=true;
 if(!sessionStorage.getItem('nameModalSkipped')){$('nameModal').classList.add('open');setTimeout(()=>$('firstNameInput').focus(),200);}
-}}catch(e){console.error('Profile load error:',e);}});}
+}
+if(profileUnsub)profileUnsub();
+profileUnsub=onSnapshot(userRef,(docSnap)=>{
+if(!docSnap.exists())return;
+const newData=docSnap.data();
+fbProfile=newData;
+renderBellBadge();
+loadFriendRequests();
+loadFriends();
+renderProfileScreen();
+if(newData.name&&$('nameModal').classList.contains('open')){
+$('nameModal').classList.remove('open');
+sessionStorage.setItem('nameModalSkipped','1');
+}
+});
+}catch(e){console.error('Profile load error:',e);}});}
+
 async function generateUniqueId(){
 const{doc,getDoc,setDoc}=window.fbFuncs;
 for(let attempt=0;attempt<20;attempt++){
@@ -1362,6 +1514,7 @@ const idRef=doc(window.fbDb,'ids',candidate);
 const snap=await getDoc(idRef);
 if(!snap.exists()){await setDoc(idRef,{uid:fbUser.uid,createdAt:Date.now()});return candidate;}}
 return String(Date.now()).slice(-6);}
+
 async function syncProfileBalance(){
 if(!fbUser||!fbProfile)return;
 try{
@@ -1370,9 +1523,23 @@ const rate=calcMiningRate()*3600;
 const bestPlate=state.inventory.length?Math.max(...state.inventory.map(i=>i.price)):0;
 const totalValue=state.inventory.reduce((s,i)=>s+i.price,0);
 const isActive=state.balance!==100000||state.inventory.length>0||state.stats.cases>0||state.stats.upgrades>0||state.stats.crafts>0||state.stats.earned>0||state.miningSlots.some(s=>s!==null);
-await updateDoc(doc(window.fbDb,'users',fbUser.uid),{balance:state.balance,stats:state.stats,active:isActive,inventoryCount:state.inventory.length,miningRate:rate,bestPlate:bestPlate,totalInventoryValue:totalValue});
-fbProfile.active=isActive;fbProfile.miningRate=rate;fbProfile.inventoryCount=state.inventory.length;
-}catch(e){}}initFirebaseProfile();
+const invForSync=state.inventory.slice(0,100).map(i=>({id:i.id,plate:i.plate,region:i.region,rarity:i.rarity,price:i.price}));
+await updateDoc(doc(window.fbDb,'users',fbUser.uid),{
+balance:state.balance,
+stats:state.stats,
+active:isActive,
+inventoryCount:state.inventory.length,
+miningRate:rate,
+bestPlate:bestPlate,
+totalInventoryValue:totalValue,
+inventory:invForSync
+});
+fbProfile.active=isActive;
+fbProfile.miningRate=rate;
+fbProfile.inventoryCount=state.inventory.length;
+fbProfile.inventory=invForSync;
+}catch(e){}}
+
 const RARITY={STANDARD:0,TAXI:1,POLICE:2,MILITARY:3,DIPLOMAT:4};
 const RARITY_NAMES=['Стандарт','Таксист','Ментовской','Военка','Дипломат'];
 const RARITY_MULT=[1,1.15,1.4,1.8,5000];
@@ -1386,7 +1553,7 @@ black:{name:'Чёрный',price:75000000,table:[{rarity:RARITY.STANDARD,chance:
 const REGION_MULT={'77':15,'99':15,'97':15,'177':15,'199':15,'197':15,'777':20,'78':8,'98':8,'178':8,'198':8,'50':8,'90':8,'150':8,'190':8,'750':8,'790':8,'23':3,'93':3,'123':3,'193':3,'223':3,'66':3,'96':3,'196':3,'16':3,'116':3,'716':3,'52':3,'152':3,'252':3,'61':3,'161':3,'261':3,'74':3,'174':3,'274':3,'54':3,'154':3,'254':3,'02':3,'102':3,'702':3,'34':3,'134':3,'234':3,'39':3,'139':3,'26':3,'126':3,'226':3,'63':3,'163':3,'263':3,'72':3,'172':3,'272':3,'86':3,'186':3,'286':3,'47':3,'147':3,'247':3};
 const REGIONS=Object.keys(REGION_MULT);
 const BLAT_SERIES={'А777АА77':250000000,'А001АА77':50000000,'А002АА77':45000000,'О001ОО77':60000000,'О777ОО77':150000000,'О002ОО77':50000000,'Е001ЕЕ77':55000000,'ЕКХ00777':220000000,'АМР00777':180000000,'С001СС77':35000000,'В001ВВ77':40000000,'М001ММ77':45000000,'К001КК77':30000000,'Н001НН77':32000000,'Т001ТТ77':28000000};
-const LETTERS='АВЕКМНОРСТУХ',HOUSE_EDGE=0.90,UPGRADE_META_BOOST=1.4,SAVE_KEY='numbgrader_save_v13',MINING_RATE=0.00001,MINING_SLOTS=10,MINING_SLOT_COST=i=>i===0?0:50000*i,MINING_LIMIT_SEC=8*3600,DAILY_FREE_COOLDOWN=24*60*60*1000,BLACKMARKET_REFRESH=5*60*1000,MARKET_UPDATE_INTERVAL=60*60*1000,BREAK_CHECK_INTERVAL=30*60*1000,BREAK_CHANCE=0.05,AUTOREPAIR_PERCENT=0.05,DEAL_TIMER_SEC=3;
+const LETTERS='АВЕКМНОРСТУХ',HOUSE_EDGE=0.90,UPGRADE_META_BOOST=1.4,SAVE_KEY='numbgrader_save_v13',MINING_RATE=0.00001,MINING_SLOTS=10,MINING_SLOT_COST=i=>i===0?0:50000*i,MINING_LIMIT_SEC=8*3600,DAILY_FREE_COOLDOWN=24*60*60*1000,BLACKMARKET_REFRESH=5*60*1000,MARKET_UPDATE_INTERVAL=60*60*1000,BREAK_CHECK_INTERVAL=30*60*1000,BREAK_CHANCE=0.05,AUTOREPAIR_PERCENT=0.05,DEAL_TIMER_SEC=3,DEAL_INVITE_TIMEOUT=60000,WHEEL_CIRCUMFERENCE=753.98;
 const $=id=>document.getElementById(id);
 function fmt(n){return Math.round(n).toLocaleString('ru-RU')+' ₽';}
 function fmtDec(n){return n.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₽';}
@@ -1437,7 +1604,7 @@ function rarityForPrice(price){if(price>=100000000000)return RARITY.DIPLOMAT;if(
 function formatPlateGroups(plate){const groups=[];let current='';let currentType=null;for(const ch of plate){const t=/\d/.test(ch)?'d':'l';if(currentType===null||currentType===t){current+=ch;}else{groups.push(current);current=ch;}currentType=t;}if(current)groups.push(current);return groups;}
 function renderPlate(plate,region,rarity,size){const sz=size||'medium';const groups=formatPlateGroups(plate);const groupsHTML=groups.map(g=>`<span class="group">${g}</span>`).join('');const regionLen=region.length;const regionClass=regionLen===2?'two-digits':'three-digits';return`<div class="plate plate-${sz} rarity-${rarity}"><div class="main">${groupsHTML}</div><div class="right ${regionClass}"><div class="region">${region}</div><div class="rus">RUS<span class="flag"></span></div></div></div>`;}
 let state={balance:100000,inventory:[],inputSlots:[null,null,null,null],addMoney:0,miningSlots:new Array(MINING_SLOTS).fill(null),miningBroken:new Array(MINING_SLOTS).fill(false),miningUnlocked:1,miningAccumulated:0,miningLastCollect:Date.now(),autorepair:false,freeCaseAvailable:true,lastFreeCaseTime:0,caseMode:1,currentCaseType:'standard',spinning:false,spinLocked:false,currentWins:[],desiredChance:50,upgradeRunning:false,history:[],stats:{earned:0,spent:0,cases:0,upgrades:0,crafts:0,crafts_failed:0},craftSlots:[null,null,null,null,null],craftChance:50,craftAddMoney:0,lastTickTime:Date.now(),blackmarketLots:[],blackmarketLastRefresh:0,marketMult:1.0,marketLastUpdate:Date.now(),lastBreakCheck:Date.now(),lastResultItem:null,selectedInvCard:null};
-function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify({balance:state.balance,inventory:state.inventory,miningSlots:state.miningSlots,miningBroken:state.miningBroken,miningUnlocked:state.miningUnlocked,miningAccumulated:state.miningAccumulated,miningLastCollect:state.miningLastCollect,autorepair:state.autorepair,freeCaseAvailable:state.freeCaseAvailable,lastFreeCaseTime:state.lastFreeCaseTime,history:state.history,stats:state.stats,craftChance:state.craftChance,blackmarketLots:state.blackmarketLots,blackmarketLastRefresh:state.blackmarketLastRefresh,marketMult:state.marketMult,marketLastUpdate:state.marketLastUpdate,lastBreakCheck:state.lastBreakCheck,lastTickTime:Date.now()}));}catch(e){}}
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify({balance:state.balance,inventory:state.inventory,miningSlots:state.miningSlots,miningBroken:state.miningBroken,miningUnlocked:state.miningUnlocked,miningAccumulated:state.miningAccumulated,miningLastCollect:state.miningLastCollect,autorepair:state.autorepair,freeCaseAvailable:state.freeCaseAvailable,lastFreeCaseTime:state.lastFreeCaseTime,history:state.history,stats:state.stats,craftChance:state.craftChance,desiredChance:state.desiredChance,blackmarketLots:state.blackmarketLots,blackmarketLastRefresh:state.blackmarketLastRefresh,marketMult:state.marketMult,marketLastUpdate:state.marketLastUpdate,lastBreakCheck:state.lastBreakCheck,lastTickTime:Date.now()}));}catch(e){}}
 function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(!raw)return;const d=JSON.parse(raw);
 if(typeof d.balance==='number')state.balance=d.balance;
 if(Array.isArray(d.inventory))state.inventory=d.inventory;
@@ -1452,6 +1619,7 @@ if(typeof d.lastFreeCaseTime==='number')state.lastFreeCaseTime=d.lastFreeCaseTim
 if(Array.isArray(d.history))state.history=d.history;
 if(d.stats)state.stats=Object.assign(state.stats,d.stats);
 if(typeof d.craftChance==='number')state.craftChance=d.craftChance;
+if(typeof d.desiredChance==='number')state.desiredChance=d.desiredChance;
 if(Array.isArray(d.blackmarketLots))state.blackmarketLots=d.blackmarketLots;
 if(typeof d.blackmarketLastRefresh==='number')state.blackmarketLastRefresh=d.blackmarketLastRefresh;
 if(typeof d.marketMult==='number')state.marketMult=d.marketMult;
@@ -1500,7 +1668,10 @@ function updateNameValidation(){const raw=$('editNameInput').value;const trimmed
 if(trimmed.length<4){hint.textContent='Минимум 4 символа';hint.className='edit-name-hint error';btn.disabled=true;}
 else{hint.textContent='Готово к сохранению';hint.className='edit-name-hint success';btn.disabled=false;}}
 async function saveNewName(){const raw=$('editNameInput').value;const trimmed=raw.replace(/^\s+|\s+$/g,'');if(trimmed.length<4||!fbUser||!fbProfile)return;
-try{const{doc,updateDoc}=window.fbFuncs;await updateDoc(doc(window.fbDb,'users',fbUser.uid),{name:trimmed});fbProfile.name=trimmed;$('editNameModal').classList.remove('open');renderProfileScreen();notify('Имя изменено','success');}catch(e){notify('Ошибка','error');}}
+$('editNameModal').classList.remove('open');
+fbProfile.name=trimmed;
+renderProfileScreen();
+try{const{doc,updateDoc}=window.fbFuncs;await updateDoc(doc(window.fbDb,'users',fbUser.uid),{name:trimmed});notify('Имя изменено','success');}catch(e){console.error(e);notify('Ошибка','error');}}
 function updateFirstNameValidation(){const raw=$('firstNameInput').value;const trimmed=raw.replace(/^\s+|\s+$/g,'');const hint=$('firstNameHint');const btn=$('saveFirstNameBtn');
 if(trimmed.length<4){hint.textContent='Минимум 4 символа';hint.className='edit-name-hint error';btn.disabled=true;}
 else{hint.textContent='Готово';hint.className='edit-name-hint success';btn.disabled=false;}}
@@ -1526,9 +1697,11 @@ try{const{collection,query,where,getDocs,doc,updateDoc}=window.fbFuncs;
 const q=query(collection(window.fbDb,'users'),where('username','==',trimmed));
 const snap=await getDocs(q);let taken=false;snap.forEach(d=>{if(d.id!==fbUser.uid)taken=true;});
 if(taken){notify('Юзернейм занят','error');return;}
-await updateDoc(doc(window.fbDb,'users',fbUser.uid),{username:trimmed,usernameChangedAt:Date.now()});
+$('usernameModal').classList.remove('open');
 fbProfile.username=trimmed;fbProfile.usernameChangedAt=Date.now();
-$('usernameModal').classList.remove('open');renderProfileScreen();notify('Сохранено: @'+trimmed,'success');}catch(e){notify('Ошибка','error');}}
+renderProfileScreen();
+await updateDoc(doc(window.fbDb,'users',fbUser.uid),{username:trimmed,usernameChangedAt:Date.now()});
+notify('Сохранено: @'+trimmed,'success');}catch(e){console.error(e);notify('Ошибка','error');}}
 function openUsernameModal(){if(!fbProfile)return;const now=Date.now();const cooldownMs=7*24*60*60*1000;
 if(fbProfile.usernameChangedAt&&(now-fbProfile.usernameChangedAt)<cooldownMs){const daysLeft=Math.ceil((cooldownMs-(now-fbProfile.usernameChangedAt))/(24*60*60*1000));notify('Смена через '+daysLeft+' дн.','error');return;}
 $('usernameInput').value=fbProfile.username||'';updateUsernameValidation();$('usernameModal').classList.add('open');setTimeout(()=>$('usernameInput').focus(),100);}
@@ -1630,6 +1803,7 @@ const dealBtn=$('pvDeal');
 if(dealBtn){dealBtn.addEventListener('click',()=>{$('profileViewModal').classList.remove('open');document.querySelector('.tab[data-tab="deals"]').click();$('dealTargetId').value=p.id;findDealTarget();});}
 }catch(e){notify('Ошибка загрузки профиля','error');}}
 function refreshInventory(btn){if(btn)btn.classList.add('loading');
+save(); // сохраняем текущее состояние перед чтением
 try{const raw=localStorage.getItem(SAVE_KEY);
 if(raw){const d=JSON.parse(raw);
 if(Array.isArray(d.inventory))state.inventory=d.inventory;
@@ -1645,195 +1819,165 @@ if(typeof d.balance==='number')state.balance=d.balance;
 updateBalance();renderInventory();renderInputSlots();renderMining();renderCraft();
 notify('Синхронизировано с другой вкладкой','');}catch(err){}});
 function pulseCard(cardEl){if(!cardEl)return;cardEl.classList.remove('pulse');void cardEl.offsetWidth;cardEl.classList.add('pulse');setTimeout(()=>cardEl.classList.remove('pulse'),600);}
-let currentDealRoomId=null,currentDealUnsub=null,dealTimerInterval=null;
-async function createDealRoom(targetUid){if(!fbUser||!fbProfile)return;
-try{const{collection,addDoc}=window.fbFuncs;
-const roomRef=await addDoc(collection(window.fbDb,'dealRooms'),{playerA:fbUser.uid,playerB:targetUid,playerAName:fbProfile.name||('ID '+fbProfile.id),playerBName:dealBuilderTarget?.name||'Игрок',playerAReady:false,playerBReady:false,playerAItems:dealMySlots.filter(Boolean),playerBItems:[],playerAMoney:dealMyMoney,playerBMoney:0,status:'waiting',createdAt:Date.now()});
-currentDealRoomId=roomRef.id;subscribeDealRoom(roomRef.id);showDealRoomView();
-notify('Комната создана, ждём второго игрока','success');}catch(e){notify('Ошибка создания комнаты','error');}}
-function showDealRoomView(){if(!$('dealRoomView')){
-const v=document.createElement('div');v.id='dealRoomView';
-v.innerHTML=`<div class="deal-grid"><div class="deal-side"><div class="deal-side-title"><span>Ваш инвентарь</span><span class="player-name" id="roomMyName">—</span></div><div class="deal-slots" id="roomMySlots"><div class="deal-slot empty"></div><div class="deal-slot empty"></div><div class="deal-slot empty"></div><div class="deal-slot empty"></div></div><div class="deal-money-block"><div class="deal-money-head"><span>Ваши деньги</span><span class="val" id="roomMyMoneyVal">0.00 ₽</span></div></div><div style="margin-top:14px;"><div class="deal-status waiting" id="roomMyStatus">Ожидание</div></div></div><div class="deal-side"><div class="deal-side-title"><span>Инвентарь получателя</span><span class="player-name" id="roomTheirName">—</span></div><div class="deal-slots" id="roomTheirSlots"><div class="deal-slot empty"></div><div class="deal-slot empty"></div><div class="deal-slot empty"></div><div class="deal-slot empty"></div></div><div class="deal-money-block"><div class="deal-money-head"><span>Деньги получателя</span><span class="val" id="roomTheirMoneyVal">0.00 ₽</span></div></div><div style="margin-top:14px;"><div class="deal-status waiting" id="roomTheirStatus">Ожидание</div></div></div></div><div class="deal-center"><div class="deal-center-title">Ход сделки</div><div class="deal-status" id="roomStatusText">Ожидание подтверждения</div><div class="deal-timer" id="roomTimer" style="display:none;">3</div><div class="deal-actions"><button class="btn" id="roomReadyBtn">Готово</button><button class="btn secondary" id="roomCancelBtn">Отмена</button></div></div>`;
-document.querySelector('.deals-wrap').appendChild(v);
-$('roomReadyBtn').addEventListener('click',markDealReady);
-$('roomCancelBtn').addEventListener('click',cancelDealRoom);}
-$('deals-create-view').style.display='none';$('deals-incoming-view').style.display='none';$('deals-outgoing-view').style.display='none';$('dealRoomView').style.display='block';}
-function subscribeDealRoom(roomId){if(currentDealUnsub)currentDealUnsub();
-const{doc,onSnapshot}=window.fbFuncs;
-currentDealUnsub=onSnapshot(doc(window.fbDb,'dealRooms',roomId),(snap)=>{
-if(!snap.exists())return;const room=snap.data();
-renderDealRoom(room);
-if(room.playerAReady&&room.playerBReady&&room.status==='both_ready'){executeDealExchange(roomId,room);}});}
-function renderDealRoom(room){const myUid=fbUser.uid;const isA=room.playerA===myUid;
-const myReady=isA?room.playerAReady:room.playerBReady;
-const theirReady=isA?room.playerBReady:room.playerAReady;
-$('roomMyName').textContent=isA?room.playerAName:room.playerBName;
-$('roomTheirName').textContent=isA?room.playerBName:room.playerAName;
-$('roomMyStatus').textContent=myReady?'Вы готовы':'Ожидание';
-$('roomMyStatus').className='deal-status '+(myReady?'ready':'waiting');
-$('roomTheirStatus').textContent=theirReady?'Готов':'Ожидание';
-$('roomTheirStatus').className='deal-status '+(theirReady?'ready':'waiting');
-const myItems=isA?room.playerAItems:room.playerBItems;
-const theirItems=isA?room.playerBItems:room.playerAItems;
-$('roomMyMoneyVal').textContent=fmtDec(isA?room.playerAMoney:room.playerBMoney);
-$('roomTheirMoneyVal').textContent=fmtDec(isA?room.playerBMoney:room.playerAMoney);
-renderRoomSlots('roomMySlots',myItems);
-renderRoomSlots('roomTheirSlots',theirItems);
-if(room.status==='both_ready'){$('roomStatusText').textContent='Обмен...';$('roomStatusText').className='deal-status ready';startDealTimer();}
-else if(myReady&&!theirReady){$('roomStatusText').textContent='Ждём второго игрока';$('roomStatusText').className='deal-status waiting';}
-else{$('roomStatusText').textContent='Ожидание подтверждения';$('roomStatusText').className='deal-status waiting';}}
-function renderRoomSlots(containerId,items){const el=$(containerId);if(!el)return;el.innerHTML='';
-for(let i=0;i<4;i++){const div=document.createElement('div');const item=items[i];
-if(item){div.className='deal-slot filled';div.innerHTML=renderPlate(item.plate,item.region,item.rarity,'small')+`<div class="deal-slot-price">${fmt(item.price)}</div>`;}
-else{div.className='deal-slot empty';}
-el.appendChild(div);}}
-function startDealTimer(){if(dealTimerInterval)return;let seconds=DEAL_TIMER_SEC;
-$('roomTimer').style.display='block';$('roomTimer').textContent=seconds;
-dealTimerInterval=setInterval(()=>{seconds--;$('roomTimer').textContent=seconds;
-if(seconds<=0){clearInterval(dealTimerInterval);dealTimerInterval=null;$('roomTimer').style.display='none';}},1000);}
-async function executeDealExchange(roomId,room){if(window._dealExecuting)return;window._dealExecuting=true;
-try{const{doc,runTransaction}=window.fbFuncs;
-await runTransaction(window.fbDb,async(tx)=>{const roomRef=doc(window.fbDb,'dealRooms',roomId);
-const snap=await tx.get(roomRef);if(!snap.exists())return;
-const r=snap.data();if(r.status==='completed')return;
-tx.update(roomRef,{status:'completed',completedAt:Date.now()});});
-const myUid=fbUser.uid;const isA=room.playerA===myUid;
-const myItems=isA?room.playerAItems:room.playerBItems;
-const theirItems=isA?room.playerBItems:room.playerAItems;
-const myMoney=isA?room.playerAMoney:room.playerBMoney;
-const theirMoney=isA?room.playerBMoney:room.playerAMoney;
-state.inventory=state.inventory.concat(theirItems||[]);
-state.inventory=state.inventory.filter(i=>!(myItems||[]).some(x=>x.id===i.id));
-state.balance+=(theirMoney||0)-(myMoney||0);
-updateBalance();renderInventory();save();syncProfileBalance();
-const otherName=isA?room.playerBName:room.playerAName;
-addHistory('Сделка',`Обмен с ${otherName}`,(theirMoney||0)-(myMoney||0));
-notify('Сделка завершена!','success');
-currentDealRoomId=null;
-if(currentDealUnsub){currentDealUnsub();currentDealUnsub=null;}
-setTimeout(()=>{const v=$('dealRoomView');if(v)v.style.display='none';
-$('deals-create-view').style.display='block';resetDealBuilder();},1500);
-}catch(e){notify('Ошибка сделки','error');}
-finally{setTimeout(()=>{window._dealExecuting=false;},2000);}}
-async function markDealReady(){if(!currentDealRoomId||!fbUser)return;
-try{const{doc,getDoc,updateDoc}=window.fbFuncs;
-const snap=await getDoc(doc(window.fbDb,'dealRooms',currentDealRoomId));
-if(!snap.exists())return;const room=snap.data();
-const isA=room.playerA===fbUser.uid;const updates={};
-if(isA){updates.playerAReady=true;updates.playerAItems=dealMySlots.filter(Boolean);updates.playerAMoney=dealMyMoney;}
-else{updates.playerBReady=true;updates.playerBItems=dealMySlots.filter(Boolean);updates.playerBMoney=dealMyMoney;}
-const otherReady=isA?room.playerBReady:room.playerAReady;
-if(otherReady)updates.status='both_ready';
-await updateDoc(doc(window.fbDb,'dealRooms',currentDealRoomId),updates);}catch(e){notify('Ошибка','error');}}
-async function cancelDealRoom(){if(!currentDealRoomId)return;
-try{const{doc,updateDoc}=window.fbFuncs;
-await updateDoc(doc(window.fbDb,'dealRooms',currentDealRoomId),{status:'cancelled'});
-if(currentDealUnsub){currentDealUnsub();currentDealUnsub=null;}
-currentDealRoomId=null;notify('Сделка отменена','');
-const v=$('dealRoomView');if(v)v.style.display='none';
-$('deals-create-view').style.display='block';resetDealBuilder();}catch(e){}}
-function setupDealsListener(){if(myDealsUnsub)myDealsUnsub();
-const{collection,query,where,onSnapshot}=window.fbFuncs;
-const q=query(collection(window.fbDb,'deals'),where('toUid','==',fbUser.uid));
-myDealsUnsub=onSnapshot(q,(snap)=>{let count=0;snap.forEach(()=>count++);
-$('incomingCount').textContent=count>0?'('+count+')':'';
-renderBellBadge();});}
-function renderInputSlots(){const wrap=$('inputSlots');wrap.innerHTML='';
-state.inputSlots.forEach((item,i)=>{const div=document.createElement('div');
-if(item){div.className='slot filled';
-div.innerHTML=renderPlate(item.plate,item.region,item.rarity,'small')+`<div style="color:#f0b90b;font-weight:900;font-size:11px;margin-top:6px;">${fmt(item.price)}</div>`;
-div.addEventListener('click',()=>{if(state.upgradeRunning)return;state.inventory.push(item);state.inputSlots[i]=null;renderInputSlots();renderInventory();save();});}
-else{div.className='slot empty';
-div.addEventListener('click',()=>{if(state.upgradeRunning)return;openPicker(i,'upgrade');});}
-wrap.appendChild(div);});
+
+function drawWheelTicks(){
+const g=$('wheelTicks');
+if(!g)return;
+let html='';
+for(let i=0;i<72;i++){
+const angle=(i*5)*Math.PI/180;
+const rOuter=120;
+const len=(i%6===0)?10:5;
+const rInner=rOuter-len;
+const x1=140+rInner*Math.cos(angle);
+const y1=140+rInner*Math.sin(angle);
+const x2=140+rOuter*Math.cos(angle);
+const y2=140+rOuter*Math.sin(angle);
+const cls=(i%6===0)?'wheel-tick major':'wheel-tick';
+html+=`<line class="${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+}
+g.innerHTML=html;
+}
+function drawWheelArc(chance){
+const arc=$('wheelArcFill');
+if(!arc)return;
+const circumference=WHEEL_CIRCUMFERENCE;
+const fillFraction=chance/100;
+const arcLen=circumference*fillFraction;
+arc.setAttribute('stroke-dasharray',`${arcLen} ${circumference}`);
+const totalArc=360*fillFraction;
+const startAngle=90-totalArc/2;
+arc.setAttribute('transform',`rotate(${startAngle} 140 140)`);
+}
+drawWheelTicks();
+
+function updateChance(){
 const filled=state.inputSlots.filter(Boolean);
-$('inputCount').textContent=filled.length+'/4';
-$('inputSum').textContent=fmt(filled.reduce((a,b)=>a+b.price,0)+state.addMoney);
-$('addMoneySlider').max=Math.max(0,state.balance);
-updateChance();}
-function updateChance(){const filled=state.inputSlots.filter(Boolean);
 const sum=filled.reduce((a,b)=>a+b.price,0)+state.addMoney;
 const btn=$('upgradeBtn');
 if(state.upgradeRunning)return;
-if(!filled.length){$('chanceBig').textContent='0.00%';$('chanceLabel').textContent='Шанс';
-$('circleFill').setAttribute('stroke-dashoffset',326.7);btn.disabled=true;
+if(!filled.length){
+$('wheelPercent').textContent='0%';
+$('wheelLabel').textContent='Шанс';
+drawWheelArc(0);
+btn.disabled=true;
 $('hintLine').textContent='Выберите хотя бы один номер';
 $('targetSlot').innerHTML='<div class="target-empty">Определится автоматически</div>';
 $('targetSum').textContent='0 ₽';return;}
 if(state.addMoney>state.balance){btn.disabled=true;return;}
-const chance=state.desiredChance;const realChance=(chance/100)*HOUSE_EDGE;
+const chance=state.desiredChance;
+const realChance=(chance/100)*HOUSE_EDGE;
 const targetPrice=Math.round((sum/realChance)*UPGRADE_META_BOOST);
-$('chanceBig').textContent=chance+'%';
-$('chanceLabel').textContent=chance<40?'низкий шанс':chance<60?'средний шанс':'высокий шанс';
-const dash=326.7;$('circleFill').setAttribute('stroke-dashoffset',dash-(dash*chance/100));
+$('wheelPercent').textContent=chance+'%';
+$('wheelLabel').textContent=chance<30?'низкий шанс':chance<60?'средний шанс':'высокий шанс';
+drawWheelArc(chance);
 btn.disabled=false;
 $('hintLine').textContent=`Ставка: ${fmt(sum)} → Ожидаемая цель: ${fmt(targetPrice)}`;
 $('targetSlot').innerHTML=`<div class="target-empty" style="border-style:solid;border-color:#233044;color:#7d8ca3;">~ ${fmt(targetPrice)}</div>`;
 $('targetSum').textContent=fmt(targetPrice);
-document.querySelectorAll('.mult-btn[data-chance]').forEach(b=>{b.classList.toggle('active',state.desiredChance===+b.dataset.chance);});}
-function openPicker(slotIndex,mode){const modal=$('pickerModal');modal.classList.add('open');
-$('pickerTitle').textContent=mode==='craft'?'Выберите номер для крафта':(mode==='mining'?'Выберите номер для майнинга':'Выберите номер');
-const grid=$('pickerGrid');grid.innerHTML='';
-let pool=state.inventory;
-if(mode==='craft'){const currentRarity=state.craftSlots.find(Boolean)?.rarity??null;
-pool=state.inventory.filter(i=>i.rarity!==RARITY.DIPLOMAT).filter(i=>currentRarity===null||i.rarity===currentRarity);}
-if(!pool.length){grid.innerHTML='<div class="inv-empty">Нет подходящих номеров</div>';return;}
-[...pool].sort((a,b)=>b.price-a.price).forEach(item=>{
-const card=document.createElement('div');card.className='inv-card rarity-'+item.rarity;
-card.innerHTML=`${renderPlate(item.plate,item.region,item.rarity,'small')}<div class="inv-rarity">${RARITY_NAMES[item.rarity]}</div><div class="inv-price">${fmt(item.price)}</div>`;
-card.addEventListener('click',()=>{
-if(mode==='craft'){state.craftSlots[slotIndex]=item;state.inventory=state.inventory.filter(x=>x.id!==item.id);renderCraft();renderInventory();}
-else if(mode==='mining'){state.miningSlots[slotIndex]=item;state.inventory=state.inventory.filter(x=>x.id!==item.id);renderMining();renderInventory();}
-else{state.inputSlots[slotIndex]=item;state.inventory=state.inventory.filter(x=>x.id!==item.id);renderInputSlots();renderInventory();}
-modal.classList.remove('open');save();});
-grid.appendChild(card);});}
-function performUpgrade(){if(state.upgradeRunning)return;
+document.querySelectorAll('.mult-btn[data-chance]').forEach(b=>{b.classList.toggle('active',state.desiredChance===+b.dataset.chance);});
+}
+
+function performUpgrade(){
+if(state.upgradeRunning)return;
 const filled=state.inputSlots.filter(Boolean);if(!filled.length)return;
 if(state.addMoney>state.balance){notify('Недостаточно средств','error');return;}
 const sum=filled.reduce((a,b)=>a+b.price,0)+state.addMoney;
-const chance=state.desiredChance;const realChance=(chance/100)*HOUSE_EDGE;
+const chance=state.desiredChance;
+const realChance=(chance/100)*HOUSE_EDGE;
 const targetPrice=Math.round((sum/realChance)*UPGRADE_META_BOOST);
 const targetRarity=rarityForPrice(targetPrice);
-state.upgradeRunning=true;state.inputSlots=[null,null,null,null];
+state.upgradeRunning=true;
+state.inputSlots=[null,null,null,null];
 const betAmount=sum;
 if(state.addMoney>0){state.balance-=state.addMoney;state.stats.spent+=state.addMoney;}
 state.addMoney=0;$('addMoneySlider').value=0;$('addMoneyVal').textContent='0.00 ₽';
 renderInputSlots();
-const wrap=$('circleWrap');const chanceBig=$('chanceBig');const chanceLabel=$('chanceLabel');const btn=$('upgradeBtn');
-wrap.classList.remove('result-win','result-lose');wrap.classList.add('spinning');
+const wrap=$('wheelWrap');
+const arrow=$('wheelArrow');
+const percentEl=$('wheelPercent');
+const labelEl=$('wheelLabel');
+const btn=$('upgradeBtn');
+wrap.classList.remove('result-win','result-lose');
 btn.disabled=true;btn.textContent='Крутим...';
-const duration=3000;
-const spinInterval=setInterval(()=>{chanceBig.textContent=(Math.random()*90+5).toFixed(2)+'%';chanceLabel.textContent='крутим...';},70);
-const skipBtn=document.createElement('button');skipBtn.className='skip-btn';skipBtn.textContent='ПРОПУСТИТЬ';
+const roll=Math.random()*100;
+const success=roll<(chance*HOUSE_EDGE);
+const arcDeg=chance*3.6;
+const arcStart=180-arcDeg/2;
+const arcEnd=180+arcDeg/2;
+let targetAngle;
+if(success){
+targetAngle=arcStart+Math.random()*(arcEnd-arcStart);
+}else{
+const darkStart=arcEnd;
+const darkEnd=arcStart+360;
+targetAngle=darkStart+Math.random()*(darkEnd-darkStart);
+}
+const finalRotation=targetAngle+360*5;
+arrow.style.transition='none';
+arrow.style.transform='rotate(0deg)';
+void arrow.offsetWidth;
+setTimeout(()=>{
+arrow.classList.add('spinning');
+arrow.style.transform=`rotate(${finalRotation}deg)`;
+},30);
+const spinInterval=setInterval(()=>{
+percentEl.textContent=(Math.random()*90+5).toFixed(0)+'%';
+labelEl.textContent='крутим...';
+},80);
+const skipBtn=document.createElement('button');
+skipBtn.className='skip-btn';skipBtn.textContent='ПРОПУСТИТЬ';
 skipBtn.style.cssText='width:100%;max-width:280px;margin-top:10px;';
 btn.parentNode.insertBefore(skipBtn,btn.nextSibling);
 let finished=false;
 skipBtn.addEventListener('click',()=>finishUpgrade());
-const timer=setTimeout(()=>finishUpgrade(),duration);
-function finishUpgrade(){if(finished)return;finished=true;
-clearTimeout(timer);clearInterval(spinInterval);skipBtn.remove();wrap.classList.remove('spinning');
-const roll=Math.random()*100;const success=roll<(chance*HOUSE_EDGE);
+const timer=setTimeout(()=>finishUpgrade(),5500);
+function finishUpgrade(){
+if(finished)return;finished=true;
+clearTimeout(timer);clearInterval(spinInterval);
+skipBtn.remove();
+arrow.classList.remove('spinning');
+arrow.style.transform=`rotate(${targetAngle}deg)`;
+percentEl.textContent=chance+'%';
 let newItem=null;
-if(success){let attempts=0;
+if(success){
+let attempts=0;
 while(attempts<40){const item=makeNumber('black');
 const ratio=item.price/targetPrice;
 if(ratio>0.5&&ratio<1.5&&item.rarity>=targetRarity-1){newItem=item;break;}attempts++;}
 if(!newItem){const{plate,region}=genPlate(targetRarity);
 newItem={plate,region,rarity:targetRarity,price:targetPrice,id:Date.now()+Math.random()};}
-state.inventory.push(newItem);wrap.classList.add('result-win');
-chanceBig.textContent='УСПЕХ';chanceLabel.textContent=newItem.plate;
+state.inventory.push(newItem);
+wrap.classList.add('result-win');
+labelEl.textContent='Апгрейд успешен!';
+labelEl.className='wheel-label win';
 addHistory('Апгрейд',`Успех: ${newItem.plate}`,newItem.price);
-state.stats.earned+=newItem.price;state.lastResultItem=newItem;}
-else{wrap.classList.add('result-lose');
-chanceBig.textContent='ПРОВАЛ';chanceLabel.textContent='−'+fmt(betAmount);
-addHistory('Апгрейд',`Провал`,-betAmount);state.lastResultItem=null;}
+state.stats.earned+=newItem.price;
+state.lastResultItem=newItem;
+}else{
+wrap.classList.add('result-lose');
+labelEl.textContent='Провал';
+labelEl.className='wheel-label lose';
+addHistory('Апгрейд',`Провал`,-betAmount);
+state.lastResultItem=null;
+}
 state.stats.upgrades++;
 renderInventory();updateBalance();save();syncProfileBalance();
-setTimeout(()=>{wrap.classList.remove('result-win','result-lose');
-chanceBig.textContent='0.00%';chanceLabel.textContent='Шанс';
-$('circleFill').setAttribute('stroke-dashoffset',326.7);
-state.upgradeRunning=false;btn.disabled=false;btn.textContent='Прокачать';
-renderInputSlots();showResultModal(success,newItem,betAmount);},400);}}
+setTimeout(()=>{
+wrap.classList.remove('result-win','result-lose');
+percentEl.textContent='0%';
+labelEl.textContent='Шанс';
+labelEl.className='wheel-label';
+arrow.style.transition='none';
+arrow.style.transform='rotate(0deg)';
+state.upgradeRunning=false;
+btn.disabled=false;btn.textContent='Прокачать';
+renderInputSlots();
+showResultModal(success,newItem,betAmount);
+},1600);
+}
+}
+
 function showResultModal(success,item,betAmount){const modal=$('resultModal');const box=$('resultModalBox');
 const title=$('resultTitle');const plateWrap=$('resultPlateWrap');
 const priceEl=$('resultPrice');const lossEl=$('resultLoss');
@@ -1854,6 +1998,7 @@ plateWrap.style.display='none';priceEl.style.display='none';
 lossEl.textContent='Потеряно: '+fmt(betAmount);lossEl.style.display='block';
 actions.style.display='none';okBtn.style.display='block';}
 modal.classList.add('open');}
+
 function showPlateInfo(item){const modal=$('plateInfoModal');
 $('plateInfoPlate').innerHTML=renderPlate(item.plate,item.region,item.rarity,'large');
 let charsHTML='';
@@ -1866,6 +2011,103 @@ const patterns=getPlatePatterns(item.plate);
 $('plateInfoPattern').textContent=patterns.length?patterns.join(', '):'нет';
 $('plateInfoPrice').textContent=fmt(item.price);
 modal.classList.add('open');}
+
+let pickerMode=null;
+let pickerIndex=null;
+
+function renderInputSlots(){
+const wrap=$('inputSlots');
+if(!wrap)return;
+wrap.innerHTML='';
+state.inputSlots.forEach((item,i)=>{
+const div=document.createElement('div');
+if(item){
+div.className='slot filled';
+div.innerHTML=renderPlate(item.plate,item.region,item.rarity,'small')+
+`<div style="color:#f0b90b;font-weight:900;font-size:10px;margin-top:4px;">${fmt(item.price)}</div>`;
+div.addEventListener('click',(e)=>{
+e.stopPropagation();
+if(state.upgradeRunning)return;
+state.inventory.push(item);
+state.inputSlots[i]=null;
+renderInputSlots();
+renderInventory();
+save();
+});
+}else{
+div.className='slot empty';
+div.addEventListener('click',()=>openPicker(i,'upgrade'));
+}
+wrap.appendChild(div);
+});
+const sum=state.inputSlots.filter(Boolean).reduce((s,i)=>s+i.price,0);
+const sumEl=$('inputSum');
+if(sumEl)sumEl.textContent=fmt(sum);
+const cnt=$('inputCount');
+if(cnt)cnt.textContent=state.inputSlots.filter(Boolean).length+'/4';
+updateChance();
+}
+
+function openPicker(index,mode){
+pickerMode=mode;
+pickerIndex=index;
+const modal=$('pickerModal');
+const grid=$('pickerGrid');
+const title=$('pickerTitle');
+if(!modal||!grid)return;
+title.textContent = mode==='upgrade' ? 'Выберите номер для апгрейда'
+: mode==='craft'   ? 'Выберите номер для крафта'
+: 'Выберите номер для майнинга';
+grid.innerHTML='';
+const busyIds=new Set();
+state.inputSlots.forEach(s=>{if(s)busyIds.add(s.id);});
+state.craftSlots.forEach(s=>{if(s)busyIds.add(s.id);});
+state.miningSlots.forEach(s=>{if(s)busyIds.add(s.id);});
+const available=state.inventory.filter(i=>!busyIds.has(i.id));
+if(!available.length){
+grid.innerHTML='<div class="inv-empty">Нет доступных номеров</div>';
+modal.classList.add('open');
+return;
+}
+available.sort((a,b)=>b.price-a.price).forEach(item=>{
+const card=document.createElement('div');
+card.className='inv-card rarity-'+item.rarity;
+card.innerHTML=`${renderPlate(item.plate,item.region,item.rarity,'small')}
+<div class="inv-rarity">${RARITY_NAMES[item.rarity]}</div>
+<div class="inv-price">${fmt(item.price)}</div>`;
+card.addEventListener('click',()=>{
+if(mode==='craft'){
+const currentRarity=state.craftSlots.find(Boolean)?.rarity??null;
+if(currentRarity!==null&&item.rarity!==currentRarity){
+notify('Только одной редкости','error');
+return;
+}
+if(item.rarity===RARITY.DIPLOMAT){
+notify('Дипломат нельзя','error');
+return;
+}
+}
+state.inventory=state.inventory.filter(x=>x.id!==item.id);
+if(mode==='upgrade'){
+state.inputSlots[pickerIndex]=item;
+renderInputSlots();
+}else if(mode==='craft'){
+state.craftSlots[pickerIndex]=item;
+renderCraft();
+}else if(mode==='mining'){
+state.miningSlots[pickerIndex]=item;
+state.miningBroken[pickerIndex]=false;
+renderMining();
+}
+renderInventory();
+save();
+modal.classList.remove('open');
+});
+grid.appendChild(card);
+});
+modal.classList.add('open');
+}
+
 function renderInventory(){const grids=[$('invGrid'),$('invGrid2'),$('invGridCraft')];
 grids.forEach(g=>{if(g)g.innerHTML='';});
 $('invCount').textContent=state.inventory.length+' шт.';
@@ -1873,11 +2115,13 @@ $('invCount2').textContent=state.inventory.length+' шт.';
 $('invCountCraft').textContent=state.inventory.length+' шт.';
 if(!state.inventory.length){grids.forEach(g=>{if(g)g.innerHTML='<div class="inv-empty">Инвентарь пуст</div>';});return;}
 const miningIds=new Set();state.miningSlots.forEach(s=>{if(s)miningIds.add(s.id);});
+const dealIds=new Set();roomMySlots.forEach(s=>{if(s)dealIds.add(s.id);});
 const sorted=[...state.inventory].sort((a,b)=>b.price-a.price);
 grids.forEach((grid,gridIdx)=>{if(!grid)return;
 sorted.forEach(item=>{const card=document.createElement('div');
 card.className='inv-card rarity-'+item.rarity;
 if(miningIds.has(item.id))card.classList.add('in-mining');
+if(dealIds.has(item.id))card.classList.add('in-deal');
 if(state.selectedInvCard===item.id&&gridIdx===1)card.classList.add('selected');
 card.innerHTML=`${renderPlate(item.plate,item.region,item.rarity,'small')}<div class="inv-rarity">${RARITY_NAMES[item.rarity]}</div><div class="inv-price">${fmt(item.price)}</div><button class="sell">Продать за ${fmt(item.price*0.8)}</button>`;
 card.querySelector('.sell').addEventListener('click',e=>{e.stopPropagation();sellItem(item.id);});
@@ -1899,6 +2143,7 @@ state.inputSlots[freeIdx]=item;
 state.inventory=state.inventory.filter(x=>x.id!==item.id);
 renderInputSlots();renderInventory();save();});
 grid.appendChild(card);});});}
+
 function sellItem(id){const idx=state.inventory.findIndex(i=>i.id===id);
 if(idx===-1)return;const item=state.inventory[idx];
 const sellPrice=Math.floor(item.price*0.8);
@@ -1909,6 +2154,7 @@ state.stats.earned+=sellPrice;
 notify(`Продано: ${item.plate} за ${fmt(sellPrice)}`,'success');
 save();syncProfileBalance();}
 const ITEM_W=190;
+
 function renderCasePicker(){const grid=$('casePickerGrid');
 const order=['free','standard','yellow','blue','black'];grid.innerHTML='';
 order.forEach(key=>{const c=CASE_TYPES[key];
@@ -2223,144 +2469,605 @@ const timeStr=d.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-di
 return`<div class="history-row ${cls}"><div class="h-left"><div class="h-type">${h.type}</div><div class="h-desc">${h.desc}</div><div class="h-time">${timeStr}</div></div><div class="h-amount ${amountClass}">${amountText}</div></div>`;}).join('');}
 function clearHistory(){if(!state.history.length)return;
 state.history=[];save();renderHistory();notify('История очищена','');}
-function updateBalance(){$('balanceDisplay').textContent=fmt(state.balance);}
+function updateBalance(){
+$('balanceDisplay').textContent=fmt(state.balance);
+const s1=$('addMoneySlider');if(s1){s1.max=Math.max(0,state.balance);if(state.addMoney>state.balance){state.addMoney=state.balance;s1.value=state.addMoney;$('addMoneyVal').textContent=fmtDec(state.addMoney);}}
+const s2=$('craftAddMoneySlider');if(s2){s2.max=Math.max(0,state.balance);if(state.craftAddMoney>state.balance){state.craftAddMoney=state.balance;s2.value=state.craftAddMoney;$('craftAddMoneyVal').textContent=fmtDec(state.craftAddMoney);}}
+}
 function flashBalance(){const box=$('balanceBox');box.classList.add('flash');
 setTimeout(()=>box.classList.remove('flash'),400);}
 function notify(text,type){const n=document.createElement('div');
 n.className='notify'+(type?' '+type:'');
 n.textContent=text;document.body.appendChild(n);
 setTimeout(()=>n.remove(),3200);}
-let dealBuilderTarget=null,dealMySlots=[null,null,null,null],dealTheirSlots=[null,null,null,null],dealMyMoney=0,dealTheirMoney=0;
-function initDealsTabs(){document.querySelectorAll('.deals-tab').forEach(tab=>{
-tab.addEventListener('click',()=>{document.querySelectorAll('.deals-tab').forEach(t=>t.classList.remove('active'));
-tab.classList.add('active');const v=tab.dataset.dealsTab;
+
+// ==================== НОВАЯ СИСТЕМА СДЕЛОК ====================
+let dealTargetCandidate=null;
+
+function initDealsTabs(){
+document.querySelectorAll('.deals-tab').forEach(tab=>{
+tab.addEventListener('click',()=>{
+document.querySelectorAll('.deals-tab').forEach(t=>t.classList.remove('active'));
+tab.classList.add('active');
+const v=tab.dataset.dealsTab;
 $('deals-create-view').style.display=v==='create'?'block':'none';
-$('deals-incoming-view').style.display=v==='incoming'?'block':'none';
 $('deals-outgoing-view').style.display=v==='outgoing'?'block':'none';
-const roomV=$('dealRoomView');if(roomV)roomV.style.display='none';
-if(v==='incoming')loadIncomingDeals();
-if(v==='outgoing')loadOutgoingDeals();});});}
+if(v==='outgoing')loadOutgoingDeals();
+});
+});
+}
+
 async function findDealTarget(){
 const raw=$('dealTargetId').value.replace(/^\s+|\s+$/g,'');
 if(!raw)return;
-try{const{collection,query,where,getDocs}=window.fbFuncs;
+try{
+const{collection,query,where,getDocs}=window.fbFuncs;
 let snap;
-if(raw.startsWith('@')){const uname=raw.slice(1).toLowerCase();
+if(raw.startsWith('@')){
+const uname=raw.slice(1).toLowerCase();
 if(!/^[a-z0-9_]{4,}$/.test(uname)){notify('Неверный @username','error');return;}
 if(fbProfile&&fbProfile.username===uname){notify('Это вы','error');return;}
-snap=await getDocs(query(collection(window.fbDb,'users'),where('username','==',uname)));}
-else{const id=raw.replace(/\D/g,'').padStart(6,'0').slice(0,6);
+snap=await getDocs(query(collection(window.fbDb,'users'),where('username','==',uname)));
+}else{
+const id=raw.replace(/\D/g,'').padStart(6,'0').slice(0,6);
 if(id.length!==6){notify('6-значный ID или @username','error');return;}
 if(fbProfile&&id===fbProfile.id){notify('Это ваш ID','error');return;}
-snap=await getDocs(query(collection(window.fbDb,'users'),where('id','==',id)));}
+snap=await getDocs(query(collection(window.fbDb,'users'),where('id','==',id)));
+}
 if(snap.empty){notify('Игрок не найден','error');return;}
-dealBuilderTarget=snap.docs[0].data();
-dealBuilderTarget.uid=snap.docs[0].id;
-dealMySlots=[null,null,null,null];
-dealTheirSlots=[null,null,null,null];
-dealMyMoney=0;dealTheirMoney=0;
-$('dealMyMoney').value=0;$('dealTheirMoney').value=0;
-$('dealMyMoneyVal').textContent='0.00 ₽';$('dealTheirMoneyVal').textContent='0.00 ₽';
-$('dealMyName').textContent=fbProfile.name||('ID '+fbProfile.id);
-$('dealTheirName').textContent=dealBuilderTarget.name||('ID '+dealBuilderTarget.id);
-$('dealBuilder').style.display='block';
-renderDealBuilder();
-}catch(e){console.error(e);notify('Ошибка','error');}}
-function renderDealBuilder(){
-const mySlotsEl=$('dealMySlots');mySlotsEl.innerHTML='';
-dealMySlots.forEach((item,i)=>{const div=document.createElement('div');
-if(item){div.className='deal-slot filled';
-div.innerHTML=renderPlate(item.plate,item.region,item.rarity,'small')+`<div class="deal-slot-price">${fmt(item.price)}</div>`;
-div.addEventListener('click',()=>{state.inventory.push(item);dealMySlots[i]=null;renderDealBuilder();renderInventory();});}
-else{div.className='deal-slot empty';
-div.addEventListener('click',()=>openDealItemPicker(i));}
-mySlotsEl.appendChild(div);});
-const theirSlotsEl=$('dealTheirSlots');theirSlotsEl.innerHTML='';
-dealTheirSlots.forEach((item,i)=>{const div=document.createElement('div');
-if(item){div.className='deal-slot filled';
-div.innerHTML=renderPlate(item.plate,item.region,item.rarity,'small')+`<div class="deal-slot-price">${fmt(item.price)}</div>`;
-div.addEventListener('click',()=>{dealTheirSlots[i]=null;renderDealBuilder();});}
-else{div.className='deal-slot empty';
-div.addEventListener('click',()=>notify('Инвентарь получателя недоступен до принятия','error'));}
-theirSlotsEl.appendChild(div);});}
-function openDealItemPicker(slotIdx){const modal=$('pickerModal');
-modal.classList.add('open');
-$('pickerTitle').textContent='Выберите номер';
-const grid=$('pickerGrid');grid.innerHTML='';
-if(!state.inventory.length){grid.innerHTML='<div class="inv-empty">Инвентарь пуст</div>';return;}
-[...state.inventory].sort((a,b)=>b.price-a.price).forEach(item=>{
-const card=document.createElement('div');card.className='inv-card rarity-'+item.rarity;
-card.innerHTML=`${renderPlate(item.plate,item.region,item.rarity,'small')}<div class="inv-rarity">${RARITY_NAMES[item.rarity]}</div><div class="inv-price">${fmt(item.price)}</div>`;
-card.addEventListener('click',()=>{dealMySlots[slotIdx]=item;
-state.inventory=state.inventory.filter(x=>x.id!==item.id);
-renderDealBuilder();renderInventory();modal.classList.remove('open');});
-grid.appendChild(card);});}
-async function sendDeal(){
-if(!fbUser||!fbProfile||!dealBuilderTarget)return;
-if(dealMySlots.filter(Boolean).length===0&&dealMyMoney===0){notify('Добавьте номер или деньги','error');return;}
-try{const{collection,addDoc}=window.fbFuncs;
-await addDoc(collection(window.fbDb,'deals'),{
+dealTargetCandidate=snap.docs[0].data();
+dealTargetCandidate.uid=snap.docs[0].id;
+const lastSeen=dealTargetCandidate.lastSeen||0;
+const isOnline=(Date.now()-lastSeen)<90000;
+if(!isOnline){
+$('dealFoundWrap').style.display='block';
+$('dealFoundWrap').innerHTML=`
+<div class="deal-found-box">
+<div class="info">
+<div class="name">${dealTargetCandidate.name||('Игрок '+dealTargetCandidate.id)}</div>
+<div class="id">[id:${dealTargetCandidate.id}] · Оффлайн</div>
+</div>
+<button class="btn secondary" disabled style="max-width:200px;">Не в сети</button>
+</div>`;
+$('dealWaitingWrap').style.display='none';
+return;
+}
+$('dealFoundWrap').style.display='block';
+$('dealFoundWrap').innerHTML=`
+<div class="deal-found-box">
+<div class="info">
+<div class="name">${dealTargetCandidate.name||('Игрок '+dealTargetCandidate.id)}</div>
+<div class="id">[id:${dealTargetCandidate.id}] · В сети</div>
+</div>
+<button class="btn" id="dealSendInviteBtn" style="max-width:200px;">Отправить</button>
+</div>`;
+$('dealWaitingWrap').style.display='none';
+$('dealSendInviteBtn').addEventListener('click',sendDealInvite);
+}catch(e){console.error(e);notify('Ошибка','error');}
+}
+
+async function sendDealInvite(){
+if(!fbUser||!fbProfile||!dealTargetCandidate)return;
+try{
+const{collection,addDoc}=window.fbFuncs;
+const docRef=await addDoc(collection(window.fbDb,'deals'),{
 fromUid:fbUser.uid,
 fromId:fbProfile.id,
 fromName:fbProfile.name||('ID '+fbProfile.id),
-toUid:dealBuilderTarget.uid,
-toId:dealBuilderTarget.id,
-toName:dealBuilderTarget.name||('ID '+dealBuilderTarget.id),
-myItems:dealMySlots.filter(Boolean),
-theirItems:[],
-myMoney:dealMyMoney,
-theirMoney:0,
+toUid:dealTargetCandidate.uid,
+toId:dealTargetCandidate.id,
+toName:dealTargetCandidate.name||('ID '+dealTargetCandidate.id),
 status:'pending',
 createdAt:Date.now()
 });
-if(dealMyMoney>0){state.balance-=dealMyMoney;updateBalance();}
-renderInventory();save();syncProfileBalance();
-notify('Сделка отправлена','success');resetDealBuilder();
-}catch(e){console.error('Deal send:',e);notify('Ошибка: '+e.message,'error');}}
-function resetDealBuilder(){
-dealBuilderTarget=null;
-dealMySlots=[null,null,null,null];
-dealTheirSlots=[null,null,null,null];
-dealMyMoney=0;dealTheirMoney=0;
-$('dealBuilder').style.display='none';
-$('dealTargetId').value='';}
-async function loadIncomingDeals(){
-const list=$('incomingList');
-try{const{collection,query,where,getDocs}=window.fbFuncs;
-const q=query(collection(window.fbDb,'deals'),where('toUid','==',fbUser.uid));
-const snap=await getDocs(q);const deals=[];
-snap.forEach(d=>deals.push({id:d.id,...d.data()}));
-if(!deals.length){list.innerHTML='<div class="friends-empty">Входящих сделок нет</div>';return;}
-list.innerHTML=deals.map(d=>{
-const itemsHtml=(d.myItems||[]).map(i=>renderPlate(i.plate,i.region,i.rarity,'small')).join('');
-return`<div class="incoming-deal"><div class="incoming-deal-header"><div class="incoming-deal-title">От ${d.fromName}</div><div class="incoming-deal-meta">${new Date(d.createdAt).toLocaleString('ru-RU')}</div></div><div style="background:#080b10;border:1px solid #1a2230;border-radius:8px;padding:10px;margin:10px 0;"><div style="font-size:10px;color:#6d7c92;font-weight:800;text-transform:uppercase;margin-bottom:8px;">Он даёт вам</div><div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">${itemsHtml||'<span style="color:#52627a;font-size:11px;">только деньги</span>'}</div>${d.myMoney>0?`<div style="text-align:center;margin-top:8px;color:#f0b90b;font-weight:900;">+${fmt(d.myMoney)}</div>`:''}</div><div class="incoming-deal-actions"><button class="btn" data-deal-accept="${d.id}">Принять</button><button class="btn secondary" data-deal-decline="${d.id}">Отклонить</button></div></div>`;}).join('');
-list.querySelectorAll('[data-deal-accept]').forEach(b=>{b.addEventListener('click',()=>acceptDeal(b.dataset.dealAccept));});
-list.querySelectorAll('[data-deal-decline]').forEach(b=>{b.addEventListener('click',()=>declineDeal(b.dataset.dealDecline));});
-}catch(e){console.error(e);list.innerHTML='<div class="friends-empty">Ошибка загрузки</div>';}}
-async function acceptDeal(dealId){
-try{const{doc,getDoc,updateDoc,deleteDoc}=window.fbFuncs;
-const snap=await getDoc(doc(window.fbDb,'deals',dealId));
-if(!snap.exists())return;const d=snap.data();
-state.inventory=state.inventory.concat(d.myItems||[]);
-state.balance+=(d.myMoney||0);
-updateBalance();renderInventory();save();syncProfileBalance();
-try{const fromSnap=await getDoc(doc(window.fbDb,'users',d.fromUid));
-if(fromSnap.exists()){await updateDoc(doc(window.fbDb,'users',d.fromUid),{balance:(fromSnap.data().balance||0)+(d.theirMoney||0)-(d.myMoney||0)});}}catch(e){console.error(e);}
-await deleteDoc(doc(window.fbDb,'deals',dealId));
-addHistory('Сделка',`Принята от ${d.fromName}`,d.myMoney||0);
-notify('Сделка принята!','success');loadIncomingDeals();
-}catch(e){console.error('Accept:',e);notify('Ошибка: '+e.message,'error');}}
-async function declineDeal(dealId){const{doc,deleteDoc}=window.fbFuncs;
-await deleteDoc(doc(window.fbDb,'deals',dealId));
-notify('Сделка отклонена','');loadIncomingDeals();}
-async function loadOutgoingDeals(){const list=$('outgoingList');
-try{const{collection,query,where,getDocs}=window.fbFuncs;
+notify('Приглашение отправлено','success');
+$('dealFoundWrap').style.display='none';
+$('dealWaitingWrap').style.display='block';
+$('dealWaitingWrap').innerHTML=`
+<div class="deal-waiting-box">
+<div class="txt">Ожидаем ответа от игрока</div>
+<div class="timer" id="dealWaitTimer">60</div>
+<div class="actions">
+<button class="btn secondary" id="dealInviteCancelBtn" style="max-width:200px;">Отменить</button>
+</div>
+</div>`;
+let seconds=60;
+const iv=setInterval(()=>{
+seconds--;
+const el=$('dealWaitTimer');
+if(el)el.textContent=seconds;
+if(seconds<=0){clearInterval(iv);}
+},1000);
+$('dealInviteCancelBtn').addEventListener('click',async()=>{
+clearInterval(iv);
+const{doc,deleteDoc}=window.fbFuncs;
+try{await deleteDoc(doc(window.fbDb,'deals',docRef.id));}catch(e){}
+$('dealWaitingWrap').style.display='none';
+$('dealFoundWrap').style.display='none';
+notify('Приглашение отменено','');
+});
+const{doc,onSnapshot}=window.fbFuncs;
+const unsub=onSnapshot(doc(window.fbDb,'deals',docRef.id),(snap)=>{
+if(!snap.exists()){
+clearInterval(iv);
+unsub();
+$('dealWaitingWrap').style.display='none';
+notify('Партнёр отклонил сделку','error');
+return;
+}
+const d=snap.data();
+if(d.status==='accepted'){
+clearInterval(iv);
+unsub();
+$('dealWaitingWrap').style.display='none';
+$('dealFoundWrap').style.display='none';
+openDealRoom(d.roomId);
+}else if(d.status==='declined'){
+clearInterval(iv);
+unsub();
+$('dealWaitingWrap').style.display='none';
+notify('Партнёр отклонил сделку','error');
+}
+});
+}catch(e){console.error('Deal send:',e);notify('Ошибка: '+e.message,'error');}
+}
+
+async function loadOutgoingDeals(){
+const list=$('outgoingList');
+try{
+const{collection,query,where,getDocs}=window.fbFuncs;
 const q=query(collection(window.fbDb,'deals'),where('fromUid','==',fbUser.uid));
-const snap=await getDocs(q);const deals=[];
+const snap=await getDocs(q);
+const deals=[];
 snap.forEach(d=>deals.push({id:d.id,...d.data()}));
-if(!deals.length){list.innerHTML='<div class="friends-empty">Исходящих сделок нет</div>';return;}
-list.innerHTML=deals.map(d=>`<div class="incoming-deal"><div class="incoming-deal-header"><div class="incoming-deal-title">Сделка для ${d.toName}</div><div class="incoming-deal-meta">Статус: ${d.status}</div></div></div>`).join('');
-}catch(e){list.innerHTML='<div class="friends-empty">Ошибка загрузки</div>';}}
+if(!deals.length){list.innerHTML='<div class="friends-empty">Нет исходящих приглашений</div>';return;}
+list.innerHTML=deals.map(d=>`<div class="incoming-deal">
+<div class="incoming-deal-header">
+<div class="incoming-deal-title">Приглашение для ${d.toName}</div>
+<div class="incoming-deal-meta">Статус: ${d.status==='pending'?'ожидание':d.status}</div>
+</div>
+${d.status==='pending'?`<div class="incoming-deal-actions"><button class="btn secondary" data-cancel-out="${d.id}">Отменить</button></div>`:''}
+</div>`).join('');
+list.querySelectorAll('[data-cancel-out]').forEach(b=>{
+b.addEventListener('click',async()=>{
+const{doc,deleteDoc}=window.fbFuncs;
+try{await deleteDoc(doc(window.fbDb,'deals',b.dataset.cancelOut));}catch(e){}
+loadOutgoingDeals();
+notify('Приглашение отменено','');
+});
+});
+}catch(e){list.innerHTML='<div class="friends-empty">Ошибка загрузки</div>';}
+}
+
+function setupDealsListener(){
+if(myDealsUnsub)myDealsUnsub();
+const{collection,query,where,onSnapshot}=window.fbFuncs;
+const q=query(collection(window.fbDb,'deals'),where('toUid','==',fbUser.uid));
+myDealsUnsub=onSnapshot(q,(snap)=>{
+const pendingDeals=[];
+snap.forEach(d=>{
+const data=d.data();
+if(data.status==='pending')pendingDeals.push({id:d.id,...data});
+});
+if(pendingDeals.length>0&&!currentDealInviteId&&!currentDealRoomId){
+const d=pendingDeals[0];
+openDealInvitePopup(d);
+}
+const now=Date.now();
+pendingDeals.forEach(async(d)=>{
+if(now-d.createdAt>DEAL_INVITE_TIMEOUT){
+const{doc,deleteDoc}=window.fbFuncs;
+try{await deleteDoc(doc(window.fbDb,'deals',d.id));}catch(e){}
+}
+});
+});
+}
+
+function openDealInvitePopup(deal){
+currentDealInviteId=deal.id;
+$('dealInviteFromName').textContent=deal.fromName||('ID '+deal.fromId);
+$('dealInviteFromId').textContent='[id:'+deal.fromId+']';
+$('dealInviteModal').classList.add('open');
+let seconds=60;
+$('dealInviteTimer').textContent=seconds;
+if(currentDealInviteTimer)clearInterval(currentDealInviteTimer);
+currentDealInviteTimer=setInterval(()=>{
+seconds--;
+$('dealInviteTimer').textContent=Math.max(0,seconds);
+if(seconds<=0){
+clearInterval(currentDealInviteTimer);
+currentDealInviteTimer=null;
+$('dealInviteModal').classList.remove('open');
+currentDealInviteId=null;
+}
+},1000);
+}
+
+async function acceptDealInvite(){
+if(!currentDealInviteId||!fbUser||!fbProfile)return;
+const dealId=currentDealInviteId;
+clearInterval(currentDealInviteTimer);
+currentDealInviteTimer=null;
+currentDealInviteId=null;
+$('dealInviteModal').classList.remove('open');
+try{
+const{doc,getDoc,updateDoc,collection,addDoc}=window.fbFuncs;
+const dealSnap=await getDoc(doc(window.fbDb,'deals',dealId));
+if(!dealSnap.exists()){notify('Приглашение не найдено','error');return;}
+const d=dealSnap.data();
+const roomRef=await addDoc(collection(window.fbDb,'dealRooms'),{
+playerA:d.fromUid,
+playerB:fbUser.uid,
+playerAName:d.fromName,
+playerBName:fbProfile.name||('ID '+fbProfile.id),
+playerAItems:[],
+playerBItems:[],
+playerAMoney:0,
+playerBMoney:0,
+playerAReady:false,
+playerBReady:false,
+status:'open',
+createdAt:Date.now()
+});
+await updateDoc(doc(window.fbDb,'deals',dealId),{status:'accepted',roomId:roomRef.id});
+notify('Принято! Открываем комнату','success');
+openDealRoom(roomRef.id);
+}catch(e){console.error(e);notify('Ошибка принятия','error');}
+}
+
+async function declineDealInvite(){
+if(!currentDealInviteId)return;
+const dealId=currentDealInviteId;
+clearInterval(currentDealInviteTimer);
+currentDealInviteTimer=null;
+currentDealInviteId=null;
+$('dealInviteModal').classList.remove('open');
+try{
+const{doc,updateDoc}=window.fbFuncs;
+await updateDoc(doc(window.fbDb,'deals',dealId),{status:'declined'});
+notify('Отклонено','');
+}catch(e){}
+}
+
+async function openDealRoom(roomId){
+if(!fbUser)return;
+currentDealRoomId=roomId;
+roomMyMoney=0;
+roomMySlots=[null,null,null,null];
+$('dealRoomScreen').classList.add('active');
+const{doc,onSnapshot}=window.fbFuncs;
+if(currentDealRoomUnsub)currentDealRoomUnsub();
+currentDealRoomUnsub=onSnapshot(doc(window.fbDb,'dealRooms',roomId),(snap)=>{
+if(!snap.exists()){
+closeDealRoomLocal();
+return;
+}
+const room=snap.data();
+currentDealRoomData=room;
+if(room.status==='cancelled'){closeDealRoomLocal();notify('Сделка отменена','error');return;}
+if(room.status==='completed'){handleDealCompleted(room);return;}
+renderDealRoomFull(room);
+loadPartnerInventory(room);
+});
+}
+
+const partnerInvCache={};
+
+async function loadPartnerInventory(room){
+if(!fbUser)return;
+const myUid=fbUser.uid;
+const partnerUid=room.playerA===myUid?room.playerB:room.playerA;
+if(!partnerUid)return;
+if(partnerInvCache[partnerUid]){
+room._theirInvCache=partnerInvCache[partnerUid];
+return;
+}
+try{
+const{doc,getDoc}=window.fbFuncs;
+const snap=await getDoc(doc(window.fbDb,'users',partnerUid));
+if(!snap.exists())return;
+const data=snap.data();
+const inv=Array.isArray(data.inventory)?data.inventory:[];
+partnerInvCache[partnerUid]=inv;
+room._theirInvCache=inv;
+renderDealRoomFull(room);
+}catch(e){console.error('Partner inv load error:',e);}
+}
+
+function renderDealRoomFull(room){
+const myUid=fbUser.uid;
+const isA=room.playerA===myUid;
+const myName=isA?room.playerAName:room.playerBName;
+const theirName=isA?room.playerBName:room.playerAName;
+const myItems=isA?room.playerAItems:room.playerBItems;
+const theirItems=isA?room.playerBItems:room.playerAItems;
+const myMoney=isA?room.playerAMoney:room.playerBMoney;
+const theirMoney=isA?room.playerBMoney:room.playerAMoney;
+const myReady=isA?room.playerAReady:room.playerBReady;
+const theirReady=isA?room.playerBReady:room.playerAReady;
+$('roomTitleA').textContent=room.playerAName;
+$('roomTitleB').textContent=room.playerBName;
+$('roomMyName').textContent=myName;
+$('roomTheirName').textContent=theirName;
+$('roomMyStatus').textContent=myReady?'Готов':'Не готов';
+$('roomMyStatus').className='status'+(myReady?' ready':'');
+$('roomTheirStatus').textContent=theirReady?'Готов':'Не готов';
+$('roomTheirStatus').className='status'+(theirReady?' ready':'');
+$('roomSideMe').classList.toggle('ready',myReady);
+$('roomSidePartner').classList.toggle('ready',theirReady);
+const mySlotsEl=$('roomMySlots');mySlotsEl.innerHTML='';
+for(let i=0;i<4;i++){
+const item=myItems[i];
+const div=document.createElement('div');
+if(item){
+div.className='deal-room-slot filled';
+div.innerHTML=renderPlate(item.plate,item.region,item.rarity,'small')+`<div class="slot-price">${fmt(item.price)}</div>`;
+div.addEventListener('click',()=>removeMyDealItem(item.id));
+}else{
+div.className='deal-room-slot empty';
+}
+mySlotsEl.appendChild(div);
+}
+const theirSlotsEl=$('roomTheirSlots');theirSlotsEl.innerHTML='';
+for(let i=0;i<4;i++){
+const item=theirItems[i];
+const div=document.createElement('div');
+if(item){
+div.className='deal-room-slot filled locked';
+div.innerHTML=renderPlate(item.plate,item.region,item.rarity,'small')+`<div class="slot-price">${fmt(item.price)}</div>`;
+}else{
+div.className='deal-room-slot empty locked';
+}
+theirSlotsEl.appendChild(div);
+}
+$('roomMyMoneyVal').textContent=fmt(myMoney);
+$('roomTheirMoneyVal').textContent=fmt(theirMoney);
+const moneySlider=$('roomMyMoney');
+moneySlider.max=Math.max(0,state.balance+myMoney);
+moneySlider.value=myMoney;
+if(!myReady){
+moneySlider.disabled=false;
+}else{
+moneySlider.disabled=true;
+}
+const myInvEl=$('roomMyInv');myInvEl.innerHTML='';
+const myDealIds=new Set(myItems.map(i=>i.id));
+const availableInv=state.inventory.filter(i=>!myDealIds.has(i.id));
+if(!availableInv.length){
+myInvEl.innerHTML='<div style="color:#52627a;font-size:11px;padding:8px;">Пусто</div>';
+}else{
+availableInv.sort((a,b)=>b.price-a.price).slice(0,30).forEach(item=>{
+const card=document.createElement('div');
+card.className='deal-room-inv-item'+(myReady?' disabled':'');
+card.innerHTML=`${renderPlate(item.plate,item.region,item.rarity,'small')}<div class="price">${fmt(item.price)}</div>`;
+if(!myReady){
+card.addEventListener('click',()=>addItemToMyDeal(item));
+}
+myInvEl.appendChild(card);
+});
+}
+const theirInvEl=$('roomTheirInv');theirInvEl.innerHTML='';
+const theirInv=room._theirInvCache||[];
+if(!theirInv.length){
+theirInvEl.innerHTML='<div style="color:#52627a;font-size:11px;padding:8px;">Пусто</div>';
+}else{
+theirInv.slice(0,30).forEach(item=>{
+const card=document.createElement('div');
+card.className='deal-room-inv-item disabled';
+card.innerHTML=`${renderPlate(item.plate,item.region,item.rarity,'small')}<div class="price">${fmt(item.price)}</div>`;
+theirInvEl.appendChild(card);
+});
+}
+if(myReady&&theirReady){
+$('roomStatusText').textContent='Обмен...';
+$('roomStatusText').className='deal-room-status ready';
+startRoomTimer();
+}else if(myReady){
+$('roomStatusText').textContent='Ждём партнёра';
+$('roomStatusText').className='deal-room-status waiting';
+}else if(theirReady){
+$('roomStatusText').textContent='Партнёр готов';
+$('roomStatusText').className='deal-room-status waiting';
+}else{
+$('roomStatusText').textContent='Ожидание подтверждения';
+$('roomStatusText').className='deal-room-status waiting';
+}
+const rBtn=$('roomReadyBtn');
+if(myReady){
+rBtn.textContent='Отменить готовность';
+rBtn.classList.add('ready-active');
+}else{
+rBtn.textContent='Я готов';
+rBtn.classList.remove('ready-active');
+}
+}
+
+async function addItemToMyDeal(item){
+if(!currentDealRoomId||!currentDealRoomData)return;
+if(currentDealRoomData.playerAReady&&currentDealRoomData.playerBReady)return;
+const isA=currentDealRoomData.playerA===fbUser.uid;
+if(isA&&currentDealRoomData.playerAReady)return;
+if(!isA&&currentDealRoomData.playerBReady)return;
+const field=isA?'playerAItems':'playerBItems';
+const currentItems=isA?(currentDealRoomData.playerAItems||[]):(currentDealRoomData.playerBItems||[]);
+if(currentItems.length>=4){notify('Максимум 4 номера','error');return;}
+const newItems=[...currentItems,item];
+try{
+const{doc,updateDoc}=window.fbFuncs;
+await updateDoc(doc(window.fbDb,'dealRooms',currentDealRoomId),{[field]:newItems});
+}catch(e){notify('Ошибка','error');}
+}
+
+async function removeMyDealItem(itemId){
+if(!currentDealRoomId||!currentDealRoomData)return;
+const isA=currentDealRoomData.playerA===fbUser.uid;
+if(isA&&currentDealRoomData.playerAReady)return;
+if(!isA&&currentDealRoomData.playerBReady)return;
+const field=isA?'playerAItems':'playerBItems';
+const currentItems=isA?(currentDealRoomData.playerAItems||[]):(currentDealRoomData.playerBItems||[]);
+const newItems=currentItems.filter(i=>i.id!==itemId);
+try{
+const{doc,updateDoc}=window.fbFuncs;
+await updateDoc(doc(window.fbDb,'dealRooms',currentDealRoomId),{[field]:newItems});
+}catch(e){notify('Ошибка','error');}
+}
+
+async function updateMyDealMoney(amount){
+if(!currentDealRoomId||!currentDealRoomData)return;
+const isA=currentDealRoomData.playerA===fbUser.uid;
+if(isA&&currentDealRoomData.playerAReady)return;
+if(!isA&&currentDealRoomData.playerBReady)return;
+const max=state.balance+(isA?currentDealRoomData.playerAMoney:currentDealRoomData.playerBMoney);
+const clamped=Math.max(0,Math.min(max,Math.round(amount)));
+roomMyMoney=clamped;
+const field=isA?'playerAMoney':'playerBMoney';
+try{
+const{doc,updateDoc}=window.fbFuncs;
+await updateDoc(doc(window.fbDb,'dealRooms',currentDealRoomId),{[field]:clamped});
+}catch(e){}
+}
+
+async function toggleDealReady(){
+if(!currentDealRoomId||!currentDealRoomData)return;
+const isA=currentDealRoomData.playerA===fbUser.uid;
+const myReady=isA?currentDealRoomData.playerAReady:currentDealRoomData.playerBReady;
+const theirReady=isA?currentDealRoomData.playerBReady:currentDealRoomData.playerAReady;
+const myItems=isA?(currentDealRoomData.playerAItems||[]):(currentDealRoomData.playerBItems||[]);
+const myMoney=isA?currentDealRoomData.playerAMoney:currentDealRoomData.playerBMoney;
+const newReady=!myReady;
+try{
+const{doc,updateDoc}=window.fbFuncs;
+const updates={};
+if(isA){
+updates.playerAReady=newReady;
+updates.playerAItems=myItems;
+updates.playerAMoney=myMoney;
+}else{
+updates.playerBReady=newReady;
+updates.playerBItems=myItems;
+updates.playerBMoney=myMoney;
+}
+if(newReady&&theirReady){
+updates.status='both_ready';
+}
+if(!newReady){
+updates.status='open';
+}
+await updateDoc(doc(window.fbDb,'dealRooms',currentDealRoomId),updates);
+if(newReady&&!theirReady)notify('Готов. Ждём партнёра','success');
+}catch(e){notify('Ошибка','error');}
+}
+
+function startRoomTimer(){
+if(roomTimerInterval)return;
+let seconds=3;
+$('roomTimer').style.display='block';
+$('roomTimer').textContent=seconds;
+roomTimerInterval=setInterval(()=>{
+seconds--;
+$('roomTimer').textContent=seconds;
+if(seconds<=0){
+clearInterval(roomTimerInterval);
+roomTimerInterval=null;
+$('roomTimer').style.display='none';
+executeTradeExchange();
+}
+},1000);
+}
+
+async function executeTradeExchange(){
+if(!currentDealRoomId||!currentDealRoomData)return;
+if(window._tradeExecuting||window._tradeCompletedByMe)return;
+if(lastCompletedRoomId===currentDealRoomId)return;
+window._tradeExecuting=true;
+let won=false;
+try{
+const{doc,runTransaction}=window.fbFuncs;
+const roomRef=doc(window.fbDb,'dealRooms',currentDealRoomId);
+await runTransaction(window.fbDb,async(tx)=>{
+const snap=await tx.get(roomRef);
+if(!snap.exists())return;
+const r=snap.data();
+if(r.status==='completed')return;
+tx.update(roomRef,{status:'completed',completedAt:Date.now()});
+won=true;
+});
+}catch(e){console.error('Trade tx error:',e);}
+if(!won){
+window._tradeExecuting=false;
+return;
+}
+window._tradeCompletedByMe=true;
+lastCompletedRoomId=currentDealRoomId;
+try{
+const room=currentDealRoomData;
+const myUid=fbUser.uid;
+const isA=room.playerA===myUid;
+const myItems=isA?(room.playerAItems||[]):(room.playerBItems||[]);
+const theirItems=isA?(room.playerBItems||[]):(room.playerAItems||[]);
+const myMoney=isA?(room.playerAMoney||0):(room.playerBMoney||0);
+const theirMoney=isA?(room.playerBMoney||0):(room.playerAMoney||0);
+state.inventory=state.inventory.filter(i=>!myItems.some(x=>x.id===i.id));
+state.inventory=state.inventory.concat(theirItems);
+state.balance=state.balance-myMoney+theirMoney;
+addHistory('Сделка',`Обмен с ${isA?room.playerBName:room.playerAName}`,theirMoney-myMoney);
+updateBalance();renderInventory();save();syncProfileBalance();
+notify('Сделка завершена!','success');
+closeDealRoomLocal();
+}catch(e){console.error('Trade apply error:',e);notify('Ошибка обмена','error');}
+finally{setTimeout(()=>{window._tradeExecuting=false;window._tradeCompletedByMe=false;},3000);}
+}
+
+function handleDealCompleted(room){
+if(window._tradeCompletedByMe)return;
+if(lastCompletedRoomId===currentDealRoomId)return;
+window._tradeCompletedByMe=true;
+lastCompletedRoomId=currentDealRoomId;
+const myUid=fbUser.uid;
+const isA=room.playerA===myUid;
+const myItems=isA?(room.playerAItems||[]):(room.playerBItems||[]);
+const theirItems=isA?(room.playerBItems||[]):(room.playerAItems||[]);
+const myMoney=isA?(room.playerAMoney||0):(room.playerBMoney||0);
+const theirMoney=isA?(room.playerBMoney||0):(room.playerAMoney||0);
+state.inventory=state.inventory.filter(i=>!myItems.some(x=>x.id===i.id));
+state.inventory=state.inventory.concat(theirItems);
+state.balance=state.balance-myMoney+theirMoney;
+addHistory('Сделка',`Обмен с ${isA?room.playerBName:room.playerAName}`,theirMoney-myMoney);
+updateBalance();renderInventory();save();syncProfileBalance();
+notify('Сделка завершена!','success');
+closeDealRoomLocal();
+setTimeout(()=>{window._tradeCompletedByMe=false;},3000);
+}
+
+async function cancelCurrentDealRoom(){
+if(!currentDealRoomId)return;
+try{
+const{doc,updateDoc}=window.fbFuncs;
+await updateDoc(doc(window.fbDb,'dealRooms',currentDealRoomId),{
+status:'cancelled',
+playerAItems:[],
+playerBItems:[]
+});
+}catch(e){}
+closeDealRoomLocal();
+notify('Сделка отменена','');
+}
+
+function closeDealRoomLocal(){
+if(currentDealRoomUnsub){currentDealRoomUnsub();currentDealRoomUnsub=null;}
+if(roomTimerInterval){clearInterval(roomTimerInterval);roomTimerInterval=null;}
+// Очищаем кэш инвентаря партнёра
+Object.keys(partnerInvCache).forEach(k=>delete partnerInvCache[k]);
+$('roomTimer').style.display='none';
+$('dealRoomScreen').classList.remove('active');
+currentDealRoomId=null;
+currentDealRoomData=null;
+roomMyMoney=0;
+roomMySlots=[null,null,null,null];
+renderInventory();
+}
+
+// ==================== ОБРАБОТЧИКИ ====================
 document.querySelectorAll('.tab').forEach(btn=>{btn.addEventListener('click',()=>{
 document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -2373,6 +3080,7 @@ if(btn.dataset.tab==='craft')renderCraft();
 if(btn.dataset.tab==='blackmarket')renderBlackmarket();
 if(btn.dataset.tab==='top')loadTop();
 if(btn.dataset.tab==='deals')initDealsTabs();});});
+
 $('upgradeBtn').addEventListener('click',performUpgrade);
 $('spinBtn').addEventListener('click',spinCase);
 $('keepBtn').addEventListener('click',keepWin);
@@ -2437,21 +3145,21 @@ $('closeBellModal').addEventListener('click',()=>$('bellModal').classList.remove
 $('bellModal').addEventListener('click',e=>{if(e.target===$('bellModal'))$('bellModal').classList.remove('open');});
 $('closePlateInfoModal').addEventListener('click',()=>$('plateInfoModal').classList.remove('open'));
 $('plateInfoModal').addEventListener('click',e=>{if(e.target===$('plateInfoModal'))$('plateInfoModal').classList.remove('open');});
+
 $('dealFindBtn').addEventListener('click',findDealTarget);
 $('dealTargetId').addEventListener('input',e=>{e.target.value=e.target.value.replace(/[^a-zA-Z0-9_@]/g,'').slice(0,20);});
-$('dealSendBtn').addEventListener('click',sendDeal);
-$('dealCancelBtn').addEventListener('click',resetDealBuilder);
-$('dealMyMoney').addEventListener('input',e=>{const max=Math.max(0,state.balance);
-dealMyMoney=Math.min(+e.target.value,max);
-$('dealMyMoney').max=max;
-$('dealMyMoneyVal').textContent=fmtDec(dealMyMoney);});
-$('dealTheirMoney').addEventListener('input',e=>{dealTheirMoney=+e.target.value;
-$('dealTheirMoneyVal').textContent=fmtDec(dealTheirMoney);});
-$('closeDealView').addEventListener('click',()=>$('dealViewModal').classList.remove('open'));
+$('dealInviteAccept').addEventListener('click',acceptDealInvite);
+$('dealInviteDecline').addEventListener('click',declineDealInvite);
+$('roomCancelBtn').addEventListener('click',cancelCurrentDealRoom);
+$('roomReadyBtn').addEventListener('click',toggleDealReady);
+$('roomMyMoney').addEventListener('input',e=>{
+updateMyDealMoney(+e.target.value);
+});
+
 document.querySelectorAll('.mult-btn[data-chance]').forEach(btn=>{btn.addEventListener('click',()=>{
 if(state.upgradeRunning)return;
 state.desiredChance=+btn.dataset.chance;
-updateChance();});});
+updateChance();save();});});
 document.querySelectorAll('.mult-btn[data-craft-chance]').forEach(btn=>{btn.addEventListener('click',()=>{
 document.querySelectorAll('.mult-btn[data-craft-chance]').forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
@@ -2486,22 +3194,47 @@ loadTopSorted(tab.dataset.topSort);});});
 $('closeProfileViewModal').addEventListener('click',()=>$('profileViewModal').classList.remove('open'));
 $('profileViewModal').addEventListener('click',e=>{if(e.target===$('profileViewModal'))$('profileViewModal').classList.remove('open');});
 document.addEventListener('contextmenu',e=>{if(e.target.closest('.inv-card'))e.preventDefault();});
-load();updateBalance();renderMarketIndicator();renderInputSlots();renderInventory();renderMining();renderCraft();renderBlackmarket();updateCaseUI();renderCasePicker();
+
+// ==================== СТАРТ ====================
+load();
+updateBalance();
+renderMarketIndicator();
+renderInputSlots();
+renderInventory();
+renderMining();
+renderCraft();
+renderBlackmarket();
+updateCaseUI();
+renderCasePicker();
 $('autorepairCheck').checked=state.autorepair;
 $('addMoneySlider').max=Math.max(0,state.balance);
 $('craftAddMoneySlider').max=Math.max(0,state.balance);
-(function initTrack(){const track=$('rouletteTrack1');
-for(let i=0;i<20;i++){const item=makeNumber('standard');
+(function initTrack(){
+const track=$('rouletteTrack1');
+for(let i=0;i<20;i++){
+const item=makeNumber('standard');
 const el=document.createElement('div');
 el.className='roulette-item rarity-'+item.rarity;
 el.innerHTML=`${renderPlate(item.plate,item.region,item.rarity,'small')}<div class="rou-price">${fmt(item.price)}</div><div class="rou-rarity">${RARITY_NAMES[item.rarity]}</div>`;
-track.appendChild(el);}})();
+track.appendChild(el);
+}})();
 setInterval(tickMining,1000);
 setInterval(save,5000);
 window.addEventListener('beforeunload',save);
 setInterval(updateBlackmarketTimer,1000);
 setInterval(()=>{if($('page-blackmarket').classList.contains('active'))renderBlackmarket();},10000);
 updateMarket();
+
+setInterval(()=>{
+if(fbUser){
+const{doc,updateDoc}=window.fbFuncs;
+updateDoc(doc(window.fbDb,'users',fbUser.uid),{lastSeen:Date.now()}).catch(()=>{});
+}
+},30000);
+if(fbUser){
+const{doc,updateDoc}=window.fbFuncs;
+updateDoc(doc(window.fbDb,'users',fbUser.uid),{lastSeen:Date.now()}).catch(()=>{});
+}
 })();
 </script>
 </body>
