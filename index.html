@@ -2048,8 +2048,12 @@ const labelEl=$('wheelLabel');
 const btn=$('upgradeBtn');
 wrap.classList.remove('result-win','result-lose');
 btn.disabled=true;btn.textContent='Крутим...';
+
+// Определяем результат заранее
 const roll=Math.random()*100;
 const success=roll<(chance*HOUSE_EDGE);
+
+// Вычисляем финальный угол
 const arcDeg=chance*3.6;
 const arcStart=180-arcDeg/2;
 const arcEnd=180+arcDeg/2;
@@ -2063,71 +2067,106 @@ const darkStart=arcEnd;
 const darkEnd=arcStart+360;
 targetAngle=darkStart+Math.random()*(darkEnd-darkStart);
 }
+
+// ВАЖНО: мы крутим на 5 полных оборотов + финальный угол.
+// Вычитаем 180, потому что стрелка при rotate(0) смотрит вниз.
 const finalRotation=(targetAngle-180)+360*5;
+
+// Сбрасываем стрелку в начальное положение
 arrow.style.transition='none';
 arrow.style.transform='rotate(0deg)';
-void arrow.offsetWidth;
+void arrow.offsetWidth; // Форсируем рефлоу
+
+// Запускаем анимацию через 50мс (чтобы браузер точно применил сброс)
 setTimeout(()=>{
-arrow.classList.add('spinning');
-arrow.style.transform=`rotate(${finalRotation}deg)`;
-},20);
-const spinInterval=setInterval(()=>{
-percentEl.textContent=(Math.random()*90+5).toFixed(0)+'%';
-labelEl.textContent='крутим...';
-},80);
-const skipBtn=document.createElement('button');
-skipBtn.className='skip-btn';skipBtn.textContent='ПРОПУСТИТЬ';
-skipBtn.style.cssText='width:100%;max-width:280px;margin-top:10px;';
-btn.parentNode.insertBefore(skipBtn,btn.nextSibling);
-let finished=false;
-skipBtn.addEventListener('click',()=>finishUpgrade());
-const SPIN_MS=5600;
-const timer=setTimeout(()=>finishUpgrade(),SPIN_MS);
-function finishUpgrade(){
-if(finished)return;finished=true;
-clearTimeout(timer);clearInterval(spinInterval);
-skipBtn.remove();
-arrow.classList.remove('spinning');
-arrow.style.transition='none';
-arrow.style.transform=`rotate(${targetAngle-180}deg)`;
-void arrow.offsetWidth;
-percentEl.textContent=chance+'%';
-let newItem=null;
-if(success){
-let attempts=0;
-while(attempts<40){const item=makeNumber('black');
-const ratio=item.price/targetPrice;
-if(ratio>0.5&&ratio<1.5&&item.rarity>=targetRarity-1){newItem=item;break;}attempts++;}
-if(!newItem){const{plate,region}=genPlate(targetRarity);
-newItem={plate,region,rarity:targetRarity,price:targetPrice,id:Date.now()+Math.random()};}
-state.inventory.push(newItem);
-wrap.classList.add('result-win');
-labelEl.textContent='Апгрейд успешен!';
-labelEl.className='wheel-label win';
-addHistory('Апгрейд',`Успех: ${newItem.plate}`,newItem.price);
-state.stats.earned+=newItem.price;
-state.lastResultItem=newItem;
-}else{
-wrap.classList.add('result-lose');
-labelEl.textContent='Провал';
-labelEl.className='wheel-label lose';
-addHistory('Апгрейд',`Провал`,-betAmount);
-state.lastResultItem=null;
-}
-state.stats.upgrades++;
-renderInventory();updateBalance();save();syncProfileBalance();
-setTimeout(()=>{
-wrap.classList.remove('result-win','result-lose');
-percentEl.textContent='0%';
-labelEl.textContent='Шанс';
-labelEl.className='wheel-label';
-arrow.style.transition='none';
-arrow.style.transform='rotate(0deg)';
-state.upgradeRunning=false;
-btn.disabled=false;btn.textContent='Прокачать';
-renderInputSlots();
-showResultModal(success,newItem,betAmount);
-},1600);
+    arrow.classList.add('spinning');
+    arrow.style.transform=`rotate(${finalRotation}deg)`;
+    
+    // Анимация цифр (просто мельтешение)
+    const spinInterval=setInterval(()=>{
+        percentEl.textContent=(Math.random()*90+5).toFixed(0)+'%';
+        labelEl.textContent='крутим...';
+    },80);
+
+    // Создаем кнопку пропуска
+    const skipBtn=document.createElement('button');
+    skipBtn.className='skip-btn';skipBtn.textContent='ПРОПУСТИТЬ';
+    skipBtn.style.cssText='width:100%;max-width:280px;margin-top:10px;';
+    btn.parentNode.insertBefore(skipBtn,btn.nextSibling);
+
+    let finished=false;
+
+    // Функция завершения (вызывается по transitionend или по кнопке)
+    function finishUpgrade(){
+        if(finished)return;finished=true;
+        clearInterval(spinInterval);
+        skipBtn.remove();
+        arrow.classList.remove('spinning');
+        
+        // Фиксируем стрелку на месте, отключая transition
+        arrow.style.transition='none';
+        arrow.style.transform=`rotate(${targetAngle-180}deg)`;
+        void arrow.offsetWidth;
+        
+        percentEl.textContent=chance+'%';
+        let newItem=null;
+        if(success){
+            let attempts=0;
+            while(attempts<40){
+                const item=makeNumber('black');
+                const ratio=item.price/targetPrice;
+                if(ratio>0.5&&ratio<1.5&&item.rarity>=targetRarity-1){newItem=item;break;}
+                attempts++;
+            }
+            if(!newItem){
+                const{plate,region}=genPlate(targetRarity);
+                newItem={plate,region,rarity:targetRarity,price:targetPrice,id:Date.now()+Math.random()};
+            }
+            state.inventory.push(newItem);
+            wrap.classList.add('result-win');
+            labelEl.textContent='Апгрейд успешен!';
+            labelEl.className='wheel-label win';
+            addHistory('Апгрейд',`Успех: ${newItem.plate}`,newItem.price);
+            state.stats.earned+=newItem.price;
+            state.lastResultItem=newItem;
+        }else{
+            wrap.classList.add('result-lose');
+            labelEl.textContent='Провал';
+            labelEl.className='wheel-label lose';
+            addHistory('Апгрейд',`Провал`,-betAmount);
+            state.lastResultItem=null;
+        }
+        state.stats.upgrades++;
+        renderInventory();updateBalance();save();syncProfileBalance();
+        
+        // Через 1.6 секунды сбрасываем всё в начальное состояние
+        setTimeout(()=>{
+            wrap.classList.remove('result-win','result-lose');
+            percentEl.textContent='0%';
+            labelEl.textContent='Шанс';
+            labelEl.className='wheel-label';
+            arrow.style.transition='none';
+            arrow.style.transform='rotate(0deg)';
+            state.upgradeRunning=false;
+            btn.disabled=false;btn.textContent='Прокачать';
+            renderInputSlots();
+            showResultModal(success,newItem,betAmount);
+        },1600);
+    }
+
+    // Слушаем завершение CSS-анимации стрелки.
+    // Как только стрелка физически доехала до финального угла — вызываем finishUpgrade.
+    arrow.addEventListener('transitionend', finishUpgrade, {once: true});
+
+    // Кнопка "Пропустить" просто телепортирует стрелку в конец и вызывает finishUpgrade
+    skipBtn.addEventListener('click', () => {
+        arrow.style.transition='none';
+        arrow.style.transform=`rotate(${finalRotation}deg)`;
+        void arrow.offsetWidth;
+        finishUpgrade();
+    });
+
+}, 50);
 }
 }
 
