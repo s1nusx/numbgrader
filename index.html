@@ -1026,6 +1026,11 @@ body{padding:8px;}
 <div class="slot empty"></div><div class="slot empty"></div>
 </div>
 <div class="sumrow"><span>Общая сумма:</span><strong id="inputSum">0 ₽</strong></div>
+<div class="add-money-box" style="margin-top:12px;">
+  <div class="add-money-head"><span>ДОБАВИТЬ К СТАВКЕ</span>
+  <span class="val" id="addMoneyVal">0.00 ₽</span></div>
+  <input type="range" class="add-money-input" id="addMoneySlider" min="0" max="100000" value="0" step="0.01">
+</div>
 </div>
 <div class="center-col">
 <div class="wheel-wrap" id="wheelWrap">
@@ -1059,14 +1064,6 @@ body{padding:8px;}
 </div>
 <button class="btn" id="upgradeBtn" disabled>Прокачать</button>
 <button class="btn secondary skip-btn" id="skipUpgradeBtn" style="display:none;margin-top:8px;max-width:100%;width:100%;">ПРОПУСТИТЬ</button>
-<div style="display:flex;gap:10px;margin-top:12px;align-items:stretch;">
-<button class="btn secondary" id="refreshTargetBtn" style="flex:1;margin:0;padding:12px;font-size:13px;font-weight:900;">ОБНОВИТЬ</button>
-<div class="add-money-box" style="flex:1;margin:0;padding:8px 12px;justify-content:center;">
-  <div class="add-money-head"><span>ДОБАВИТЬ К СТАВКЕ</span>
-  <span class="val" id="addMoneyVal">0.00 ₽</span></div>
-  <input type="range" class="add-money-input" id="addMoneySlider" min="0" max="100000" value="0" step="0.01">
-</div>
-</div>
 <div class="hint" id="hintLine">Выберите номер и цель</div>
 </div>
 <div class="target-panel" id="targetPanel">
@@ -1079,10 +1076,11 @@ body{padding:8px;}
 </div>
 <div class="target-alts-title">Другие варианты</div>
 <div class="target-alts" id="targetAlts"></div>
+<button class="target-refresh-big" id="refreshTargetBtn">⟳ ОБНОВИТЬ</button>
 </div>
 </div>
 <div class="inv-wrap">
-<div class="inv-head"><h3>Ваши номера — клик отправит в апгрейдер</h3>
+<div class="inv-head"><h3>Ваши номера</h3>
 <span class="count" id="invCount">0 шт.</span></div>
 <div class="inv-grid" id="invGrid"></div>
 </div>
@@ -1124,7 +1122,7 @@ body{padding:8px;}
 </div>
 <div class="page" id="page-craft">
 <div class="page-title">Крафт номеров<small>5 одинаковых → 1 следующей редкости</small></div>
-<div class="craft-wrap">
+<div class="craft-wrap" style="zoom: 0.85;">
 <div class="craft-info">Положите <strong>5 номеров одной редкости</strong> и получите
 <strong>1 номер следующей редкости</strong>. Дипломат в крафте не участвует.</div>
 <div class="craft-slots" id="craftSlots"></div>
@@ -2720,7 +2718,7 @@ function doCraft(){
 }
 
 /* ============ ЧЁРНЫЙ РЫНОК ============ */
-function generateBlackmarket(){const lots=[];const count=4+randInt(3);
+function generateBlackmarket(){const lots=[];const count=10+randInt(6); // 10-15 лотов
 for(let i=0;i<count;i++){const isBlat=Math.random()<0.3;
 if(isBlat){const keys=Object.keys(BLAT_SERIES);
 const fullPlate=randFrom(keys);
