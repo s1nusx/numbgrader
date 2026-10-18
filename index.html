@@ -946,12 +946,16 @@ body{padding:8px;}
 .history-summary{grid-template-columns:1fr;}
 .deal-room-slots{grid-template-columns:repeat(2,1fr);}
 .deal-room-actions .btn{max-width:100%;}
+.wheel-wrap{width:240px;height:240px;}
+.wheel-percent{font-size:38px;}
 }
 @media(max-width:500px){
 .tab{padding:7px 10px;font-size:9px;}
 .balance{padding:6px 12px;font-size:11px;}
 .balance .lbl{display:none;}
 .market-indicator .lbl{display:none;}
+.wheel-wrap{width:220px;height:220px;}
+.wheel-percent{font-size:34px;}
 }
 
 /* Эффект конфетти для выигрыша */
@@ -1076,7 +1080,7 @@ body{padding:8px;}
 </div>
 <div class="target-alts-title">Другие варианты</div>
 <div class="target-alts" id="targetAlts"></div>
-<button class="target-refresh-big" id="refreshTargetBtn">⟳ ОБНОВИТЬ</button>
+<button class="target-refresh-big" id="refreshTargetBtn">ОБНОВИТЬ</button>
 </div>
 </div>
 <div class="inv-wrap">
@@ -2014,14 +2018,13 @@ function calcBet(){
   return sum + state.addMoney;
 }
 
-function calcRealChance(desiredChance){
-  return desiredChance;
-}
-
 function generateTarget(bet, mult){
-  // Немного дороже, чем базовая ставка, чтобы был смысл
-  const boost = 1.3 + (100 - state.desiredChance) / 150; 
-  const desiredPrice = Math.round(bet * mult * boost);
+  // Добавляем разброс к желаемой цене. Желаемая цена = (bet / (desiredChance/100)) * mult
+  const baseTarget = (bet / (state.desiredChance / 100)) * mult;
+  // Разброс от -3% до +3%
+  const variance = 0.97 + Math.random() * 0.06;
+  const desiredPrice = Math.round(baseTarget * variance);
+  
   const rarity = rarityForPrice(desiredPrice);
   let best = null;
   let bestDiff = Infinity;
@@ -2067,7 +2070,8 @@ function renderTargetAlts(){
   }
   const bet = calcBet();
   state.targetAlts.forEach(altItem => {
-    const realChance = calcRealChance(state.desiredChance);
+    // Динамический шанс для каждой альтернативы на основе её реальной цены
+    const realChance = (bet / altItem.price) * 100;
     const div = document.createElement('div');
     div.className = 'alt-item' + (state.targetItem && altItem.id === state.targetItem.id ? ' selected' : '');
     div.innerHTML = `
@@ -2079,7 +2083,7 @@ function renderTargetAlts(){
     div.addEventListener('click', () => {
       if(state.upgradeRunning) return;
       state.targetItem = altItem;
-      state.realChance = calcRealChance(state.desiredChance);
+      state.realChance = (bet / altItem.price) * 100;
       renderTargetPanel();
       renderTargetAlts();
       updateWheelDisplay();
@@ -2101,7 +2105,7 @@ function regenerateTarget(){
     return;
   }
   state.targetItem = generateTarget(bet, state.desiredMultiplier);
-  state.realChance = calcRealChance(state.desiredChance);
+  state.realChance = (bet / state.targetItem.price) * 100;
   state.targetAlts = [];
   const seen = new Set([state.targetItem.id]);
   let tries = 0;
