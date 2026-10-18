@@ -1026,11 +1026,6 @@ body{padding:8px;}
 <div class="slot empty"></div><div class="slot empty"></div>
 </div>
 <div class="sumrow"><span>Общая сумма:</span><strong id="inputSum">0 ₽</strong></div>
-<div class="add-money-box">
-<div class="add-money-head"><span>Добавить к ставке</span>
-<span class="val" id="addMoneyVal">0.00 ₽</span></div>
-<input type="range" class="add-money-input" id="addMoneySlider" min="0" max="100000" value="0" step="0.01">
-</div>
 </div>
 <div class="center-col">
 <div class="wheel-wrap" id="wheelWrap">
@@ -1064,6 +1059,14 @@ body{padding:8px;}
 </div>
 <button class="btn" id="upgradeBtn" disabled>Прокачать</button>
 <button class="btn secondary skip-btn" id="skipUpgradeBtn" style="display:none;margin-top:8px;max-width:100%;width:100%;">ПРОПУСТИТЬ</button>
+<div style="display:flex;gap:10px;margin-top:12px;align-items:stretch;">
+<button class="btn secondary" id="refreshTargetBtn" style="flex:1;margin:0;padding:12px;font-size:13px;font-weight:900;">ОБНОВИТЬ</button>
+<div class="add-money-box" style="flex:1;margin:0;padding:8px 12px;justify-content:center;">
+  <div class="add-money-head"><span>ДОБАВИТЬ К СТАВКЕ</span>
+  <span class="val" id="addMoneyVal">0.00 ₽</span></div>
+  <input type="range" class="add-money-input" id="addMoneySlider" min="0" max="100000" value="0" step="0.01">
+</div>
+</div>
 <div class="hint" id="hintLine">Выберите номер и цель</div>
 </div>
 <div class="target-panel" id="targetPanel">
@@ -1077,18 +1080,9 @@ body{padding:8px;}
 <div class="target-alts-title">Другие варианты</div>
 <div class="target-alts" id="targetAlts"></div>
 </div>
-<div style="display:flex;gap:10px;margin-top:10px;">
-<button class="btn secondary" id="refreshTargetBtn" style="flex:1;">ОБНОВИТЬ</button>
-<div class="add-money-box" style="flex:1;margin-top:0;padding:8px 12px;">
-  <div class="add-money-head"><span>Добавить к ставке</span>
-  <span class="val" id="addMoneyVal2">0.00 ₽</span></div>
-  <input type="range" class="add-money-input" id="addMoneySlider2" min="0" max="100000" value="0" step="0.01">
-</div>
-</div>
-</div>
 </div>
 <div class="inv-wrap">
-<div class="inv-head"><h3>Мои номера — клик отправит в апгрейдер</h3>
+<div class="inv-head"><h3>Ваши номера — клик отправит в апгрейдер</h3>
 <span class="count" id="invCount">0 шт.</span></div>
 <div class="inv-grid" id="invGrid"></div>
 </div>
@@ -1642,7 +1636,6 @@ const REGION_MULT={'77':15,'99':15,'97':15,'177':15,'199':15,'197':15,'777':20,'
 const REGIONS=Object.keys(REGION_MULT);
 const BLAT_SERIES={'А777АА77':250000000,'А001АА77':50000000,'А002АА77':45000000,'О001ОО77':60000000,'О777ОО77':150000000,'О002ОО77':50000000,'Е001ЕЕ77':55000000,'ЕКХ00777':220000000,'АМР00777':180000000,'С001СС77':35000000,'В001ВВ77':40000000,'М001ММ77':45000000,'К001КК77':30000000,'Н001НН77':32000000,'Т001ТТ77':28000000};
 const LETTERS='АВЕКМНОРСТУХ';
-const HOUSE_EDGE=0.90;
 const ROTATION_MS=3000;
 const SAVE_KEY='numbgrader_save_v13';
 const MINING_RATE=0.00001,MINING_SLOTS=10,MINING_SLOT_COST=i=>i===0?0:50000*i,MINING_LIMIT_SEC=8*3600,DAILY_FREE_COOLDOWN=24*60*60*1000,BLACKMARKET_REFRESH=5*60*1000,MARKET_UPDATE_INTERVAL=60*60*1000,BREAK_CHECK_INTERVAL=30*60*1000,BREAK_CHANCE=0.05,AUTOREPAIR_PERCENT=0.05,DEAL_TIMER_SEC=3,DEAL_INVITE_TIMEOUT=60000;
@@ -2024,11 +2017,13 @@ function calcBet(){
 }
 
 function calcRealChance(desiredChance){
-  return Math.round((desiredChance * HOUSE_EDGE) / state.desiredMultiplier * 100) / 100;
+  return desiredChance;
 }
 
 function generateTarget(bet, mult){
-  const desiredPrice = Math.round(bet * mult);
+  // Немного дороже, чем базовая ставка, чтобы был смысл
+  const boost = 1.3 + (100 - state.desiredChance) / 150; 
+  const desiredPrice = Math.round(bet * mult * boost);
   const rarity = rarityForPrice(desiredPrice);
   let best = null;
   let bestDiff = Infinity;
@@ -2081,7 +2076,7 @@ function renderTargetAlts(){
       <div class="alt-plate-wrap">${renderPlate(altItem.plate, altItem.region, altItem.rarity, 'small')}</div>
       <div class="alt-meta">
         <span class="alt-price">${fmt(altItem.price)}</span>
-        <span class="alt-chance">шанс ${realChance.toFixed(1)}%</span>
+        <span class="alt-chance">шанс ${realChance.toFixed(2)}%</span>
       </div>`;
     div.addEventListener('click', () => {
       if(state.upgradeRunning) return;
@@ -2141,7 +2136,7 @@ function updateWheelDisplay(){
     $('hintLine').textContent = 'Выберите номер и цель';
     return;
   }
-  percentEl.textContent = state.realChance.toFixed(1) + '%';
+  percentEl.textContent = state.realChance.toFixed(2) + '%';
   if(state.realChance < 20) labelEl.textContent = 'низкий шанс';
   else if(state.realChance < 45) labelEl.textContent = 'средний шанс';
   else labelEl.textContent = 'высокий шанс';
@@ -2178,9 +2173,7 @@ function performUpgrade(){
   state.inputSlots = [null,null,null,null];
   state.addMoney = 0;
   $('addMoneySlider').value = 0;
-  $('addMoneySlider2').value = 0;
   $('addMoneyVal').textContent = '0.00 ₽';
-  $('addMoneyVal2').textContent = '0.00 ₽';
 
   renderInputSlots();
   renderInventory();
@@ -2200,10 +2193,9 @@ function performUpgrade(){
   document.querySelectorAll('.mult-btn').forEach(b => b.disabled = true);
   $('refreshTargetBtn').disabled = true;
   $('addMoneySlider').disabled = true;
-  $('addMoneySlider2').disabled = true;
 
   wrap.classList.remove('result-win','result-lose');
-  percentEl.textContent = chance.toFixed(1) + '%';
+  percentEl.textContent = chance.toFixed(2) + '%';
 
   const success = Math.random() * 100 < chance;
 
@@ -2279,7 +2271,6 @@ function performUpgrade(){
       document.querySelectorAll('.mult-btn').forEach(b => b.disabled = false);
       $('refreshTargetBtn').disabled = false;
       $('addMoneySlider').disabled = false;
-      $('addMoneySlider2').disabled = false;
       renderInputSlots();
       renderTargetPanel();
       renderTargetAlts();
@@ -2381,32 +2372,12 @@ function bindUpgraderControls(){
       const max = Math.max(0, state.balance);
       state.addMoney = Math.min(+e.target.value, max);
       $('addMoneyVal').textContent = fmtDec(state.addMoney);
-      $('addMoneySlider2').value = state.addMoney;
-      $('addMoneyVal2').textContent = fmtDec(state.addMoney);
       const bet = calcBet();
       const sumEl = $('inputSum');
       if(sumEl) sumEl.textContent = fmt(bet - state.addMoney);
       $('hintLine').textContent = `Ставка: ${fmt(bet)}`;
     });
     addSlider.addEventListener('change', () => {
-      if(state.upgradeRunning) return;
-      regenerateTarget();
-    });
-  }
-  const addSlider2 = $('addMoneySlider2');
-  if(addSlider2){
-    addSlider2.addEventListener('input', e => {
-      const max = Math.max(0, state.balance);
-      state.addMoney = Math.min(+e.target.value, max);
-      $('addMoneyVal2').textContent = fmtDec(state.addMoney);
-      $('addMoneySlider').value = state.addMoney;
-      $('addMoneyVal').textContent = fmtDec(state.addMoney);
-      const bet = calcBet();
-      const sumEl = $('inputSum');
-      if(sumEl) sumEl.textContent = fmt(bet - state.addMoney);
-      $('hintLine').textContent = `Ставка: ${fmt(bet)}`;
-    });
-    addSlider2.addEventListener('change', () => {
       if(state.upgradeRunning) return;
       regenerateTarget();
     });
@@ -2920,7 +2891,6 @@ state.history=[];save();renderHistory();notify('История очищена','
 function updateBalance(){
 $('balanceDisplay').textContent=fmt(state.balance);
 const s1=$('addMoneySlider');if(s1){s1.max=Math.max(0,state.balance);if(state.addMoney>state.balance){state.addMoney=state.balance;s1.value=state.addMoney;$('addMoneyVal').textContent=fmtDec(state.addMoney);}}
-const s1_2=$('addMoneySlider2');if(s1_2){s1_2.max=Math.max(0,state.balance);if(state.addMoney>state.balance){state.addMoney=state.balance;s1_2.value=state.addMoney;$('addMoneyVal2').textContent=fmtDec(state.addMoney);}}
 const s2=$('craftAddMoneySlider');if(s2){s2.max=Math.max(0,state.balance);if(state.craftAddMoney>state.balance){state.craftAddMoney=state.balance;s2.value=state.craftAddMoney;$('craftAddMoneyVal').textContent=fmtDec(state.craftAddMoney);}}
 }
 function flashBalance(){const box=$('balanceBox');box.classList.add('flash');
@@ -3674,7 +3644,6 @@ initUpgraderWheel();
 renderInputSlots();
 $('autorepairCheck').checked=state.autorepair;
 $('addMoneySlider').max=Math.max(0,state.balance);
-$('addMoneySlider2').max=Math.max(0,state.balance);
 $('craftAddMoneySlider').max=Math.max(0,state.balance);
 
 (function initTrack(){
