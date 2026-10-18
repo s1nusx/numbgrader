@@ -387,6 +387,36 @@ letter-spacing:1.2px;text-transform:uppercase;text-align:center;padding:10px;}
   .wheel-percent{font-size:24px;}
   .target-alts{max-height:120px;}
 }
+
+/* Эффект конфетти для выигрыша */
+.confetti-particle {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background-color: #f0b90b;
+  z-index: 10000;
+  pointer-events: none;
+  border-radius: 2px;
+  animation: fall linear forwards;
+}
+@keyframes fall {
+  to {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+.flash-win {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, rgba(34,197,94,0.4) 0%, transparent 70%);
+  z-index: 9999;
+  pointer-events: none;
+  animation: flashAnim 0.5s ease-out forwards;
+}
+@keyframes flashAnim {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
 </style>
 </head>
 <body>
@@ -935,7 +965,6 @@ signInAnonymously(fbAuth).catch(err => console.error('FB auth error:', err));
 window.fbReady = true;
 window.dispatchEvent(new Event('fb-ready'));
 </script>
-
 <script>
 (function(){
 'use strict';
