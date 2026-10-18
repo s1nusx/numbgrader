@@ -150,7 +150,6 @@ border-left:1.5px solid #000;padding:2px 5px;line-height:1;min-width:28px;}
 .plate.rarity-4 .flag{border-color:#fff;}
 .center-col{text-align:center;}
 
-/* ============ КОЛЕСО: МОНОТОННАЯ ДУГА, БЕЛАЯ СТРЕЛКА СВЕРХУ, КРУТИТСЯ РОТОР ============ */
 .wheel-wrap{position:relative;width:280px;height:280px;margin:0 auto 18px;}
 .wheel-rotor{position:absolute;inset:0;transform-origin:140px 140px;will-change:transform;}
 .wheel-svg{width:100%;height:100%;display:block;overflow:visible;}
@@ -194,7 +193,6 @@ border-left:1.5px solid #000;padding:2px 5px;line-height:1;min-width:28px;}
   .wheel-percent{font-size:34px;}
 }
 
-/* ============ КНОПКИ ШАНСОВ И МНОЖИТЕЛЕЙ ============ */
 .chance-controls{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
 .chance-row{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;}
 .mult-btn{background:linear-gradient(180deg,#0b0f15,#090d12);
@@ -264,7 +262,6 @@ letter-spacing:1.2px;text-transform:uppercase;text-align:center;padding:10px;}
 .target-panel .target-alts-title{font-size:10px;color:#6d7c92;font-weight:800;
   letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
 
-/* ============ АЛЬТЕРНАТИВЫ — МИНИ-ПЛАШКИ ============ */
 .target-panel .target-alts{display:flex;flex-direction:column;gap:6px;
   max-height:220px;overflow-y:auto;padding-right:4px;
   border-top:1px solid #1a2230;padding-top:10px;width:100%;}
@@ -335,14 +332,12 @@ box-shadow:0 12px 30px -10px rgba(0,0,0,0.8);}
 .case-picker-card:hover{transform:translateY(-8px);}
 .case-picker-card.free{border-color:#4a7a2e;}
 .case-picker-card.free:hover{border-color:#8fd65a;}
-.case-picker-card.standard{border-color:#8a8a8a;}
-.case-picker-card.standard:hover{border-color:#d0d0d0;}
-.case-picker-card.yellow{border-color:#8a6d00;}
-.case-picker-card.yellow:hover{border-color:#f5d76e;}
-.case-picker-card.blue{border-color:#12407a;}
-.case-picker-card.blue:hover{border-color:#3b82f6;}
-.case-picker-card.black{border-color:#4a4a4a;}
-.case-picker-card.black:hover{border-color:#ffffff;}
+.case-picker-card.silver{border-color:#8a8a8a;}
+.case-picker-card.silver:hover{border-color:#d0d0d0;}
+.case-picker-card.gold{border-color:#8a6d00;}
+.case-picker-card.gold:hover{border-color:#f5d76e;}
+.case-picker-card.platinum{border-color:#12407a;}
+.case-picker-card.platinum:hover{border-color:#3b82f6;}
 .case-scene{width:100%;height:130px;position:relative;display:flex;
 align-items:center;justify-content:center;perspective:800px;margin-bottom:6px;}
 .case-3d{position:relative;width:170px;height:110px;transform-style:preserve-3d;
@@ -371,10 +366,9 @@ background:linear-gradient(90deg,#000,#2a2a2a);border-radius:3px;}
 width:12px;height:14px;background:linear-gradient(180deg,#e0e0e0,#909090);border-radius:2px;}
 .case-3d .case-lock-tl{left:34%;}.case-3d .case-lock-tr{right:34%;}
 .case-3d.free .case-front{background:linear-gradient(135deg,#b8e6a0,#4a7a2e 70%);}
-.case-3d.standard .case-front{background:linear-gradient(135deg,#d8dde5,#7a828e 70%);}
-.case-3d.yellow .case-front{background:linear-gradient(135deg,#fce27e,#8a6d00 70%);}
-.case-3d.blue .case-front{background:linear-gradient(135deg,#5aa0ff,#0c2a5a 70%);}
-.case-3d.black .case-front{background:linear-gradient(135deg,#3a3a3a,#000 70%);}
+.case-3d.silver .case-front{background:linear-gradient(135deg,#d8dde5,#7a828e 70%);}
+.case-3d.gold .case-front{background:linear-gradient(135deg,#fce27e,#8a6d00 70%);}
+.case-3d.platinum .case-front{background:linear-gradient(135deg,#5aa0ff,#0c2a5a 70%);}
 .case-picker-card .case-picker-name{font-size:17px;font-weight:900;color:#fff;
 letter-spacing:1.5px;text-transform:uppercase;}
 .case-picker-card .case-picker-price{font-size:20px;font-weight:900;color:#f0b90b;
@@ -959,6 +953,36 @@ body{padding:8px;}
 .balance .lbl{display:none;}
 .market-indicator .lbl{display:none;}
 }
+
+/* Эффект конфетти для выигрыша */
+.confetti-particle {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background-color: #f0b90b;
+  z-index: 10000;
+  pointer-events: none;
+  border-radius: 2px;
+  animation: fall linear forwards;
+}
+@keyframes fall {
+  to {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+.flash-win {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, rgba(34,197,94,0.4) 0%, transparent 70%);
+  z-index: 9999;
+  pointer-events: none;
+  animation: flashAnim 0.5s ease-out forwards;
+}
+@keyframes flashAnim {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
 </style>
 </head>
 <body>
@@ -1033,13 +1057,13 @@ body{padding:8px;}
 <button class="mult-btn" data-mult="8">×8</button>
 </div>
 <div class="chance-row" id="chanceRow">
-<button class="mult-btn active" data-chance="30">30%<small>реально 27%</small></button>
-<button class="mult-btn" data-chance="50">50%<small>реально 45%</small></button>
-<button class="mult-btn" data-chance="70">70%<small>реально 63%</small></button>
+<button class="mult-btn active" data-chance="30">30%</button>
+<button class="mult-btn" data-chance="50">50%</button>
+<button class="mult-btn" data-chance="70">70%</button>
 </div>
 </div>
 <button class="btn" id="upgradeBtn" disabled>Прокачать</button>
-<button class="btn secondary skip-btn" id="skipUpgradeBtn" style="display:none;margin-top:8px;max-width:280px;">ПРОПУСТИТЬ</button>
+<button class="btn secondary skip-btn" id="skipUpgradeBtn" style="display:none;margin-top:8px;max-width:100%;width:100%;">ПРОПУСТИТЬ</button>
 <div class="hint" id="hintLine">Выберите номер и цель</div>
 </div>
 <div class="target-panel" id="targetPanel">
@@ -1052,7 +1076,15 @@ body{padding:8px;}
 </div>
 <div class="target-alts-title">Другие варианты</div>
 <div class="target-alts" id="targetAlts"></div>
-<button class="target-refresh-big" id="refreshTargetBtn">⟳ ОБНОВИТЬ</button>
+</div>
+<div style="display:flex;gap:10px;margin-top:10px;">
+<button class="btn secondary" id="refreshTargetBtn" style="flex:1;">ОБНОВИТЬ</button>
+<div class="add-money-box" style="flex:1;margin-top:0;padding:8px 12px;">
+  <div class="add-money-head"><span>Добавить к ставке</span>
+  <span class="val" id="addMoneyVal2">0.00 ₽</span></div>
+  <input type="range" class="add-money-input" id="addMoneySlider2" min="0" max="100000" value="0" step="0.01">
+</div>
+</div>
 </div>
 </div>
 <div class="inv-wrap">
@@ -1112,6 +1144,12 @@ body{padding:8px;}
 <button class="mult-btn" data-craft-chance="30">30%</button>
 <button class="mult-btn active" data-craft-chance="50">50%</button>
 <button class="mult-btn" data-craft-chance="70">70%</button>
+</div>
+<div class="chance-row" id="craftMultRow">
+<button class="mult-btn active" data-craft-mult="1">×1</button>
+<button class="mult-btn" data-craft-mult="2">×2</button>
+<button class="mult-btn" data-craft-mult="4">×4</button>
+<button class="mult-btn" data-craft-mult="8">×8</button>
 </div>
 </div>
 <div class="add-money-box" style="max-width:600px;width:100%;">
@@ -1177,7 +1215,7 @@ body{padding:8px;}
 </div>
 <div class="mining-actions"><button class="btn" id="collectBtn">Собрать доход</button></div>
 <div class="autorepair-row">
-<input type="checkbox" id="autorepairCheck">
+<input type="checkbox" id="autorepairCheck" checked>
 <label for="autorepairCheck">Авторемонт (5% от дохода при поломке)</label>
 </div>
 </div>
@@ -1596,10 +1634,10 @@ const RARITY_MULT=[1,1.15,1.4,1.8,5000];
 const BASE_PRICE={0:3000,1:5750,2:16800,3:45000,4:300000000};
 const CASE_TYPES={
 free:{name:'Бесплатный',price:0,free:true,table:[{rarity:RARITY.STANDARD,chance:55.0},{rarity:RARITY.TAXI,chance:30.0},{rarity:RARITY.POLICE,chance:12.0},{rarity:RARITY.MILITARY,chance:2.9},{rarity:RARITY.DIPLOMAT,chance:0.1}]},
-standard:{name:'Стандартный',price:50000,table:[{rarity:RARITY.STANDARD,chance:55.0},{rarity:RARITY.TAXI,chance:30.0},{rarity:RARITY.POLICE,chance:12.0},{rarity:RARITY.MILITARY,chance:2.9},{rarity:RARITY.DIPLOMAT,chance:0.001}]},
-yellow:{name:'Жёлтый',price:500000,table:[{rarity:RARITY.STANDARD,chance:15.0},{rarity:RARITY.TAXI,chance:70.0},{rarity:RARITY.POLICE,chance:13.0},{rarity:RARITY.MILITARY,chance:1.9},{rarity:RARITY.DIPLOMAT,chance:0.001}]},
-blue:{name:'Синий',price:5000000,table:[{rarity:RARITY.STANDARD,chance:5.0},{rarity:RARITY.TAXI,chance:25.0},{rarity:RARITY.POLICE,chance:63.0},{rarity:RARITY.MILITARY,chance:6.995},{rarity:RARITY.DIPLOMAT,chance:0.005}]},
-black:{name:'Чёрный',price:75000000,table:[{rarity:RARITY.STANDARD,chance:2.0},{rarity:RARITY.TAXI,chance:18.0},{rarity:RARITY.POLICE,chance:35.0},{rarity:RARITY.MILITARY,chance:44.99},{rarity:RARITY.DIPLOMAT,chance:0.01}]}};
+silver:{name:'Серебряный',price:50000,table:[{rarity:RARITY.STANDARD,chance:55.0},{rarity:RARITY.TAXI,chance:30.0},{rarity:RARITY.POLICE,chance:12.0},{rarity:RARITY.MILITARY,chance:2.9},{rarity:RARITY.DIPLOMAT,chance:0.001}]},
+gold:{name:'Золотой',price:250000,table:[{rarity:RARITY.STANDARD,chance:15.0},{rarity:RARITY.TAXI,chance:70.0},{rarity:RARITY.POLICE,chance:13.0},{rarity:RARITY.MILITARY,chance:1.9},{rarity:RARITY.DIPLOMAT,chance:0.001}]},
+platinum:{name:'Платиновый',price:500000,table:[{rarity:RARITY.STANDARD,chance:5.0},{rarity:RARITY.TAXI,chance:25.0},{rarity:RARITY.POLICE,chance:63.0},{rarity:RARITY.MILITARY,chance:6.995},{rarity:RARITY.DIPLOMAT,chance:0.005}]}
+};
 const REGION_MULT={'77':15,'99':15,'97':15,'177':15,'199':15,'197':15,'777':20,'78':8,'98':8,'178':8,'198':8,'50':8,'90':8,'150':8,'190':8,'750':8,'790':8,'23':3,'93':3,'123':3,'193':3,'223':3,'66':3,'96':3,'196':3,'16':3,'116':3,'716':3,'52':3,'152':3,'252':3,'61':3,'161':3,'261':3,'74':3,'174':3,'274':3,'54':3,'154':3,'254':3,'02':3,'102':3,'702':3,'34':3,'134':3,'234':3,'39':3,'139':3,'26':3,'126':3,'226':3,'63':3,'163':3,'263':3,'72':3,'172':3,'272':3,'86':3,'186':3,'286':3,'47':3,'147':3,'247':3};
 const REGIONS=Object.keys(REGION_MULT);
 const BLAT_SERIES={'А777АА77':250000000,'А001АА77':50000000,'А002АА77':45000000,'О001ОО77':60000000,'О777ОО77':150000000,'О002ОО77':50000000,'Е001ЕЕ77':55000000,'ЕКХ00777':220000000,'АМР00777':180000000,'С001СС77':35000000,'В001ВВ77':40000000,'М001ММ77':45000000,'К001КК77':30000000,'Н001НН77':32000000,'Т001ТТ77':28000000};
@@ -1658,14 +1696,13 @@ function rarityForPrice(price){if(price>=100000000000)return RARITY.DIPLOMAT;if(
 function formatPlateGroups(plate){const groups=[];let current='';let currentType=null;for(const ch of plate){const t=/\d/.test(ch)?'d':'l';if(currentType===null||currentType===t){current+=ch;}else{groups.push(current);current=ch;}currentType=t;}if(current)groups.push(current);return groups;}
 function renderPlate(plate,region,rarity,size){const sz=size||'medium';const groups=formatPlateGroups(plate);const groupsHTML=groups.map(g=>`<span class="group">${g}</span>`).join('');const regionLen=region.length;const regionClass=regionLen===2?'two-digits':'three-digits';return`<div class="plate plate-${sz} rarity-${rarity}"><div class="main">${groupsHTML}</div><div class="right ${regionClass}"><div class="region">${region}</div><div class="rus">RUS<span class="flag"></span></div></div></div>`;}
 
-let state={balance:100000,inventory:[],inputSlots:[null,null,null,null],addMoney:0,miningSlots:new Array(MINING_SLOTS).fill(null),miningBroken:new Array(MINING_SLOTS).fill(false),miningUnlocked:1,miningAccumulated:0,miningLastCollect:Date.now(),autorepair:false,freeCaseAvailable:true,lastFreeCaseTime:0,caseMode:1,currentCaseType:'standard',spinning:false,spinLocked:false,currentWins:[],desiredChance:30,upgradeRunning:false,history:[],stats:{earned:0,spent:0,cases:0,upgrades:0,crafts:0,crafts_failed:0},craftSlots:[null,null,null,null,null],craftChance:50,craftAddMoney:0,lastTickTime:Date.now(),blackmarketLots:[],blackmarketLastRefresh:0,marketMult:1.0,marketLastUpdate:Date.now(),lastBreakCheck:Date.now(),lastResultItem:null,selectedInvCard:null,
+let state={balance:100000,inventory:[],inputSlots:[null,null,null,null],addMoney:0,miningSlots:new Array(MINING_SLOTS).fill(null),miningBroken:new Array(MINING_SLOTS).fill(false),miningUnlocked:1,miningAccumulated:0,miningLastCollect:Date.now(),autorepair:true,freeCaseAvailable:true,lastFreeCaseTime:0,caseMode:1,currentCaseType:'silver',spinning:false,spinLocked:false,currentWins:[],desiredChance:30,upgradeRunning:false,history:[],stats:{earned:0,spent:0,cases:0,upgrades:0,crafts:0,crafts_failed:0},craftSlots:[null,null,null,null,null],craftChance:50,craftMult:1,craftAddMoney:0,lastTickTime:Date.now(),blackmarketLots:[],blackmarketLastRefresh:0,marketMult:1.0,marketLastUpdate:Date.now(),lastBreakCheck:Date.now(),lastResultItem:null,selectedInvCard:null,
   desiredMultiplier: 1,
   targetItem: null,
   targetAlts: [],
-  realChance: 0,
-  wheelRotation: 0
+  realChance: 0
 };
-function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify({balance:state.balance,inventory:state.inventory,miningSlots:state.miningSlots,miningBroken:state.miningBroken,miningUnlocked:state.miningUnlocked,miningAccumulated:state.miningAccumulated,miningLastCollect:state.miningLastCollect,autorepair:state.autorepair,freeCaseAvailable:state.freeCaseAvailable,lastFreeCaseTime:state.lastFreeCaseTime,history:state.history,stats:state.stats,craftChance:state.craftChance,desiredChance:state.desiredChance,desiredMultiplier:state.desiredMultiplier,blackmarketLots:state.blackmarketLots,blackmarketLastRefresh:state.blackmarketLastRefresh,marketMult:state.marketMult,marketLastUpdate:state.marketLastUpdate,lastBreakCheck:state.lastBreakCheck,lastTickTime:Date.now()}));}catch(e){}}
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify({balance:state.balance,inventory:state.inventory,miningSlots:state.miningSlots,miningBroken:state.miningBroken,miningUnlocked:state.miningUnlocked,miningAccumulated:state.miningAccumulated,miningLastCollect:state.miningLastCollect,autorepair:state.autorepair,freeCaseAvailable:state.freeCaseAvailable,lastFreeCaseTime:state.lastFreeCaseTime,history:state.history,stats:state.stats,craftChance:state.craftChance,craftMult:state.craftMult,desiredChance:state.desiredChance,desiredMultiplier:state.desiredMultiplier,blackmarketLots:state.blackmarketLots,blackmarketLastRefresh:state.blackmarketLastRefresh,marketMult:state.marketMult,marketLastUpdate:state.marketLastUpdate,lastBreakCheck:state.lastBreakCheck,lastTickTime:Date.now()}));}catch(e){}}
 function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(!raw)return;const d=JSON.parse(raw);
 if(typeof d.balance==='number')state.balance=d.balance;
 if(Array.isArray(d.inventory))state.inventory=d.inventory;
@@ -1680,6 +1717,7 @@ if(typeof d.lastFreeCaseTime==='number')state.lastFreeCaseTime=d.lastFreeCaseTim
 if(Array.isArray(d.history))state.history=d.history;
 if(d.stats)state.stats=Object.assign(state.stats,d.stats);
 if(typeof d.craftChance==='number')state.craftChance=d.craftChance;
+if(typeof d.craftMult==='number')state.craftMult=d.craftMult;
 if(typeof d.desiredChance==='number')state.desiredChance=d.desiredChance;
 if(typeof d.desiredMultiplier==='number')state.desiredMultiplier=d.desiredMultiplier;
 if(Array.isArray(d.blackmarketLots))state.blackmarketLots=d.blackmarketLots;
@@ -1986,15 +2024,11 @@ function calcBet(){
 }
 
 function calcRealChance(desiredChance){
-  return Math.round(desiredChance * HOUSE_EDGE * 100) / 100;
-}
-
-function calcDesiredPrice(bet, mult){
-  return Math.round(bet * mult);
+  return Math.round((desiredChance * HOUSE_EDGE) / state.desiredMultiplier * 100) / 100;
 }
 
 function generateTarget(bet, mult){
-  const desiredPrice = calcDesiredPrice(bet, mult);
+  const desiredPrice = Math.round(bet * mult);
   const rarity = rarityForPrice(desiredPrice);
   let best = null;
   let bestDiff = Infinity;
@@ -2144,7 +2178,9 @@ function performUpgrade(){
   state.inputSlots = [null,null,null,null];
   state.addMoney = 0;
   $('addMoneySlider').value = 0;
+  $('addMoneySlider2').value = 0;
   $('addMoneyVal').textContent = '0.00 ₽';
+  $('addMoneyVal2').textContent = '0.00 ₽';
 
   renderInputSlots();
   renderInventory();
@@ -2164,15 +2200,13 @@ function performUpgrade(){
   document.querySelectorAll('.mult-btn').forEach(b => b.disabled = true);
   $('refreshTargetBtn').disabled = true;
   $('addMoneySlider').disabled = true;
+  $('addMoneySlider2').disabled = true;
 
   wrap.classList.remove('result-win','result-lose');
   percentEl.textContent = chance.toFixed(1) + '%';
 
   const success = Math.random() * 100 < chance;
 
-  // Дуга успеха занимает сектор от 0° (верх) по часовой на arcLen градусов.
-  // Стрелка неподвижна сверху (0°). Чтобы нужный сектор оказался под стрелкой,
-  // нужно повернуть ротор так, чтобы этот сектор пришёл в верхнюю точку.
   const arcLen = (chance / 100) * 360;
   let finalAngle;
   if(success){
@@ -2185,11 +2219,7 @@ function performUpgrade(){
     finalAngle = lo + Math.random() * (hi - lo);
   }
 
-  // Поворот по часовой = положительный CSS rotate.
-  // Ротор должен остановиться так, чтобы нужный угол оказался под неподвижной стрелкой сверху.
-  // Дуга нарисована от верха по часовой. Если повернуть ротор на -finalAngle, точка finalAngle придёт наверх.
   const targetRotation = -finalAngle;
-  // Добавляем 5 полных оборотов для зрелищности (по часовой = отрицательные значения)
   const totalRotation = targetRotation - 360 * 5;
 
   rotor.style.transition = 'none';
@@ -2218,6 +2248,7 @@ function performUpgrade(){
       labelEl.textContent = 'УСПЕХ';
       labelEl.className = 'wheel-label win';
       addHistory('Апгрейд', `Успех: ${target.plate}`, target.price);
+      spawnWinEffects();
     } else {
       wrap.classList.add('result-lose');
       labelEl.textContent = 'ПРОВАЛ';
@@ -2248,6 +2279,7 @@ function performUpgrade(){
       document.querySelectorAll('.mult-btn').forEach(b => b.disabled = false);
       $('refreshTargetBtn').disabled = false;
       $('addMoneySlider').disabled = false;
+      $('addMoneySlider2').disabled = false;
       renderInputSlots();
       renderTargetPanel();
       renderTargetAlts();
@@ -2349,12 +2381,32 @@ function bindUpgraderControls(){
       const max = Math.max(0, state.balance);
       state.addMoney = Math.min(+e.target.value, max);
       $('addMoneyVal').textContent = fmtDec(state.addMoney);
+      $('addMoneySlider2').value = state.addMoney;
+      $('addMoneyVal2').textContent = fmtDec(state.addMoney);
       const bet = calcBet();
       const sumEl = $('inputSum');
       if(sumEl) sumEl.textContent = fmt(bet - state.addMoney);
       $('hintLine').textContent = `Ставка: ${fmt(bet)}`;
     });
     addSlider.addEventListener('change', () => {
+      if(state.upgradeRunning) return;
+      regenerateTarget();
+    });
+  }
+  const addSlider2 = $('addMoneySlider2');
+  if(addSlider2){
+    addSlider2.addEventListener('input', e => {
+      const max = Math.max(0, state.balance);
+      state.addMoney = Math.min(+e.target.value, max);
+      $('addMoneyVal2').textContent = fmtDec(state.addMoney);
+      $('addMoneySlider').value = state.addMoney;
+      $('addMoneyVal').textContent = fmtDec(state.addMoney);
+      const bet = calcBet();
+      const sumEl = $('inputSum');
+      if(sumEl) sumEl.textContent = fmt(bet - state.addMoney);
+      $('hintLine').textContent = `Ставка: ${fmt(bet)}`;
+    });
+    addSlider2.addEventListener('change', () => {
       if(state.upgradeRunning) return;
       regenerateTarget();
     });
@@ -2526,7 +2578,7 @@ const ITEM_W=190;
 /* ============ КЕЙСЫ ============ */
 function renderCasePicker(){
   const grid=$('casePickerGrid');
-  const order=['free','standard','yellow','blue','black'];grid.innerHTML='';
+  const order=['free','silver','gold','platinum'];grid.innerHTML='';
   order.forEach(key=>{const c=CASE_TYPES[key];
     const freeAvailable=key==='free'&&state.freeCaseAvailable;
     const card=document.createElement('div');card.className='case-picker-card '+key;
@@ -2534,7 +2586,7 @@ function renderCasePicker(){
     card.innerHTML=`<div class="case-scene"><div class="case-3d ${key}"><div class="case-back"></div><div class="case-front"></div><div class="case-lock-tl"></div><div class="case-lock-tr"></div><div class="case-handle"></div></div></div><div class="case-picker-name">${c.name}</div><div class="case-picker-price">${priceStr}</div><div class="case-picker-desc">${getCaseDesc(key)}</div><div class="case-picker-chance">${getCaseChanceStr(c.table)}</div>`;
     card.addEventListener('click',()=>{if(key==='free'&&!state.freeCaseAvailable){notify('Бесплатный кейс уже использован сегодня','error');return;}openRoulette(key);});
     grid.appendChild(card);});}
-function getCaseDesc(key){return{free:'Раз в день бесплатно',standard:'Базовый кейс',yellow:'Фокус на таксисте',blue:'Фокус на ментовском',black:'Фокус на военке'}[key]||'';}
+function getCaseDesc(key){return{free:'Раз в день бесплатно',silver:'Базовый кейс',gold:'Фокус на таксисте',platinum:'Фокус на ментовском'}[key]||'';}
 function getCaseChanceStr(table){return table.filter(r=>r.chance>0).map(r=>`${RARITY_NAMES[r.rarity]} ${r.chance}%`).join(' · ');}
 function openRoulette(caseKey){state.currentCaseType=caseKey;
 if(caseKey==='free'&&state.caseMode>1)state.caseMode=1;
@@ -2655,7 +2707,7 @@ function updateCraftResult(){
   if(filled.length===5&&filled.every(i=>i.rarity===filled[0].rarity)&&filled[0].rarity<RARITY.MILITARY){
     const nextRarity=filled[0].rarity+1;
     result.classList.add('ready');
-    result.innerHTML=`<div class="craft-result-label">Результат</div><div style="font-size:14px;color:#f0b90b;font-weight:900;">${RARITY_NAMES[nextRarity]}</div><div style="font-size:11px;color:#7d8ca3;font-weight:700;">случайный номер</div><div style="font-size:11px;color:#22c55e;font-weight:800;margin-top:6px;">Шанс: ${state.craftChance}% · Добавка: ${fmt(state.craftAddMoney)}</div>`;
+    result.innerHTML=`<div class="craft-result-label">Результат</div><div style="font-size:14px;color:#f0b90b;font-weight:900;">${RARITY_NAMES[nextRarity]}</div><div style="font-size:11px;color:#7d8ca3;font-weight:700;">случайный номер</div><div style="font-size:11px;color:#22c55e;font-weight:800;margin-top:6px;">Шанс: ${state.craftChance}% · Множитель: ×${state.craftMult} · Добавка: ${fmt(state.craftAddMoney)}</div>`;
     btn.disabled=false;
   } else {
     result.classList.remove('ready');
@@ -2680,11 +2732,13 @@ function doCraft(){
   if(success){state.craftSlots=[null,null,null,null,null];
     const{plate,region}=genPlate(nextRarity);
     const basePrice=calcPrice(nextRarity,plate,region);
-    const finalPrice=Math.round(basePrice*priceMult+state.craftAddMoney);
+    const finalPrice=Math.round((basePrice*priceMult+state.craftAddMoney) * state.craftMult);
     newItem={plate,region,rarity:nextRarity,price:finalPrice,id:Date.now()+Math.random()};
     state.inventory.push(newItem);state.stats.crafts++;
     addHistory('Крафт',`Успех: ${newItem.plate}`,newItem.price);
-    notify(`Скрафчен ${newItem.plate}`,'success');state.lastResultItem=newItem;}
+    notify(`Скрафчен ${newItem.plate}`,'success');state.lastResultItem=newItem;
+    spawnWinEffects();
+  }
   else{state.craftSlots=[null,null,null,null,null];
     state.stats.crafts_failed++;
     addHistory('Крафт',`Провал`,0);
@@ -2740,6 +2794,14 @@ addHistory('Покупка',`Чёрный рынок: ${lot.plate}`,-lot.price);
 save();syncProfileBalance();}
 
 /* ============ МАЙНИНГ ============ */
+function getRepairCost(item, slotIndex){
+  let mult = 1;
+  if (state.miningUnlocked > 3) mult = 1.5;
+  if (state.miningUnlocked > 6) mult = 2.5;
+  if (state.miningUnlocked > 8) mult = 4;
+  return Math.round(item.price * 0.2 * mult);
+}
+
 function renderMining(){const grid=$('miningGrid');grid.innerHTML='';
 state.miningSlots.forEach((item,i)=>{const div=document.createElement('div');
 const unlocked=i<state.miningUnlocked;
@@ -2754,7 +2816,7 @@ updateBalance();flashBalance();renderMining();
 addHistory('Покупка',`Открыта ячейка ${i+1}`,-cost);
 notify(`Ячейка ${i+1} открыта!`,'success');save();syncProfileBalance();});}
 else if(item){if(broken){div.className='mining-slot broken';
-const repairCost=Math.round(item.price*0.2);
+const repairCost=getRepairCost(item, i);
 div.innerHTML=`<div class="broken-icon">⚠</div><div class="broken-label">СЛОМАНА</div><div class="broken-repair">${fmt(repairCost)}</div>`;
 div.addEventListener('click',()=>{if(state.balance<repairCost){notify(`Нужно ${fmt(repairCost)}`,'error');return;}
 state.balance-=repairCost;state.miningBroken[i]=false;
@@ -2858,6 +2920,7 @@ state.history=[];save();renderHistory();notify('История очищена','
 function updateBalance(){
 $('balanceDisplay').textContent=fmt(state.balance);
 const s1=$('addMoneySlider');if(s1){s1.max=Math.max(0,state.balance);if(state.addMoney>state.balance){state.addMoney=state.balance;s1.value=state.addMoney;$('addMoneyVal').textContent=fmtDec(state.addMoney);}}
+const s1_2=$('addMoneySlider2');if(s1_2){s1_2.max=Math.max(0,state.balance);if(state.addMoney>state.balance){state.addMoney=state.balance;s1_2.value=state.addMoney;$('addMoneyVal2').textContent=fmtDec(state.addMoney);}}
 const s2=$('craftAddMoneySlider');if(s2){s2.max=Math.max(0,state.balance);if(state.craftAddMoney>state.balance){state.craftAddMoney=state.balance;s2.value=state.craftAddMoney;$('craftAddMoneyVal').textContent=fmtDec(state.craftAddMoney);}}
 }
 function flashBalance(){const box=$('balanceBox');box.classList.add('flash');
@@ -2866,6 +2929,25 @@ function notify(text,type){const n=document.createElement('div');
 n.className='notify'+(type?' '+type:'');
 n.textContent=text;document.body.appendChild(n);
 setTimeout(()=>n.remove(),3200);}
+
+function spawnWinEffects() {
+  const flash = document.createElement('div');
+  flash.className = 'flash-win';
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 500);
+
+  for (let i = 0; i < 50; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'confetti-particle';
+    particle.style.left = Math.random() * 100 + 'vw';
+    particle.style.top = '-20px';
+    particle.style.backgroundColor = ['#f0b90b', '#ffd966', '#22c55e', '#fff'][Math.floor(Math.random() * 4)];
+    particle.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+    particle.style.animationDelay = (Math.random() * 0.5) + 's';
+    document.body.appendChild(particle);
+    setTimeout(() => particle.remove(), 3000);
+  }
+}
 
 /* ============ СДЕЛКИ ============ */
 let dealTargetCandidate=null;
@@ -3541,6 +3623,12 @@ btn.classList.add('active');
 state.craftChance=+btn.dataset.craftChance;
 updateCraftResult();save();});});
 
+document.querySelectorAll('.mult-btn[data-craft-mult]').forEach(btn=>{btn.addEventListener('click',()=>{
+document.querySelectorAll('.mult-btn[data-craft-mult]').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+state.craftMult=+btn.dataset.craftMult;
+updateCraftResult();save();});});
+
 document.querySelectorAll('.mult-btn[data-mode]').forEach(btn=>{btn.addEventListener('click',()=>{
 if(state.spinLocked)return;
 if(state.currentCaseType==='free'&&+btn.dataset.mode>1){notify('Бесплатный кейс только ×1','error');return;}
@@ -3586,12 +3674,13 @@ initUpgraderWheel();
 renderInputSlots();
 $('autorepairCheck').checked=state.autorepair;
 $('addMoneySlider').max=Math.max(0,state.balance);
+$('addMoneySlider2').max=Math.max(0,state.balance);
 $('craftAddMoneySlider').max=Math.max(0,state.balance);
 
 (function initTrack(){
 const track=$('rouletteTrack1');
 for(let i=0;i<20;i++){
-const item=makeNumber('standard');
+const item=makeNumber('silver');
 const el=document.createElement('div');
 el.className='roulette-item rarity-'+item.rarity;
 el.innerHTML=`${renderPlate(item.plate,item.region,item.rarity,'small')}<div class="rou-price">${fmt(item.price)}</div><div class="rou-rarity">${RARITY_NAMES[item.rarity]}</div>`;
