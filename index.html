@@ -926,110 +926,212 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 .plate-info-row .lbl{color:#7d8ca3;font-weight:700;}
 .plate-info-row .val{color:#f0b90b;font-weight:900;}
 
-/* КОМПАКТНЫЙ МОБИЛЬНЫЙ ИНТЕРФЕЙС */
-@media(max-width:768px){
-  body{padding:6px;}
-  .content{padding:10px;}
-  .upgrid{grid-template-columns:1fr;gap:12px;}
+/* ============ МОБИЛЬНЫЙ ИНТЕРФЕЙС (ПО РЕФЕРЕНСУ) ============ */
+@media(max-width: 768px) {
+  body { padding: 0; background: #0a0d12; }
+  .app { border-radius: 0; border: none; box-shadow: none; max-width: 100%; }
   
-  /* Уменьшаем колесо и переставляем местами для мобилки */
-  .center-col{order: -1;}
-  .wheel-wrap{width:180px;height:180px;margin-bottom:10px;}
-  .wheel-percent{font-size:28px;}
-  .wheel-label{font-size:9px;margin-top:6px;}
+  /* Верхняя панель: делаем компактной в одну строку */
+  .topbar { padding: 10px 12px; gap: 8px; }
+  .topbar-row-top { gap: 8px; }
   
-  .slots{grid-template-columns:repeat(4,1fr);gap:6px;}
-  .slot{padding:4px;}
-  .slot.empty::before{font-size:20px;}
+  .brand { font-size: 14px; gap: 6px; }
+  .brand .mark { width: 24px; height: 24px; font-size: 12px; }
   
-  .plate.plate-small{height:26px;}
-  .plate.plate-small .main{font-size:12px;}
-  .plate.plate-small .region{font-size:10px;}
-  .plate.plate-small .rus{font-size:4px;}
-  .plate.plate-small .flag{width:9px;height:6px;}
-  .plate.plate-small .right{min-width:20px;padding:1px 3px;}
+  .userbar-right { gap: 6px; }
+  .market-indicator { display: none; } /* Убираем рынок, чтобы влез баланс */
   
-  .mult-btn{padding:6px 10px;font-size:11px;min-width:50px;}
-  .btn{padding:10px;font-size:13px;}
-  .page-title{font-size:16px;margin-bottom:12px;}
-  .page-title small{font-size:9px;}
-  .panel-head{font-size:10px;margin-bottom:8px;}
+  .balance { 
+    padding: 6px 10px; 
+    font-size: 12px; 
+    gap: 4px; 
+    border-radius: 12px;
+  }
+  .balance .lbl { display: none; } /* Скрываем слово БАЛАНС */
   
-  .sumrow{margin-top:6px;}
-  .add-money-box{margin-top:8px;padding:6px 8px;}
-  .add-money-head{font-size:10px;}
+  .bell { width: 30px; height: 30px; }
+  .bell svg { width: 14px; height: 14px; }
+  .bell .badge { min-width: 14px; height: 14px; font-size: 8px; }
   
-  .target-panel{padding:10px;min-height:auto; height: auto;}
-  .target-main-wrap{padding:4px 0;min-height:60px;}
-  .target-price-row{font-size:11px;}
-  .target-price-row .val{font-size:14px;}
+  .avatar { width: 30px; height: 30px; font-size: 12px; border-width: 1px; }
+
+  /* Вкладки: горизонтальный скролл, без сжатия */
+  .tabs-center { padding: 0 10px; }
+  .tabs { border-radius: 8px; padding: 3px; gap: 2px; }
+  .tab { padding: 6px 10px; font-size: 10px; }
   
-  /* Список альтернатив ограничиваем по высоте, чтобы не листать */
-  .target-alts{max-height:140px;padding-top:6px;}
-  .alt-item{padding:4px 6px;gap:6px;}
-  .alt-item .alt-plate-wrap .plate{height:24px;}
-  .alt-item .alt-plate-wrap .plate .main{font-size:11px;}
-  .alt-item .alt-plate-wrap .plate .region{font-size:9px;}
-  .alt-item .alt-price{font-size:11px;}
-  .alt-item .alt-chance{font-size:9px;}
+  /* Контент */
+  .content { padding: 10px; }
+  .page-title { display: none; } /* Скрываем заголовки для экономии места */
   
-  .target-refresh-big{padding:8px;font-size:11px;}
+  /* СЕТКА АПГРЕЙДЕРА: переводим в одну колонку */
+  .upgrid { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+  }
+
+  /* 1. Левая панель (Ваши номера) — прячем вверх, делаем горизонтальной */
+  .upgrid > .panel {
+    order: 1;
+    padding: 8px;
+    background: transparent;
+    border: none;
+  }
+  .panel-head { display: none; } /* Скрываем заголовок "Ваши номера 0/4" */
+  .slots { 
+    display: flex; 
+    gap: 6px; 
+    justify-content: center;
+  }
+  .slot { 
+    width: 60px; 
+    height: 60px; 
+    aspect-ratio: auto; 
+    border-radius: 6px;
+    padding: 2px;
+  }
+  .slot.empty::before { font-size: 18px; }
+  .slot.filled .plate { transform: scale(0.7); }
+  .slot.filled .plate + div { font-size: 8px !important; margin-top: 0 !important; }
   
-  .inv-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;}
-  .inv-card{padding:6px;gap:4px;}
-  .inv-card .inv-price{font-size:11px;}
-  .inv-card .inv-rarity{font-size:8px;}
-  .inv-card .sell{padding:5px;font-size:9px;}
+  .sumrow { margin-top: 8px; font-size: 11px; }
+  .sumrow strong { font-size: 12px; }
   
-  .case-picker-grid{grid-template-columns:1fr 1fr;gap:10px;}
-  .case-picker-card{padding:16px 10px;border-radius:12px;gap:8px;}
-  .case-picker-card .case-picker-name{font-size:13px;}
-  .case-picker-card .case-picker-price{font-size:15px;}
-  .case-picker-card .case-picker-desc{font-size:10px;}
-  .case-picker-card .case-picker-chance{font-size:9px;padding:6px;}
-  .case-3d{width:100px;height:70px;}
+  /* Ползунок "Добавить к ставке" */
+  .add-money-box { margin-top: 8px; padding: 6px 10px; }
+  .add-money-head { font-size: 9px; }
+  .add-money-input { height: 4px; }
+
+  /* 2. Центральная колонка (Колесо) */
+  .center-col {
+    order: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
   
+  /* Уменьшаем колесо */
+  .wheel-wrap { width: 200px; height: 200px; margin: 0 auto; }
+  .wheel-percent { font-size: 28px; }
+  .wheel-label { font-size: 9px; margin-top: 4px; }
+
+  /* Кнопки шансов и множителей */
+  .chance-controls { gap: 6px; margin-bottom: 0; width: 100%; }
+  .chance-row { gap: 4px; justify-content: center; }
+  .mult-btn {
+    padding: 6px 10px;
+    font-size: 10px;
+    min-width: 44px;
+    border-radius: 6px;
+    flex: 1;
+    max-width: 70px;
+  }
+  .mult-btn small { display: none; } /* Прячем мелкий текст */
+
+  /* Кнопка ПРОКАЧАТЬ — на всю ширину, как на референсе */
+  #upgradeBtn {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 4px;
+    padding: 14px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+  .hint { font-size: 10px; margin-top: 4px; }
+
+  /* 3. Правая панель (Цель) */
+  .target-panel {
+    order: 3;
+    padding: 12px;
+    gap: 8px;
+    min-height: auto;
+  }
+  
+  .target-main-wrap { padding: 4px 0; min-height: 60px; }
+  .target-price-row { font-size: 11px; }
+  .target-price-row .val { font-size: 14px; }
+  
+  .target-alts-title { font-size: 9px; margin-top: 2px; }
+  .target-alts { max-height: 140px; padding-top: 6px; gap: 4px; }
+  
+  .alt-item { padding: 6px; gap: 8px; border-radius: 6px; }
+  .alt-item .alt-plate-wrap .plate { transform: scale(0.8); transform-origin: left center; }
+  .alt-item .alt-price { font-size: 11px; }
+  .alt-item .alt-chance { font-size: 9px; }
+  .target-refresh-big { padding: 8px; font-size: 11px; margin-top: 4px; }
+
+  /* Инвентарь снизу */
+  .inv-wrap { margin-top: 12px; padding: 10px; }
+  .inv-head { margin-bottom: 8px; }
+  .inv-head h3 { font-size: 10px; }
+  .inv-head .count { font-size: 10px; }
+  .inv-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .inv-card { padding: 8px; gap: 4px; }
+  .inv-card .inv-price { font-size: 11px; }
+  .inv-card .inv-rarity { font-size: 8px; }
+  .inv-card .sell { padding: 6px; font-size: 9px; }
+
+  /* Остальные страницы (кейсы, крафт, майнинг) */
+  .case-picker-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .case-picker-card { padding: 16px 10px; border-radius: 12px; gap: 8px; }
+  .case-picker-card .case-picker-name { font-size: 13px; }
+  .case-picker-card .case-picker-price { font-size: 15px; }
+  .case-picker-card .case-picker-desc { font-size: 10px; }
+  .case-picker-card .case-picker-chance { font-size: 9px; padding: 6px; }
+  .case-3d { width: 100px; height: 70px; }
+
   .craft-wrap { transform: scale(0.95); transform-origin: top center; }
-  .craft-slots{grid-template-columns:repeat(5,1fr);gap:4px;}
-  .craft-slot{padding:2px;}
-  .craft-slot .craft-price{font-size:8px;margin-top:2px;}
+  .craft-slots { gap: 4px; }
+  .craft-slot { padding: 2px; }
+  .craft-slot .craft-price { font-size: 8px; margin-top: 2px; }
+
+  .mining-header { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mining-stat { padding: 10px; }
+  .mining-stat .lbl { font-size: 9px; }
+  .mining-stat .val { font-size: 14px; }
+  .mining-grid-wrap { grid-template-columns: 1fr; gap: 12px; }
+  .mining-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .mining-slot .locked-price { font-size: 7px; }
+  .mining-slot .locked-label { font-size: 6px; }
+  .mining-slot .mining-rate { font-size: 7px; }
   
-  .mining-header{grid-template-columns:repeat(2,1fr);gap:8px;}
-  .mining-stat{padding:10px;}
-  .mining-stat .lbl{font-size:9px;}
-  .mining-stat .val{font-size:14px;}
-  .mining-grid-wrap{grid-template-columns:1fr;gap:12px;}
-  .mining-grid{grid-template-columns:repeat(5,1fr);gap:4px;}
-  .mining-slot .locked-price{font-size:7px;}
-  .mining-slot .locked-label{font-size:6px;}
-  .mining-slot .mining-rate{font-size:7px;}
-  .sets-panel{padding:10px;}
-  .set-row{padding:8px;margin-bottom:4px;}
-  .set-row .set-name{font-size:12px;}
-  .set-row .set-progress{font-size:10px;}
-  .set-row .set-bonus{font-size:12px;}
+  .sets-panel { padding: 10px; }
+  .set-row { padding: 8px; margin-bottom: 4px; }
+  .set-row .set-name { font-size: 12px; }
+  .set-row .set-progress { font-size: 10px; }
+  .set-row .set-bonus { font-size: 12px; }
   
-  .blackmarket-grid{grid-template-columns:1fr 1fr;gap:8px;}
-  .bm-card{padding:10px;gap:6px;}
-  .bm-card .bm-price{font-size:13px;}
-  .bm-card .bm-buy{padding:7px;font-size:10px;}
+  .blackmarket-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .bm-card { padding: 10px; gap: 6px; }
+  .bm-card .bm-price { font-size: 13px; }
+  .bm-card .bm-buy { padding: 7px; font-size: 10px; }
+
+  .deals-input-row { flex-direction: column; }
+  .deals-find-btn { padding: 12px; }
   
-  .deals-input-row{flex-direction:column;}
-  .deals-find-btn{padding:12px;}
+  .profile-avatar-big { width: 80px; height: 80px; font-size: 32px; }
+  .profile-name-display { font-size: 18px; }
+  .profile-tab { padding: 7px 12px; font-size: 10px; }
+  .history-summary { grid-template-columns: 1fr 1fr; }
+  .top-subtab { padding: 6px 10px; font-size: 10px; }
   
-  .profile-avatar-big{width:80px;height:80px;font-size:32px;}
-  .profile-name-display{font-size:18px;}
-  .profile-tab{padding:7px 12px;font-size:10px;}
-  .history-summary{grid-template-columns:1fr 1fr;}
-  .top-subtab{padding:6px 10px;font-size:10px;}
-  .deal-room-slots{grid-template-columns:repeat(2,1fr);}
-  .deal-room-actions .btn{max-width:100%;}
+  /* Модалки */
+  .modal { max-width: calc(100vw - 20px) !important; padding: 16px; }
+  .modal h3 { font-size: 12px; }
+  
+  /* Сделки */
+  .deal-room-slots { grid-template-columns: repeat(2, 1fr); }
+  .deal-room-actions .btn { max-width: 100%; }
 }
 
-@media(max-width:400px){
-  .wheel-wrap{width:160px;height:160px;}
-  .wheel-percent{font-size:24px;}
-  .target-alts{max-height:120px;}
+/* Очень маленькие экраны (iPhone SE и т.п.) */
+@media(max-width: 400px) {
+  .wheel-wrap { width: 170px; height: 170px; }
+  .wheel-percent { font-size: 24px; }
+  .target-alts { max-height: 110px; }
+  .slot { width: 50px; height: 50px; }
 }
 
 /* Эффект конфетти для выигрыша */
@@ -1695,7 +1797,7 @@ fbProfile.active=isActive;
 fbProfile.miningRate=rate;
 fbProfile.inventoryCount=state.inventory.length;
 fbProfile.inventory=invForSync;
-}catch(e){}}
+}catch(e){}} 
 
 const RARITY={STANDARD:0,TAXI:1,POLICE:2,MILITARY:3,DIPLOMAT:4};
 const RARITY_NAMES=['Стандарт','Таксист','Ментовской','Военка','Дипломат'];
