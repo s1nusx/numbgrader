@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NUMBGRADER — Апгрейд номеров</title>
 <style>
 @font-face {
@@ -83,13 +83,11 @@ color:#fff;margin-bottom:22px;text-transform:uppercase;}
 .page-title small{display:block;color:#5c6c82;font-size:11px;font-weight:700;
 letter-spacing:1.5px;margin-top:4px;}
 .panel{background:linear-gradient(180deg,#0b0f15,#090d12);
-border:1px solid #171e29;border-radius:12px;padding:16px; display:flex; flex-direction:column; height: 100%;}
+border:1px solid #171e29;border-radius:12px;padding:16px;}
 .panel-head{display:flex;justify-content:space-between;align-items:center;
 font-size:11px;color:#6d7c92;font-weight:800;letter-spacing:1.2px;
 text-transform:uppercase;margin-bottom:14px;}
-
-/* ИЗМЕНЕНИЕ СЕТКИ ДЛЯ СИММЕТРИИ */
-.upgrid{display:grid;grid-template-columns:1fr 340px 1fr;gap:18px;align-items:stretch;}
+.upgrid{display:grid;grid-template-columns:1fr 340px 1fr;gap:18px;align-items:start;}
 @media(max-width:1050px){.upgrid{grid-template-columns:1fr;}}
 .slots{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .slot{aspect-ratio:1/1;background:linear-gradient(180deg,#090d12,#070a0e);
@@ -150,7 +148,7 @@ border-left:1.5px solid #000;padding:2px 5px;line-height:1;min-width:28px;}
 .plate.rarity-4{background:#8b0000;color:#fff;border-color:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.5),0 0 26px rgba(255,255,255,0.35);}
 .plate.rarity-4 .right{border-left-color:#fff;}
 .plate.rarity-4 .flag{border-color:#fff;}
-.center-col{text-align:center; display:flex; flex-direction:column; justify-content:space-between; height: 100%;}
+.center-col{text-align:center;}
 
 .wheel-wrap{position:relative;width:280px;height:280px;margin:0 auto 18px;}
 .wheel-rotor{position:absolute;inset:0;transform-origin:140px 140px;will-change:transform;}
@@ -186,6 +184,14 @@ border-left:1.5px solid #000;padding:2px 5px;line-height:1;min-width:28px;}
 50%{filter:drop-shadow(0 0 30px rgba(239,68,68,0.9));}}
 .wheel-wrap.result-win{animation:winPulse 0.8s ease-in-out 2;}
 .wheel-wrap.result-lose{animation:losePulse 0.8s ease-in-out 2;}
+@media(max-width:768px){
+  .wheel-wrap{width:240px;height:240px;}
+  .wheel-percent{font-size:38px;}
+}
+@media(max-width:500px){
+  .wheel-wrap{width:220px;height:220px;}
+  .wheel-percent{font-size:34px;}
+}
 
 .chance-controls{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
 .chance-row{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;}
@@ -247,7 +253,7 @@ letter-spacing:1.2px;text-transform:uppercase;text-align:center;padding:10px;}
 
 .target-panel{background:linear-gradient(180deg,#0b0f15,#090d12);
   border:1px solid #171e29;border-radius:12px;padding:16px;
-  display:flex;flex-direction:column;gap:10px;position:relative;height:100%;}
+  display:flex;flex-direction:column;gap:10px;min-height:400px;position:relative;}
 .target-panel .target-main-wrap{display:flex;justify-content:center;align-items:center;
   width:100%;padding:10px 0;min-height:80px;}
 .target-panel .target-price-row{width:100%;display:flex;justify-content:space-between;
@@ -257,8 +263,8 @@ letter-spacing:1.2px;text-transform:uppercase;text-align:center;padding:10px;}
   letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
 
 .target-panel .target-alts{display:flex;flex-direction:column;gap:6px;
-  flex:1;overflow-y:auto;padding-right:4px;
-  border-top:1px solid #1a2230;padding-top:10px;width:100%;min-height:150px;}
+  max-height:220px;overflow-y:auto;padding-right:4px;
+  border-top:1px solid #1a2230;padding-top:10px;width:100%;}
 .target-panel .target-alts::-webkit-scrollbar{width:4px;}
 .target-panel .target-alts::-webkit-scrollbar-thumb{background:#2c3b50;border-radius:2px;}
 .target-panel .alt-item{background:#080b10;border:1px solid #1a2230;border-radius:8px;
@@ -926,196 +932,30 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 .plate-info-row .lbl{color:#7d8ca3;font-weight:700;}
 .plate-info-row .val{color:#f0b90b;font-weight:900;}
 
-/* ============ МОБИЛЬНЫЙ ИНТЕРФЕЙС (ПО РЕФЕРЕНСУ) ============ */
-@media(max-width: 768px) {
-  body { padding: 0; background: #0a0d12; }
-  .app { border-radius: 0; border: none; box-shadow: none; max-width: 100%; }
-  
-  .topbar { padding: 10px 12px; gap: 8px; }
-  .topbar-row-top { gap: 8px; }
-  
-  .brand { font-size: 14px; gap: 6px; }
-  .brand .mark { width: 24px; height: 24px; font-size: 12px; }
-  
-  .userbar-right { gap: 6px; }
-  .market-indicator { display: none; }
-  
-  .balance { 
-    padding: 6px 10px; 
-    font-size: 12px; 
-    gap: 4px; 
-    border-radius: 12px;
-  }
-  .balance .lbl { display: none; }
-  
-  .bell { width: 30px; height: 30px; }
-  .bell svg { width: 14px; height: 14px; }
-  .bell .badge { min-width: 14px; height: 14px; font-size: 8px; }
-  
-  .avatar { width: 30px; height: 30px; font-size: 12px; border-width: 1px; }
-
-  .tabs-center { padding: 0 10px; }
-  .tabs { border-radius: 8px; padding: 3px; gap: 2px; }
-  .tab { padding: 6px 10px; font-size: 10px; }
-  
-  .content { padding: 10px; }
-  .page-title { display: none; }
-  
-  .upgrid { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 12px; 
-  }
-
-  .upgrid > .panel {
-    order: 1;
-    padding: 8px;
-    background: transparent;
-    border: none;
-  }
-  .panel-head { display: none; }
-  .slots { 
-    display: flex; 
-    gap: 6px; 
-    justify-content: center;
-  }
-  .slot { 
-    width: 60px; 
-    height: 60px; 
-    aspect-ratio: auto; 
-    border-radius: 6px;
-    padding: 2px;
-  }
-  .slot.empty::before { font-size: 18px; }
-  .slot.filled .plate { transform: scale(0.7); }
-  .slot.filled .plate + div { font-size: 8px !important; margin-top: 0 !important; }
-  
-  .sumrow { margin-top: 8px; font-size: 11px; }
-  .sumrow strong { font-size: 12px; }
-  
-  .add-money-box { margin-top: 8px; padding: 6px 10px; }
-  .add-money-head { font-size: 9px; }
-  .add-money-input { height: 4px; }
-
-  .center-col {
-    order: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-  }
-  
-  .wheel-wrap { width: 200px; height: 200px; margin: 0 auto; }
-  .wheel-percent { font-size: 28px; }
-  .wheel-label { font-size: 9px; margin-top: 4px; }
-
-  .chance-controls { gap: 6px; margin-bottom: 0; width: 100%; }
-  .chance-row { gap: 4px; justify-content: center; }
-  .mult-btn {
-    padding: 6px 10px;
-    font-size: 10px;
-    min-width: 44px;
-    border-radius: 6px;
-    flex: 1;
-    max-width: 70px;
-  }
-  .mult-btn small { display: none; }
-
-  #upgradeBtn {
-    width: 100%;
-    max-width: 100%;
-    margin-top: 4px;
-    padding: 14px;
-    font-size: 15px;
-    border-radius: 10px;
-  }
-  .hint { font-size: 10px; margin-top: 4px; }
-
-  .target-panel {
-    order: 3;
-    padding: 12px;
-    gap: 8px;
-    min-height: auto;
-  }
-  
-  .target-main-wrap { padding: 4px 0; min-height: 60px; }
-  .target-price-row { font-size: 11px; }
-  .target-price-row .val { font-size: 14px; }
-  
-  .target-alts-title { font-size: 9px; margin-top: 2px; }
-  .target-alts { max-height: 140px; padding-top: 6px; gap: 4px; }
-  
-  .alt-item { padding: 6px; gap: 8px; border-radius: 6px; }
-  .alt-item .alt-plate-wrap .plate { transform: scale(0.8); transform-origin: left center; }
-  .alt-item .alt-price { font-size: 11px; }
-  .alt-item .alt-chance { font-size: 9px; }
-  .target-refresh-big { padding: 8px; font-size: 11px; margin-top: 4px; }
-
-  .inv-wrap { margin-top: 12px; padding: 10px; }
-  .inv-head { margin-bottom: 8px; }
-  .inv-head h3 { font-size: 10px; }
-  .inv-head .count { font-size: 10px; }
-  .inv-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .inv-card { padding: 8px; gap: 4px; }
-  .inv-card .inv-price { font-size: 11px; }
-  .inv-card .inv-rarity { font-size: 8px; }
-  .inv-card .sell { padding: 6px; font-size: 9px; }
-
-  .case-picker-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .case-picker-card { padding: 16px 10px; border-radius: 12px; gap: 8px; }
-  .case-picker-card .case-picker-name { font-size: 13px; }
-  .case-picker-card .case-picker-price { font-size: 15px; }
-  .case-picker-card .case-picker-desc { font-size: 10px; }
-  .case-picker-card .case-picker-chance { font-size: 9px; padding: 6px; }
-  .case-3d { width: 100px; height: 70px; }
-
-  .craft-wrap { transform: scale(0.95); transform-origin: top center; }
-  .craft-slots { gap: 4px; }
-  .craft-slot { padding: 2px; }
-  .craft-slot .craft-price { font-size: 8px; margin-top: 2px; }
-
-  .mining-header { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .mining-stat { padding: 10px; }
-  .mining-stat .lbl { font-size: 9px; }
-  .mining-stat .val { font-size: 14px; }
-  .mining-grid-wrap { grid-template-columns: 1fr; gap: 12px; }
-  .mining-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; }
-  .mining-slot .locked-price { font-size: 7px; }
-  .mining-slot .locked-label { font-size: 6px; }
-  .mining-slot .mining-rate { font-size: 7px; }
-  
-  .sets-panel { padding: 10px; }
-  .set-row { padding: 8px; margin-bottom: 4px; }
-  .set-row .set-name { font-size: 12px; }
-  .set-row .set-progress { font-size: 10px; }
-  .set-row .set-bonus { font-size: 12px; }
-  
-  .blackmarket-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .bm-card { padding: 10px; gap: 6px; }
-  .bm-card .bm-price { font-size: 13px; }
-  .bm-card .bm-buy { padding: 7px; font-size: 10px; }
-
-  .deals-input-row { flex-direction: column; }
-  .deals-find-btn { padding: 12px; }
-  
-  .profile-avatar-big { width: 80px; height: 80px; font-size: 32px; }
-  .profile-name-display { font-size: 18px; }
-  .profile-tab { padding: 7px 12px; font-size: 10px; }
-  .history-summary { grid-template-columns: 1fr 1fr; }
-  .top-subtab { padding: 6px 10px; font-size: 10px; }
-  
-  .modal { max-width: calc(100vw - 20px) !important; padding: 16px; }
-  .modal h3 { font-size: 12px; }
-  
-  .deal-room-slots { grid-template-columns: repeat(2, 1fr); }
-  .deal-room-actions .btn { max-width: 100%; }
+@media(max-width:768px){
+body{padding:8px;}
+.content{padding:14px;}
+.tab{padding:8px 12px;font-size:10px;}
+.mining-header{grid-template-columns:repeat(2,1fr);}
+.inv-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));}
+.profile-avatar-big{width:90px;height:90px;font-size:36px;}
+.profile-name-display{font-size:20px;}
+.profile-tab{padding:8px 14px;font-size:11px;}
+.deal-grid{grid-template-columns:1fr;}
+.top-subtab{padding:7px 14px;font-size:11px;}
+.history-summary{grid-template-columns:1fr;}
+.deal-room-slots{grid-template-columns:repeat(2,1fr);}
+.deal-room-actions .btn{max-width:100%;}
+.wheel-wrap{width:240px;height:240px;}
+.wheel-percent{font-size:38px;}
 }
-
-@media(max-width: 400px) {
-  .wheel-wrap { width: 170px; height: 170px; }
-  .wheel-percent { font-size: 24px; }
-  .target-alts { max-height: 110px; }
-  .slot { width: 50px; height: 50px; }
+@media(max-width:500px){
+.tab{padding:7px 10px;font-size:9px;}
+.balance{padding:6px 12px;font-size:11px;}
+.balance .lbl{display:none;}
+.market-indicator .lbl{display:none;}
+.wheel-wrap{width:220px;height:220px;}
+.wheel-percent{font-size:34px;}
 }
 
 /* Эффект конфетти для выигрыша */
@@ -1240,6 +1080,7 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 </div>
 <div class="target-alts-title">Другие варианты</div>
 <div class="target-alts" id="targetAlts"></div>
+<button class="target-refresh-big" id="refreshTargetBtn">ОБНОВИТЬ</button>
 </div>
 </div>
 <div class="inv-wrap">
@@ -1285,7 +1126,7 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 </div>
 <div class="page" id="page-craft">
 <div class="page-title">Крафт номеров<small>5 одинаковых → 1 следующей редкости</small></div>
-<div class="craft-wrap">
+<div class="craft-wrap" style="zoom: 0.85;">
 <div class="craft-info">Положите <strong>5 номеров одной редкости</strong> и получите
 <strong>1 номер следующей редкости</strong>. Дипломат в крафте не участвует.</div>
 <div class="craft-slots" id="craftSlots"></div>
@@ -1324,7 +1165,7 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 </div>
 </div>
 <div class="page" id="page-blackmarket">
-<div class="page-title">Чёрный рынок<small>эксклюзивные лоты - обновление раз в 5 минут</small></div>
+<div class="page-title">Чёрный рынок<small>эксклюзивные лоты — обновление раз в 5 минут</small></div>
 <div class="blackmarket-header">
 <div class="bm-title">◆ ЭЛИТНЫЕ ЛОТЫ</div>
 <div class="bm-timer">Обновление: <span id="bmTimer">05:00</span></div>
@@ -1350,7 +1191,7 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 </div>
 </div>
 <div class="page" id="page-mining">
-<div class="page-title">Майнинг номеров<small>загружайте номера, чтобы получать пассивный доход</small></div>
+<div class="page-title">Майнинг номеров<small>загружайте номера — они приносят доход</small></div>
 <div class="mining-header">
 <div class="mining-stat"><div class="lbl">Доход в час</div>
 <div class="val green" id="miningRateHour">0 ₽</div></div>
@@ -1398,7 +1239,7 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 </div>
 </div>
 <div class="page" id="page-deals">
-<div class="page-title">Сделки<small>отправьте приглашение игроку и он получит его мгновенно</small></div>
+<div class="page-title">Сделки<small>отправьте приглашение игроку — он получит его мгновенно</small></div>
 <div class="deals-wrap">
 <div class="deals-tabs">
 <button class="deals-tab active" data-deals-tab="create">Создать</button>
@@ -1524,7 +1365,7 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 <button class="close" id="closeUsernameModal">×</button>
 <h3>Юзернейм</h3>
 <div style="color:#8a9bb5;font-size:12px;font-weight:700;margin-bottom:14px;line-height:1.6;text-align:center;">
-Латиница, цифры и нижнее подчёркивание.<br>
+Латиница и цифры. Разрешено нижнее подчёркивание.<br>
 Минимум 4 символа. Поменять можно раз в 7 дней.
 </div>
 <div style="position:relative;">
@@ -1538,8 +1379,8 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 <div class="modal-bg name-modal" id="nameModal">
 <div class="modal">
 <div class="name-modal-title">Добро пожаловать</div>
-<div class="name-modal-desc">Введите имя.<br>
-Если пропустите - вместо имени будет ваш ID.</div>
+<div class="name-modal-desc">Введите имя, чтобы вас видели другие игроки.<br>
+Можно скипнуть — тогда имя будет как ваш ID.</div>
 <input type="text" id="firstNameInput" class="edit-name-input" maxlength="20" placeholder="Ваше имя">
 <div class="edit-name-hint" id="firstNameHint">Минимум 4 символа</div>
 <button class="btn" id="saveFirstNameBtn" style="margin-top:14px;">Сохранить</button>
@@ -1597,7 +1438,7 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 <div class="modal-bg deal-invite-modal" id="dealInviteModal">
 <div class="modal">
 <div class="deal-invite-title">Вам сделка</div>
-<div class="deal-invite-sub">Игрок хочет заключить сделку с вами</div>
+<div class="deal-invite-sub">Игрок хочет обменяться с вами</div>
 <div class="deal-invite-from">
 <div class="lbl">От кого</div>
 <div class="name" id="dealInviteFromName">—</div>
@@ -1635,7 +1476,7 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 </div>
 <input type="range" class="add-money-input" id="roomMyMoney" min="0" max="100000" value="0" step="1">
 </div>
-<div class="deal-room-inv-title">Мой инвентарь</div>
+<div class="deal-room-inv-title">Мой инвентарь — клик добавит в ставку</div>
 <div class="deal-room-inv" id="roomMyInv"></div>
 </div>
 <div class="deal-room-side partner" id="roomSidePartner">
@@ -1650,7 +1491,7 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 <span class="val" id="roomTheirMoneyVal">0 ₽</span>
 </div>
 </div>
-<div class="deal-room-inv-title">Инвентарь партнёра</div>
+<div class="deal-room-inv-title">Инвентарь партнёра — только смотреть</div>
 <div class="deal-room-inv" id="roomTheirInv"></div>
 </div>
 </div>
@@ -1781,7 +1622,7 @@ fbProfile.active=isActive;
 fbProfile.miningRate=rate;
 fbProfile.inventoryCount=state.inventory.length;
 fbProfile.inventory=invForSync;
-}catch(e){}} 
+}catch(e){}}
 
 const RARITY={STANDARD:0,TAXI:1,POLICE:2,MILITARY:3,DIPLOMAT:4};
 const RARITY_NAMES=['Стандарт','Таксист','Ментовской','Военка','Дипломат'];
@@ -2222,7 +2063,7 @@ function renderTargetAlts(){
   if(!altsEl) return;
   altsEl.innerHTML = '';
   if(!state.targetAlts.length){
-    altsEl.innerHTML = '<div style="color:#52627a;font-size:11px;text-align:center;padding:10px;">Нет альтернатив</div>';
+    altsEl.innerHTML = '<div style="color:#52627a;font-size:11px;text-align:center;padding:10px;">Нет альтернатив — нажмите ⟳</div>';
     return;
   }
   const bet = calcBet();
@@ -2349,6 +2190,7 @@ function performUpgrade(){
   btn.textContent = 'Крутим...';
   skipBtn.style.display = 'block';
   document.querySelectorAll('.mult-btn').forEach(b => b.disabled = true);
+  if($('refreshTargetBtn')) $('refreshTargetBtn').disabled = true;
   $('addMoneySlider').disabled = true;
 
   wrap.classList.remove('result-win','result-lose');
@@ -2426,6 +2268,7 @@ function performUpgrade(){
       btn.disabled = false;
       btn.textContent = 'Прокачать';
       document.querySelectorAll('.mult-btn').forEach(b => b.disabled = false);
+      if($('refreshTargetBtn')) $('refreshTargetBtn').disabled = false;
       $('addMoneySlider').disabled = false;
       renderInputSlots();
       renderTargetPanel();
@@ -2515,6 +2358,13 @@ function bindUpgraderControls(){
       regenerateTarget();
     });
   });
+  const refreshBtn = $('refreshTargetBtn');
+  if(refreshBtn){
+    refreshBtn.addEventListener('click', () => {
+      if(state.upgradeRunning) return;
+      regenerateTarget();
+    });
+  }
   const addSlider = $('addMoneySlider');
   if(addSlider){
     addSlider.addEventListener('input', e => {
@@ -3010,6 +2860,8 @@ const hours=Math.floor(limitSec/3600);
 const mins=Math.floor((limitSec%3600)/60);
 const secs=Math.floor(limitSec%60);
 $('miningLimit').textContent=String(hours).padStart(2,'0')+':'+String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');}
+if(!state.freeCaseAvailable&&state.lastFreeCaseTime&&(Date.now()-state.lastFreeCaseTime)>=DAILY_FREE_COOLDOWN){
+state.freeCaseAvailable=true;renderCasePicker();}
 updateMarket();checkBreaks();}
 let historyFilter='all';
 function addHistory(type,desc,amount){state.history.unshift({type,desc,amount,time:Date.now()});
@@ -3810,6 +3662,13 @@ setInterval(updateBlackmarketTimer,1000);
 setInterval(()=>{if($('page-blackmarket').classList.contains('active'))renderBlackmarket();},10000);
 updateMarket();
 
+setInterval(()=>{
+if(fbUser){
+const{doc,updateDoc}=window.fbFuncs;
+updateDoc(doc(window.fbDb,'users',fbUser.uid),{lastSeen:Date.now()}).catch(()=>{});
+}
+},30000);
+
 /* Проверка ежедневного бесплатного кейса — независимо от вкладки */
 setInterval(()=>{
   if(!state.freeCaseAvailable && state.lastFreeCaseTime && (Date.now()-state.lastFreeCaseTime)>=DAILY_FREE_COOLDOWN){
@@ -3819,13 +3678,6 @@ setInterval(()=>{
     notify('Бесплатный кейс снова доступен!','success');
   }
 }, 30000);
-
-setInterval(()=>{
-if(fbUser){
-const{doc,updateDoc}=window.fbFuncs;
-updateDoc(doc(window.fbDb,'users',fbUser.uid),{lastSeen:Date.now()}).catch(()=>{});
-}
-},30000);
 
 initFirebaseProfile();
 })();
