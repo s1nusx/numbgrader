@@ -87,8 +87,6 @@ border:1px solid #171e29;border-radius:12px;padding:16px; display:flex; flex-dir
 .panel-head{display:flex;justify-content:space-between;align-items:center;
 font-size:11px;color:#6d7c92;font-weight:800;letter-spacing:1.2px;
 text-transform:uppercase;margin-bottom:14px;}
-
-/* ИЗМЕНЕНИЕ СЕТКИ ДЛЯ СИММЕТРИИ */
 .upgrid{display:grid;grid-template-columns:1fr 340px 1fr;gap:18px;align-items:stretch;}
 @media(max-width:1050px){.upgrid{grid-template-columns:1fr;}}
 .slots{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
@@ -926,45 +924,46 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 .plate-info-row .lbl{color:#7d8ca3;font-weight:700;}
 .plate-info-row .val{color:#f0b90b;font-weight:900;}
 
-/* КОМПАКТНЫЙ МОБИЛЬНЫЙ ИНТЕРФЕЙС */
+/* ============ МОБИЛЬНЫЙ ИНТЕРФЕЙС (СТИЛЬ КАК В ФАЙЛЕ, НО БЕЗ БАГОВ) ============ */
 @media(max-width:768px){
-  body{padding:6px;}
-  .content{padding:10px;}
+  body{padding:8px;}
+  .content{padding:14px;}
+  .tab{padding:8px 12px;font-size:10px;}
+
+  /* НЕ переставляем колесо — оставляем в потоке, чтобы не выпадало */
   .upgrid{grid-template-columns:1fr;gap:12px;}
-  
-  /* Уменьшаем колесо и переставляем местами для мобилки */
-  .center-col{order: -1;}
-  .wheel-wrap{width:180px;height:180px;margin-bottom:10px;}
-  .wheel-percent{font-size:28px;}
-  .wheel-label{font-size:9px;margin-top:6px;}
-  
+
   .slots{grid-template-columns:repeat(4,1fr);gap:6px;}
   .slot{padding:4px;}
   .slot.empty::before{font-size:20px;}
-  
+
   .plate.plate-small{height:26px;}
   .plate.plate-small .main{font-size:12px;}
   .plate.plate-small .region{font-size:10px;}
   .plate.plate-small .rus{font-size:4px;}
   .plate.plate-small .flag{width:9px;height:6px;}
   .plate.plate-small .right{min-width:20px;padding:1px 3px;}
-  
+
   .mult-btn{padding:6px 10px;font-size:11px;min-width:50px;}
   .btn{padding:10px;font-size:13px;}
   .page-title{font-size:16px;margin-bottom:12px;}
   .page-title small{font-size:9px;}
   .panel-head{font-size:10px;margin-bottom:8px;}
-  
+
   .sumrow{margin-top:6px;}
   .add-money-box{margin-top:8px;padding:6px 8px;}
   .add-money-head{font-size:10px;}
-  
-  .target-panel{padding:10px;min-height:auto; height: auto;}
+
+  /* Колесо — 200×200, origin 140 остаётся в центре SVG (viewBox 280) */
+  .wheel-wrap{width:200px;height:200px;margin:0 auto 10px;}
+  .wheel-percent{font-size:28px;}
+  .wheel-label{font-size:9px;margin-top:4px;}
+
+  .target-panel{padding:10px;min-height:auto;height:auto;}
   .target-main-wrap{padding:4px 0;min-height:60px;}
   .target-price-row{font-size:11px;}
   .target-price-row .val{font-size:14px;}
-  
-  /* Список альтернатив ограничиваем по высоте, чтобы не листать */
+
   .target-alts{max-height:140px;padding-top:6px;}
   .alt-item{padding:4px 6px;gap:6px;}
   .alt-item .alt-plate-wrap .plate{height:24px;}
@@ -972,15 +971,15 @@ border-bottom:1px solid #1a2230;font-size:13px;}
   .alt-item .alt-plate-wrap .plate .region{font-size:9px;}
   .alt-item .alt-price{font-size:11px;}
   .alt-item .alt-chance{font-size:9px;}
-  
+
   .target-refresh-big{padding:8px;font-size:11px;}
-  
+
   .inv-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;}
   .inv-card{padding:6px;gap:4px;}
   .inv-card .inv-price{font-size:11px;}
   .inv-card .inv-rarity{font-size:8px;}
   .inv-card .sell{padding:5px;font-size:9px;}
-  
+
   .case-picker-grid{grid-template-columns:1fr 1fr;gap:10px;}
   .case-picker-card{padding:16px 10px;border-radius:12px;gap:8px;}
   .case-picker-card .case-picker-name{font-size:13px;}
@@ -988,12 +987,12 @@ border-bottom:1px solid #1a2230;font-size:13px;}
   .case-picker-card .case-picker-desc{font-size:10px;}
   .case-picker-card .case-picker-chance{font-size:9px;padding:6px;}
   .case-3d{width:100px;height:70px;}
-  
-  .craft-wrap { transform: scale(0.95); transform-origin: top center; }
+
+  .craft-wrap{transform:scale(0.95);transform-origin:top center;}
   .craft-slots{grid-template-columns:repeat(5,1fr);gap:4px;}
   .craft-slot{padding:2px;}
   .craft-slot .craft-price{font-size:8px;margin-top:2px;}
-  
+
   .mining-header{grid-template-columns:repeat(2,1fr);gap:8px;}
   .mining-stat{padding:10px;}
   .mining-stat .lbl{font-size:9px;}
@@ -1008,15 +1007,15 @@ border-bottom:1px solid #1a2230;font-size:13px;}
   .set-row .set-name{font-size:12px;}
   .set-row .set-progress{font-size:10px;}
   .set-row .set-bonus{font-size:12px;}
-  
+
   .blackmarket-grid{grid-template-columns:1fr 1fr;gap:8px;}
   .bm-card{padding:10px;gap:6px;}
   .bm-card .bm-price{font-size:13px;}
   .bm-card .bm-buy{padding:7px;font-size:10px;}
-  
+
   .deals-input-row{flex-direction:column;}
   .deals-find-btn{padding:12px;}
-  
+
   .profile-avatar-big{width:80px;height:80px;font-size:32px;}
   .profile-name-display{font-size:18px;}
   .profile-tab{padding:7px 12px;font-size:10px;}
@@ -1024,10 +1023,16 @@ border-bottom:1px solid #1a2230;font-size:13px;}
   .top-subtab{padding:6px 10px;font-size:10px;}
   .deal-room-slots{grid-template-columns:repeat(2,1fr);}
   .deal-room-actions .btn{max-width:100%;}
+
+  /* Модалка влезает на мелком экране */
+  .modal-bg{padding:8px;}
+  .modal{max-width:calc(100vw - 16px) !important;padding:14px;max-height:calc(100vh - 24px);}
+  .result-modal .modal{max-width:calc(100vw - 16px) !important;}
+  .modal h3{font-size:12px;}
 }
 
 @media(max-width:400px){
-  .wheel-wrap{width:160px;height:160px;}
+  .wheel-wrap{width:170px;height:170px;}
   .wheel-percent{font-size:24px;}
   .target-alts{max-height:120px;}
 }
@@ -1238,7 +1243,7 @@ border-bottom:1px solid #1a2230;font-size:13px;}
 </div>
 </div>
 <div class="page" id="page-blackmarket">
-<div class="page-title">Чёрный рынок<small>эксклюзивные лоты - обновление раз в 5 минут</small></div>
+<div class="page-title">Чёрный рынок<small>эксклюзивные лоты — обновление раз в 5 минут</small></div>
 <div class="blackmarket-header">
 <div class="bm-title">◆ ЭЛИТНЫЕ ЛОТЫ</div>
 <div class="bm-timer">Обновление: <span id="bmTimer">05:00</span></div>
@@ -2053,7 +2058,7 @@ notify('Синхронизировано с другой вкладкой','');}
 function pulseCard(cardEl){if(!cardEl)return;cardEl.classList.remove('pulse');void cardEl.offsetWidth;cardEl.classList.add('pulse');setTimeout(()=>cardEl.classList.remove('pulse'),600);}
 
 /* ============================================================
-   АПГРЕЙДЕР — КРУТИТСЯ РОТОР, СТРЕЛКА БЕЛАЯ СВЕРХУ
+   АПГРЕЙДЕР — ЛОГИКА ИЗ МОЕГО ПОСЛЕДНЕГО КОДА (РАБОТАЕТ)
    ============================================================ */
 
 const WHEEL_CIRC = 2 * Math.PI * 120;
@@ -2092,12 +2097,10 @@ function calcBet(){
 }
 
 function generateTarget(bet, mult){
-  // Добавляем разброс к желаемой цене. Желаемая цена = (bet / (desiredChance/100)) * mult
   const baseTarget = (bet / (state.desiredChance / 100)) * mult;
-  // Разброс от -3% до +3%
   const variance = 0.97 + Math.random() * 0.06;
   const desiredPrice = Math.round(baseTarget * variance);
-  
+
   const rarity = rarityForPrice(desiredPrice);
   let best = null;
   let bestDiff = Infinity;
@@ -2143,7 +2146,6 @@ function renderTargetAlts(){
   }
   const bet = calcBet();
   state.targetAlts.forEach(altItem => {
-    // Динамический шанс для каждой альтернативы на основе её реальной цены
     const realChance = (bet / altItem.price) * 100;
     const div = document.createElement('div');
     div.className = 'alt-item' + (state.targetItem && altItem.id === state.targetItem.id ? ' selected' : '');
@@ -2266,7 +2268,7 @@ function performUpgrade(){
   btn.textContent = 'Крутим...';
   skipBtn.style.display = 'block';
   document.querySelectorAll('.mult-btn').forEach(b => b.disabled = true);
-  $('refreshTargetBtn').disabled = true;
+  if($('refreshTargetBtn')) $('refreshTargetBtn').disabled = true;
   $('addMoneySlider').disabled = true;
 
   wrap.classList.remove('result-win','result-lose');
@@ -2344,7 +2346,7 @@ function performUpgrade(){
       btn.disabled = false;
       btn.textContent = 'Прокачать';
       document.querySelectorAll('.mult-btn').forEach(b => b.disabled = false);
-      $('refreshTargetBtn').disabled = false;
+      if($('refreshTargetBtn')) $('refreshTargetBtn').disabled = false;
       $('addMoneySlider').disabled = false;
       renderInputSlots();
       renderTargetPanel();
@@ -2795,7 +2797,7 @@ function doCraft(){
 }
 
 /* ============ ЧЁРНЫЙ РЫНОК ============ */
-function generateBlackmarket(){const lots=[];const count=10+randInt(6); // 10-15 лотов
+function generateBlackmarket(){const lots=[];const count=10+randInt(6);
 for(let i=0;i<count;i++){const isBlat=Math.random()<0.3;
 if(isBlat){const keys=Object.keys(BLAT_SERIES);
 const fullPlate=randFrom(keys);
@@ -3738,16 +3740,23 @@ setInterval(updateBlackmarketTimer,1000);
 setInterval(()=>{if($('page-blackmarket').classList.contains('active'))renderBlackmarket();},10000);
 updateMarket();
 
+/* Ежедневный бесплатный кейс — независимо от вкладки */
+setInterval(()=>{
+  if(!state.freeCaseAvailable && state.lastFreeCaseTime && (Date.now()-state.lastFreeCaseTime)>=DAILY_FREE_COOLDOWN){
+    state.freeCaseAvailable = true;
+    save();
+    renderCasePicker();
+    notify('Бесплатный кейс снова доступен!','success');
+  }
+}, 30000);
+
 setInterval(()=>{
 if(fbUser){
 const{doc,updateDoc}=window.fbFuncs;
 updateDoc(doc(window.fbDb,'users',fbUser.uid),{lastSeen:Date.now()}).catch(()=>{});
 }
 },30000);
-if(fbUser){
-const{doc,updateDoc}=window.fbFuncs;
-updateDoc(doc(window.fbDb,'users',fbUser.uid),{lastSeen:Date.now()}).catch(()=>{});
-}
+
 initFirebaseProfile();
 })();
 </script>
